@@ -6,7 +6,7 @@ Accrete Genetics & Breeding (AGB) is an opens-source laboratory information mana
 AGB was designed based on a maize genetics and breeding program but should be compatible with other programs.
 
 # Programing design
-This system is fully integrated in the Eclipse programming environment and is platform-independent. AGB is programmed in Java Swing using the Spring framework for control of software interface components and the Hibernate framework for mapping data from two relational databases, AGB-Manager and AGB-Data. AGB also connects to R providing extensibility for AGB through the he vast collection of packages available via R. Currently, the R API is only used for the experimental design module, calling functions from the agricolae package for randomizing trials.
+This system is fully integrated in the Eclipse programming environment and is platform-independent. AGB is programmed in Java Swing using the Spring framework for control of software interface components and the Hibernate framework for mapping data from two relational databases, AGB-Manager and AGB-Data. AGB also connects to R providing extensibility for AGB through the vast collection of packages available via R. Currently, the R API is only used for the experimental design module, calling functions from the agricolae package for randomizing trials.
 
 # Developers
 Ningjing Tian, Naveen Kumar, Matthew Saponaro, Chinmay Pednekar, Teclemariam Weldekidan, Randy Wisser
