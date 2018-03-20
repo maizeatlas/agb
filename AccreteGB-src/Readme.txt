@@ -1,0 +1,1 @@
+This source code folder can be imported as Maven project in Eclipse. 

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+   
+	<session-factory>
+		<!--Database connection settings-->				 
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<!-- SQL dialect -->
+		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+		<!-- Enable Hibernate's automatic session context management -->
+		<property name="current_session_context_class">thread</property>
+		<!-- Disable the second-level cache -->
+		<!-- property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property-->
+		<!-- Echo all executed SQL to stdout -->
+		<!-- property name="show_sql">false</property-->
+		<!-- <property name="hbm2ddl.auto">validate</property> -->
+		<property name="c3p0.min_size">5</property>
+		<property name="c3p0.max_size">1000</property>
+		<property name="c3p0.timeout">1800</property>
+		<property name="c3p0.max_statements">500000</property>
+		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property> 
+		<property name="hibernate.enable_lazy_load_no_trans">true</property> 
+		<property name="hibernate.jdbc.batch_size">1000</property>   
+		<property name="hibernate.order_inserts">true</property>
+		<property name="hibernate.order_updates">true</property>
+		<property name="hibernate.jdbc.batch_versioned_data">true</property>
+		<property name="show_sql">false</property>
+		<property name="hibernate.cache.use_second_level_cache">false</property>
+        <mapping class="org.accretegb.modules.hibernate.PassportSynonym" />
+        <mapping class="org.accretegb.modules.hibernate.Mate" />
+        <mapping class="org.accretegb.modules.hibernate.Field" />
+        <mapping class="org.accretegb.modules.hibernate.StockPacketContainer" />
+        <mapping class="org.accretegb.modules.hibernate.ObservationUnitSample" />
+        <mapping class="org.accretegb.modules.hibernate.Experiment" />
+        <mapping class="org.accretegb.modules.hibernate.Classification" />
+        <mapping class="org.accretegb.modules.hibernate.FieldOwner" />
+        <mapping class="org.accretegb.modules.hibernate.ExperimentFactorValue" />
+        <mapping class="org.accretegb.modules.hibernate.MateMethodConnect" />
+        <mapping class="org.accretegb.modules.hibernate.PassportGroup" />
+        <mapping class="org.accretegb.modules.hibernate.Passport" />
+        <mapping class="org.accretegb.modules.hibernate.Stock" />
+        <mapping class="org.accretegb.modules.hibernate.StockGeneration" />
+        <mapping class="org.accretegb.modules.hibernate.MeasurementUnit" />
+        <mapping class="org.accretegb.modules.hibernate.Taxonomy" />
+        <mapping class="org.accretegb.modules.hibernate.ContainerLocation" />
+        <mapping class="org.accretegb.modules.hibernate.Project" />
+        <mapping class="org.accretegb.modules.hibernate.MeasurementParameter" />
+        <mapping class="org.accretegb.modules.hibernate.MateMethod" />
+        <mapping class="org.accretegb.modules.hibernate.ObservationUnit" />
+        <mapping class="org.accretegb.modules.hibernate.PassportSet" />
+        <mapping class="org.accretegb.modules.hibernate.Users" />
+        <mapping class="org.accretegb.modules.hibernate.ExperimentFactor" />
+        <mapping class="org.accretegb.modules.hibernate.Location" />
+        <mapping class="org.accretegb.modules.hibernate.MeasurementValue" />
+        <mapping class="org.accretegb.modules.hibernate.Source" />
+        <mapping class="org.accretegb.modules.hibernate.CollectionInfo" />
+        <mapping class="org.accretegb.modules.hibernate.MeasurementType" />
+        <mapping class="org.accretegb.modules.hibernate.StockPacket" />
+        <mapping class="org.accretegb.modules.hibernate.StockComposition" />	
+        
+      </session-factory>
+</hibernate-configuration>

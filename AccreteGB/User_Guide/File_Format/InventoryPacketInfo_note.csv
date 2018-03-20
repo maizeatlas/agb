@@ -1,0 +1,4 @@
+This is a csv file that can be imported into the table in Packets Inventory of Inventory module. This file is used to add weight for packets.
+
+14.1.19716.02225.0000001#1	—> packet name. (= stock name + # + number of the packet)123				-> weight14.1.19716.02225.0000001#2	—> packet name413				-> weight14.1.19716.02225.0000004#1	—> packet name
+556				-> weight

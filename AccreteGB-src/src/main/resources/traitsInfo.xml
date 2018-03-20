@@ -1,0 +1,19 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanel" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Bean starts -->
+	<bean id="traitsInfoPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanel">
+		<property name="panelIndex" value="0" />
+	</bean>
+	<!-- Parent Bean ends   -->
+	
+	<!-- Child Bean starts -->
+	
+	<!-- Child Bean ends   -->	
+</beans>

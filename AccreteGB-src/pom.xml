@@ -1,0 +1,204 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.accretegb</groupId>
+  <artifactId>AccreteGB</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>openaccretegb-common</name>
+  <url>http://maven.apache.org</url>
+
+  <repositories>
+  	<repository>
+    	<id>my-local-repo</id>
+    	<url>file://${basedir}/lib</url>
+  	</repository>
+  </repositories>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <org.springframework.version>4.0.3.RELEASE</org.springframework.version>
+  </properties>
+
+  <dependencies> 
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+	<!-- Local libraries -->
+	<dependency>
+		<groupId>no.tornado.databinding</groupId>
+		<artifactId>jxdatepicker-support</artifactId>
+		<version>1.0</version>
+	</dependency>
+    <dependency>
+		 <groupId>org.json</groupId>
+		<artifactId>json</artifactId>
+		<version>20131018</version>
+	</dependency>
+    
+    <dependency>
+      <groupId>org.freixas.jcalendar</groupId>
+      <artifactId>jcalendar</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    
+    <!--<dependency>   
+	  groupId>com.github.jbytecode</groupId>
+	<artifactId>RCaller</artifactId>
+	<version>2.8</version>
+   </dependency>-->
+   
+	<dependency>
+   	 <groupId>org.rosuda.REngine</groupId>
+   	 <artifactId>Rserve</artifactId>
+   	 <version>1.8.1</version>
+	</dependency>
+   
+   
+    <dependency>
+      <groupId>org.commons</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.accretegb.hibernate</groupId>
+      <artifactId>accretegb-service</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <!-- MySQL Database Connectivity -->
+    <dependency>
+	  <groupId>mysql</groupId>
+	  <artifactId>mysql-connector-java</artifactId>
+	  <version>5.1.6</version>
+    </dependency>
+    <!-- Spring Framework -->
+    <dependency>
+ 		<groupId>org.springframework</groupId>
+ 		<artifactId>spring-core</artifactId>
+ 		<version>${org.springframework.version}</version>
+ 	</dependency>
+ 	<dependency>
+ 		<groupId>org.springframework</groupId>
+ 		<artifactId>spring-expression</artifactId>
+ 		<version>${org.springframework.version}</version>
+ 	</dependency>
+	<dependency>
+ 		<groupId>org.springframework</groupId>
+ 		<artifactId>spring-beans</artifactId>
+ 	<version>${org.springframework.version}</version>
+ 	</dependency>
+ 	<dependency>
+ 		<groupId>org.springframework</groupId>
+ 		<artifactId>spring-aop</artifactId>
+ 		<version>${org.springframework.version}</version>
+ 	</dependency>
+ 	<dependency>
+ 		<groupId>org.springframework</groupId>
+ 		<artifactId>spring-context</artifactId>
+ 		<version>${org.springframework.version}</version>
+ 	</dependency>
+ 	<dependency>
+ 		<groupId>org.springframework</groupId>
+ 		<artifactId>spring-context-support</artifactId>
+ 		<version>${org.springframework.version}</version>
+ 	</dependency>
+    <!--  Hibernate framework -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search</artifactId>
+     <version>4.3.0.Final</version>
+    </dependency>
+	<dependency>
+		<groupId>net.java.dev.swing-layout</groupId>
+		<artifactId>swing-layout</artifactId>
+		<version>1.0.2</version>
+	</dependency>
+	<dependency>
+	   <groupId>com.google.code.gson</groupId>
+	   <artifactId>gson</artifactId>
+	   <version>2.8.0</version>
+	</dependency>
+	<!-- MigLayout Layout -->
+	<dependency>
+		<groupId>com.miglayout</groupId>
+		<artifactId>miglayout</artifactId>
+		<version>3.7.3.1</version>
+	</dependency>
+	<!-- cp30 and Hibernate cp30 lib -->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-c3p0</artifactId>
+		<version>4.2.7.Final</version>
+	</dependency>
+	<dependency>
+		<groupId>commons-beanutils</groupId>
+		<artifactId>commons-beanutils</artifactId>
+		<version>1.8.3</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-lang3</artifactId>
+		<version>3.0</version>
+	</dependency> 
+	
+	<dependency>
+	<groupId>com.jtattoo</groupId>
+	<artifactId>JTattoo</artifactId>
+	<version>1.6.7</version>
+	</dependency>
+	
+	<dependency>
+	<groupId>org.swinglabs</groupId>
+	<artifactId>swingx</artifactId>
+	<version>1.6.1</version>
+    </dependency>
+    <dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-core</artifactId>      
+    <version>3.0.1.RELEASE</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework.security</groupId>
+	    <artifactId>spring-security-openid</artifactId>
+	    <version>3.0.1.RELEASE</version>
+	</dependency>
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-config</artifactId>
+        <version>3.0.1.RELEASE</version>
+    </dependency>
+     <dependency>
+	    <groupId>javax.mail</groupId>
+	    <artifactId>mail</artifactId>
+	    <version>1.4</version>
+	</dependency>
+	<dependency>
+	    <groupId>javax.activation</groupId>
+	    <artifactId>activation</artifactId>
+	    <version>1.1.1</version>
+	</dependency>
+  </dependencies>
+  
+  
+  <build>
+ 	<plugins>
+    	<plugin>
+			  <groupId>org.springframework.boot</groupId>
+			  <artifactId>spring-boot-maven-plugin</artifactId>
+			  <version>1.2.5.RELEASE</version>
+			  <executions>
+			    <execution>
+			      <goals>
+			        <goal>repackage</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+		</plugin>
+ 	</plugins>
+  </build>  
+</project>

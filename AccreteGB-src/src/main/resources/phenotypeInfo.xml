@@ -1,0 +1,117 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!-- Super Parent Bean starts -->
+    <bean id="parentTabComponentPanelPhenotypeInfo" class="javax.swing.JPanel" />
+    <!-- Super Parent Bean ends -->
+
+    <!-- Parent Bean starts -->
+    <bean id="phenotypeInfoPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelPhenotypeInfo">
+        <property name="panelIndex" value="0" />
+    </bean>
+    <!--  Parent Bean ends  -->
+
+
+    <!-- Field Table Starts -->
+    <bean id="phenotypeFieldTableInfo"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+        <property name="columnNames">
+            <list>
+                <value>Select</value>
+                <value>Field ID</value>
+                <value>Field Name</value>
+                <value>Field Number</value>
+                <value>Altitude</value>
+                <value>City</value>
+                <value>State</value>
+                <value>Country</value>
+                <value>ZipCode</value>
+            </list>
+        </property>
+        <property name="checkBoxHeader" value="false"/>
+    </bean>
+
+    <!-- Field Table Ends -->
+
+    <!-- Field Table Panel Starts -->
+
+    <bean id="fieldPhenotypeTablePanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+        <property name="horizontalList">
+            <list>
+                <value>search</value>
+                <value>gap</value>
+                <value>columnSelector</value>
+            </list>
+        </property>
+        <property name="table" ref="phenotypeFieldTableInfo" />
+    </bean>
+    <!-- Field Table Panel Ends -->
+
+    <!-- Start Calendar starts -->
+    <bean id="startPhenotypeCustomCalendar" class="org.accretegb.modules.customswingcomponent.CustomCalendar" init-method="initialize" />
+    <!-- Start Calendar ends -->
+
+    <!-- End Calendar starts -->
+    <bean id="endPhenotypeCustomCalendar" class="org.accretegb.modules.customswingcomponent.CustomCalendar" init-method="initialize" />
+    <!-- End Calendar ends -->
+    
+    <!-- End Calendar starts -->
+    <bean id="tagnameFieldPhenotype" class="org.accretegb.modules.customswingcomponent.CustomCalendar" init-method="initialize" />
+    <!-- End Calendar ends -->
+    
+
+    <!-- Child Bean starts  -->
+
+    <bean id="phenotypeProgressBar"      class="javax.swing.JProgressBar">
+        <constructor-arg index="0" type="int" value="0" />
+        <constructor-arg index="1" type="int" value="100" />
+    </bean>
+    <bean id="phenotypeTableOutput" class="org.accretegb.modules.customswingcomponent.Table" init-method="initialize">
+        <property name="columnNames">
+            <list>
+                <value>Tag Name</value>
+                <value>Parameter Name</value>
+                <value>Value</value>
+                <value>Unit</value>
+                <value>Measurement Type</value>
+                <value>Date Measured</value>
+               
+            </list>
+        </property>
+    </bean>
+    <bean id="startPhenotypePlot"        class="javax.swing.JTextField">
+        <constructor-arg index="0" type="int" value="24" />
+    </bean>
+    <bean id="endPhenotypePlot"          class="javax.swing.JTextField">
+        <constructor-arg index="0" type="int" value="24" />
+    </bean>
+    <bean id="phenotypeProgressBarValue" class="javax.swing.JLabel">
+        <constructor-arg index="0" type="String" value="Progress : 0 %" />
+    </bean>
+    <bean id="phenotypeZipCode"          class="javax.swing.JTextField">
+        <constructor-arg index="0" type="int" value="16" />
+    </bean>
+    <bean id="phenotypeSubmitButton"     class="javax.swing.JButton">
+        <constructor-arg index="0" type="String" value="Search" />
+    </bean>
+    <bean id="exportPhenotypeButton"     class="javax.swing.JButton">
+        <constructor-arg index="0" type="String" value="Export" />
+    </bean>
+   
+
+    <bean id="phenotypeInfoChildPanel0" class="org.accretegb.modules.phenotype.PhenotypeInfoPanel"
+          parent="phenotypeInfoPanel0" init-method="initialize">
+        <property name="progressBar"      ref="phenotypeProgressBar" />
+        <property name="tableOutput"      ref="phenotypeTableOutput" />
+        <property name="startPlot"        ref="startPhenotypePlot" />
+        <property name="endPlot"          ref="endPhenotypePlot" />
+        <property name="startDate"        ref="startPhenotypeCustomCalendar" />
+        <property name="endDate"          ref="endPhenotypeCustomCalendar" />
+        <property name="progressBarValue" ref="phenotypeProgressBarValue" />
+        <property name="fieldTablePanel"  ref="fieldPhenotypeTablePanel" />
+        <property name="submitButton"     ref="phenotypeSubmitButton" />
+        <property name="exportButton"     ref="exportPhenotypeButton" />
+    </bean>
+    <!-- Child Bean ends    -->
+</beans>

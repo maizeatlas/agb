@@ -1,0 +1,154 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelstockAnnotation" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Bean starts -->
+	<bean id="stockAnnotationPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelstockAnnotation">
+		<property name="panelIndex" value="0" />
+	</bean>
+	<!--  Parent Bean ends  -->
+
+
+    <!-- Field Table Starts -->
+    	<bean id="stockTableInfo"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Stock Name</value>
+				<value>Stock id</value>
+				<value>Passport id</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>	
+				<value>Generation</value>
+				<value>Classification Code</value>
+				<value>Classification id</value>
+				<value>Population</value>
+				<value>Taxonomy id</value>
+			</list>
+		</property>
+		 <property name="showColumns"> 
+	      <list>
+	            <value>Select</value>
+	            <value>Stock Name</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>	
+				<value>Generation</value>
+				<value>Classification Code</value>
+				<value>Population</value>
+	      </list>
+	      </property>
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+
+    <!-- Field Table Ends -->
+    
+    <!-- Field Table Panel Starts -->
+	
+	<bean id="stockTablePanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>gap</value>
+	          <value>columnSelector</value>
+	          <value>delete</value>
+	          <value>refresh</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="stockTableInfo" />	
+	</bean>
+	<!-- Field Table Panel Ends -->
+    
+	<!-- Start Calendar starts -->
+	<bean id="startCustomCalendar" class="org.accretegb.modules.customswingcomponent.CustomCalendar" init-method="initialize" />
+	<!-- Start Calendar ends -->
+	
+	<!-- End Calendar starts -->
+	<bean id="endCustomCalendar" class="org.accretegb.modules.customswingcomponent.CustomCalendar" init-method="initialize" />
+	<!-- End Calendar ends -->
+	
+	
+	<!-- Child Bean starts  -->
+	 <bean id="classificationTable1"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Classification id</value>
+				<value>Classification Code</value>
+				<value>Classification Type</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="true" />
+	</bean>
+    <!-- Classification Code Table Ends -->
+    
+    <!--  Classification Code Table Panel Starts -->
+	<bean id="classificationPanel1" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>upload</value>
+	          <value>clear</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="classificationTable1" />	
+	</bean>
+	<!-- Classification Code Table Panel Ends -->
+    
+    <!-- Taxonomy Table Starts -->
+    <bean id="taxonomyTable1"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Taxonomy id</value>
+				<value>Genus</value>
+				<value>Species</value>	
+				<value>Subspeicies</value>
+				<value>Subtaxa</value>
+				<value>Race</value>
+				<value>Common name</value>
+				<value>Population</value>
+				<value>Gto</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="true" />
+	</bean>
+    <!-- Taxonomy Table Ends -->
+    
+    <!--  Taxonomy Table Panel Starts -->
+	<bean id="taxonomyPanel1" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>upload</value>
+	          <value>clear</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="taxonomyTable1" />	
+	</bean>
+	<!-- Taxonomy Table Panel Ends -->
+	
+	
+	<bean id="stockAnnotationChildPanel0" class="org.accretegb.modules.germplasm.stockannotation.StockAnnotationPanel" 
+		  parent="stockAnnotationPanel0" init-method="initialize">	
+		<property name="stockTablePanel"  ref="stockTablePanel" />
+		<property name="classificationTablePanel" ref="classificationPanel1" />
+		<property name="taxonomyTablePanel" ref="taxonomyPanel1" />
+		<property name="progressBar"      ref="progressBar" />
+	</bean>
+	<!-- Child Bean ends    -->
+</beans>

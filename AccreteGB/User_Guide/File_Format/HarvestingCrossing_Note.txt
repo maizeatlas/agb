@@ -1,0 +1,44 @@
+This file can be imported into the table in Crossing Record tab of Harvesting group. In order to import the data successfully, please make sure all tags exist in the database.
+CR, BC, SF, SB, PP, 1MNF_BC and 1MNF_CR are the supported crossing types. 
+
+
+CR                       ----------> crossing type
+16.1.19716.00001.0000000 ----------> female tag
+2.1                      ----------> male tag represented by <row number>.<plant number>
+end
+
+
+BC                       ----------> crossing type
+16.1.19716.00002.0000000 ----------> female tag
+6.0                      ----------> male tag represented by <row number>.<plant number>
+method                   ----------> optional
+end
+
+SF
+16.1.19716.00001.0000001 ----------> female tag
+end
+
+SB
+16.1.19716.00001.0000008 ----------> female tag
+end
+
+PP
+16.1.19716.00001.0000003  ----------> female tag
+1.0  ----------> male tag represented by <row number>.<plant number>
+2.0  ----------> male tag represented by <row number>.<plant number>
+3.0  ----------> male tag represented by <row number>.<plant number>
+end
+
+1MNF_BC
+16.1.19716.00001.0000004  ----------> male tag
+5.0  ----------> female tag represented by <row number>.<plant number>
+6.0  ----------> female tag represented by <row number>.<plant number>
+7.0  ----------> female tag represented by <row number>.<plant number>
+end
+
+1MNF_CR
+16.1.19716.00001.0000004  ----------> male tag
+5.0  ----------> female tag represented by <row number>.<plant number>
+6.0  ----------> female tag represented by <row number>.<plant number>
+7.0  ----------> female tag represented by <row number>.<plant number>
+end

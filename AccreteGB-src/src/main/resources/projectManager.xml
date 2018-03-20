@@ -1,0 +1,59 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelProjectManager" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Bean starts -->
+	<bean id="projectManagerPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelProjectManager">
+		<property name="panelIndex" value="0" />
+	</bean>
+	<!--  Parent Bean ends  -->
+	
+	<!-- Field Table starts -->
+	<bean id="allTable" class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+			    <value>Select</value>
+				<value>Project Name</value>
+				<value>Owner</value>
+				<value>Token Holder</value>
+				<value>Expiration Date</value>				
+				<value>Created</value>
+				<value>Last Modified</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	<!-- Field Table ends -->
+	
+	<bean id="allTablePanel"  class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel" init-method="initialize">
+		<property name="horizontalList">
+		    <list>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>delete</value>
+	          <value>refresh</value>	        
+	      </list>
+		</property>
+		<property name="table" ref="allTable"/>
+	</bean>	
+	
+	
+	<bean id="projectManagerAllPanel" class="org.accretegb.modules.projectmanager.ProjectManagerAllPanel" init-method="initialize">		
+	   <property name="allTablePanel" ref="allTablePanel"/>
+	</bean>
+	
+	
+	
+	<!-- Child Bean starts  -->
+
+	<bean id="projectManagerChildPanel0" class="org.accretegb.modules.projectmanager.ProjectManagerTab" 
+		  parent="projectManagerPanel0" init-method="initialize">
+		<property name="projectManagerAllPanel" ref="projectManagerAllPanel"/>
+	</bean>
+	
+	<!-- Child Bean ends    -->
+</beans>

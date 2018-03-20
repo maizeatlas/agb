@@ -1,0 +1,80 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- ToolBar Buttons starts -->
+	<bean id="projectManagerToolBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Project Manager" />
+	</bean>
+	<bean id="outsideSeedToolBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Outside Seed" />
+	</bean>
+	
+	<bean id="stockSelectionToolBarButton" class="javax.swing.JButton">
+	    <constructor-arg index="0" type="java.lang.String" value="Stocks Information" />
+	</bean>
+
+	<bean id="previousPlantingToolBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Preplanting Information" />
+	</bean>
+
+    <bean id="phenotypeToolBarButton" class="javax.swing.JButton">
+        <constructor-arg index="0" type="java.lang.String" value="Phenotype Information" />
+    </bean>
+
+    <bean id="plantingToolBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Planting Information" />
+	</bean>
+	
+	<bean id="harvestingToolBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Harvesting" />
+	</bean>
+	<bean id="inventoryToolBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Inventory Information" />
+	</bean>
+	
+	<bean id="stockAnnotationBarButton" class="javax.swing.JButton">
+		<constructor-arg index="0" type="java.lang.String" value="Stock Annotation" />
+	</bean>
+	
+		
+	<!-- ToolBar Buttons ends -->
+
+	<!-- ToolBar Starts -->
+	<bean id="toolBar" class="org.accretegb.modules.ToolBar" init-method="initialize">
+		<property name="indexToButtonMap">
+			<map>
+			    <entry key="Project Manager">
+					<ref bean="projectManagerToolBarButton" />
+				</entry>
+			    <entry key="Outside Seed">
+					<ref bean="outsideSeedToolBarButton" />
+			    </entry>			   
+				<entry key="Stock Information">
+					<ref bean="stockSelectionToolBarButton" />
+				</entry>
+				<entry key="Preplanting Information">
+					<ref bean="previousPlantingToolBarButton" />
+				</entry>
+                <entry key="Phenotype Information">
+                    <ref bean="phenotypeToolBarButton" />
+                </entry>
+ 				<!--  entry key="Planting Information">
+                       <ref bean="plantingToolBarButton" />
+                </entry>
+				<entry key="Harvesting">
+					<ref bean="harvestingToolBarButton" />
+				</entry-->
+				<entry key="Inventory Information">
+                    <ref bean="inventoryToolBarButton" />
+                </entry>
+                <entry key="Stock Annotation">
+                    <ref bean="stockAnnotationBarButton" />
+                </entry>
+               
+			</map>
+		</property>
+	</bean>
+	<!-- ToolBar ends -->
+</beans>

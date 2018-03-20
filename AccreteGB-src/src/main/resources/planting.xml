@@ -1,0 +1,207 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelPlanting" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Bean starts -->
+	<bean id="plantingPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelPlanting">
+		<property name="panelIndex" value="0" />
+	</bean>
+	<!--  Parent Bean ends  -->
+	
+	<!-- Field Table starts -->
+	<bean id="fieldInfoTable" class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Field id</value>
+				<value>Field Number</value>				
+				<value>Field Name</value>
+				<value>Latitude</value>
+				<value>Longitude</value>
+				<value>City</value>
+				<value>Zipcode</value>
+				<value>State</value>
+				<value>Country</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false"/>
+		<property name="singleSelection" value="true" />
+	</bean>
+	<!-- Field Table ends -->
+	
+	<bean id="fieldSelectionPanel"  class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel" init-method="initialize">
+		<property name="table" ref="fieldInfoTable"/>
+	  <property name="horizontalList">
+	      <list>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	      </list>
+	  </property>
+	</bean>
+	
+	<!-- Stock Info Table starts -->
+	<bean id="stocksInfoTable"  class="org.accretegb.modules.customswingcomponent.PlotIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Row</value>
+				<value>Stock id</value>
+				<value>Stock Name</value>				
+				<value>Accession Name</value>
+				<value>Pedigree</value>
+				<value>Generation</value>
+				<value>Cycle</value>
+				<value>Classification Code</value>
+				<value>Population</value>
+				<value>Start Tag</value>
+				<value>End Tag</value>
+				<value>Count</value>
+				<value>Planting Date</value>
+				<value>Kernels</value>	
+				<value>Delay</value>		
+				<value>Purpose</value>
+				<value>Comment</value>
+				<value>Mating Plan id</value>
+				<value>Mating Plan</value>	
+				<value>x</value>
+				<value>y</value>
+				<value>Rep</value>
+				<value>Tag id</value>
+				<value>Modified</value>
+				<value>Tag</value>
+				<value>Exp_id</value>
+				<value>Exp_factor_value_ids</value>
+			</list>
+		</property>
+		<property name="editableColumns">
+		    <list>
+		        <value>13</value>
+		        <value>14</value>
+		        <value>15</value>
+		        <value>16</value>
+		    </list>
+		</property>
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	<!-- Stock Info Table ends -->
+	
+	<bean id="stocksOrderPanel"  class="org.accretegb.modules.customswingcomponent.PlotIndexToolBoxPanel" init-method="initialize">
+		<property name="table" ref="stocksInfoTable"/>
+		<property name="verticalList">
+	      <list>
+	          <value>add</value>
+	          <value>delete</value>
+	          <value>moveUp</value>
+	          <value>moveDown</value>
+	      </list>
+	  	</property>
+	  	<property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>columnSelector</value>
+	      </list>
+	  	</property>
+	  	<property name="draggable" value="true"/>
+	</bean>
+	
+	<bean id="fieldSelection" class="org.accretegb.modules.germplasm.planting.FieldSelection" init-method="initialize">
+		<property name="fieldSelectionPanel" ref="fieldSelectionPanel"/>
+	</bean>
+
+	<bean id="tableView" class="org.accretegb.modules.germplasm.planting.TableView" init-method="initialize">
+		<property name="stocksOrderPanel" ref="stocksOrderPanel"/>
+	</bean>
+	
+	<bean id="canvas" class="org.accretegb.modules.germplasm.planting.Canvas" init-method="initialize">
+	</bean>
+	
+	<bean id="mapView" class="org.accretegb.modules.germplasm.planting.MapView" init-method="initialize">
+	    <property name="canvas" ref="canvas" />
+	</bean>
+		
+	<!-- Tags Table starts -->
+	<bean id="tagsTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+			    <value>Select</value>
+			    <value>Row Num</value>
+			    <value>Tag id</value>
+			    <value>Type</value>
+				<value>Row</value>
+				<value>Plant</value>
+				<value>x</value>
+				<value>y</value>
+				<value>Tag</value>
+				<value>Stock id</value>
+				<value>Stock Name</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>
+				<value>Generation</value>
+				<value>Cycle</value>
+				<value>Classification Code</value>
+				<value>Population</value>
+				<value>Start Tag</value>
+				<value>End Tag</value>
+				<value>Count</value>
+				<value>Planting Date</value>
+				<value>Kernels</value>
+				<value>Delay</value>
+				<value>Purpose</value>
+				<value>Comment</value>
+				<value>Mating Plan id</value>
+				<value>Mating Plan</value>
+				<value>Rep</value>
+				<value>Modified</value>
+				<value>Exp_id</value>
+				<value>Exp_factor_value_ids</value>
+			</list>
+		</property>
+		<property name="editableColumns">
+		    <list>
+		        <value>17</value>
+		        <value>18</value>
+		        <value>19</value>
+		        <value>21</value>
+		        <value>22</value>
+		        <value>23</value>
+		        <value>24</value>
+		    </list>
+		</property>
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	<!-- Tags Table ends -->
+	
+	<bean id="tagsTablePanel"  class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel" init-method="initialize">
+		<property name="table" ref="tagsTable"/>
+	  	<property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>columnSelector</value>
+	          <value>gap</value>
+	          <value>refresh</value>
+	      </list>
+	  	</property>
+	</bean>
+	
+	<bean id="tagGenerator" class="org.accretegb.modules.germplasm.planting.TagGenerator" init-method="initialize">
+	  	<property name="tagsTablePanel" ref="tagsTablePanel" />
+	</bean>
+	
+	<!-- Child Bean starts  -->
+
+	<bean id="plantingChildPanel0" class="org.accretegb.modules.germplasm.planting.Planting" 
+		  parent="plantingPanel0" init-method="initialize">
+	  	<property name="fieldSelection" ref="fieldSelection"/>
+		<property name="tableView" ref="tableView"/>
+		<property name="mapView" ref="mapView"/>
+		<property name="tagGenerator" ref="tagGenerator"/>
+	</bean>
+	<!-- Child Bean ends    -->
+</beans>

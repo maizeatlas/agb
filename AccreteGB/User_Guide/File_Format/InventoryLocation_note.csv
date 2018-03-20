@@ -1,0 +1,35 @@
+This is a csv file that can be imported into the table in Packets Inventory of Inventory module. This file is used to edit the location information for packets or for container units.
+
+# Add four packets to container unit 60
+padd				60			        ->add to the container unit with label 6014.1.19716.02225.0000001#1	->packet name
+14.1.19716.02225.0000002#1	->packet name
+14.1.19716.02225.0000003#1	->packet name
+14.1.19716.02225.0000004#1	->packet name
+
+# Add four packets to container unit 72padd				72				->add to the container unit with label 6014.1.19716.02225.0000001#2	->packet name
+14.1.19716.02225.0000002#2	->packet name
+14.1.19716.02225.0000003#2	->packet name
+14.1.19716.02225.0000004#2	->packet name
+
+
+
+# Delete 2 packets from databasepdelete				14.1.19716.02226.0000003#1	->packet name
+14.1.19716.02227.0000003#1	->packet name
+
+
+
+# Move 2 packets to container unit 60pmove				->move a packet60				->move to the container unit with label 6014.1.19716.02228.0000004#1	->packet name
+14.1.19716.02229.0000004#1	->packet name
+
+
+# Move 3 container units to shelf W-1-1-05bmove				->move a container unitW-1-1-05			->move the container unit to shelf with label “w-1-1-05”60				->the label of the container unit to be moved is 60
+61				->the label of the container unit to be moved is 60
+62				->the label of the container unit to be moved is 60
+
+
+# Delete container unit(shelf) W-1-1-05bdelete				->delete a container unit90				->the label of the container unit to be deleted is 90
+
+# Move 1 container units to shelf E-1-1-01
+badd				->add a container unit
+E-1-1-01			->add a container unit to shelf with label “E-1-1-01”
+76				->the label of the container unit to be added is 76

@@ -1,0 +1,100 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+    
+    <!-- Menu manager starts -->
+    <bean id="exitSubMenu"  class="org.accretegb.modules.menu.ExitMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Exit" />
+    </bean>
+    <bean id="createProjectSubMenu"  class="org.accretegb.modules.menu.CreateProjectMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="New Project" />
+    </bean>
+    <bean id="saveProjectSubMenu"  class="org.accretegb.modules.menu.SaveProjectSubMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Save Project" />
+    </bean>
+    <!--bean id="openProjectSubMenu"  class="org.accretegb.modules.menu.MenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Open Project" />
+    </bean-->
+    <bean id="backupDBSubMenu"  class="org.accretegb.modules.menu.BackupDBMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Back up database" />
+    </bean>
+    <bean id="restoreDBSubMenu"  class="org.accretegb.modules.menu.RestoreDBMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Restore database" />
+    </bean>
+    <bean id="setupEmailSubMenu"  class="org.accretegb.modules.menu.SetupEmailMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Setup Email" />
+    </bean>
+    
+    <!--Not used in Rserve  bean id="settingSubMenu"  class="org.accretegb.modules.menu.SettingMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Settings" />
+    </bean-->
+
+    <bean id="fileMenu"  class="org.accretegb.modules.menu.Menu">
+        <constructor-arg index="0" type="java.lang.String" value="File" />
+        <property name="subMenus">
+            <list>
+                <ref bean="createProjectSubMenu" />
+                <!-- not used inref bean="openProjectSubMenu" /-->
+                <ref bean="saveProjectSubMenu" />
+                <!-- not used in Rserve ref bean= "settingSubMenu" / -->
+                <ref bean="exitSubMenu" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="aboutAccreteGBSubMenu"  class="org.accretegb.modules.menu.AboutAccreteGBMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="About AccreteGB" />
+    </bean>    
+    <bean id="aboutMenu" class="org.accretegb.modules.menu.Menu">
+        <constructor-arg index="0" type="java.lang.String" value="About" />
+        <property name="subMenus">
+            <list>
+                <ref bean="aboutAccreteGBSubMenu" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="loggerSubMenu"  class="org.accretegb.modules.menu.LoggerMenuItem">
+        <constructor-arg index="0" type="java.lang.String" value="Logging Console" />
+    </bean>
+
+    <bean id="viewMenu" class="org.accretegb.modules.menu.Menu">
+        <constructor-arg index="0" type="java.lang.String" value="View" />
+        <property name="subMenus">
+            <list>
+                <ref bean="loggerSubMenu" />
+            </list>
+        </property>
+    </bean>
+    
+
+    <bean id="toolMenu" class="org.accretegb.modules.menu.Menu">
+        <constructor-arg index="0" type="java.lang.String" value="Tools" />
+        <property name="subMenus">
+            <list>
+                <ref bean="backupDBSubMenu" />
+                <ref bean="restoreDBSubMenu" />
+                <ref bean="setupEmailSubMenu" />
+            </list>
+        </property>
+    </bean>   
+
+    <bean id="menuBar" class="javax.swing.JMenuBar" />
+    <bean id="menuManager" class="org.accretegb.modules.menu.MenuManager" init-method="initialize" >
+        <property name="menuBar" ref="menuBar" />
+        <property name="menus">
+            <list>
+                <ref bean="fileMenu" />
+                <ref bean="toolMenu" />
+                <ref bean="viewMenu" />
+                <ref bean="aboutMenu" />
+            </list>
+        </property>
+    </bean>
+    <!-- Menu manager ends -->
+    
+    
+    <!-- Settings Frame ends   -->
+    
+</beans>

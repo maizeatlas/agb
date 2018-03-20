@@ -1,0 +1,222 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+		
+
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelInventory" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Beans starts -->
+	<bean id="inventoryPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelInventory">
+		<property name="panelIndex"    value="0" />
+	</bean>
+	<!-- Parent Beans ends -->
+	
+
+	<bean id="uploadButton"	class="javax.swing.JButton" >
+	    <constructor-arg index="0" type="java.lang.String" value="Upload" />	
+	</bean>
+	<bean id="searchButton"	class="javax.swing.JButton" >
+	    <constructor-arg index="0" type="java.lang.String" value="Stock" />	
+	</bean>
+	<bean id="registerButton"	class="javax.swing.JButton" >
+	    <constructor-arg index="0" type="java.lang.String" value="Register" />	
+	</bean>
+	<bean id="filePath" class="javax.swing.JTextField" />
+	
+	<bean id="selectStocksPackets" class="javax.swing.JLabel" >
+	    <constructor-arg index="0" type="java.lang.String" value="stock packets data" />	
+	</bean>
+	
+	<bean id="currentInventoryAddress" class="javax.swing.JComboBox" ></bean>
+	
+	<!-- stockInventory Table Starts -->
+    <bean id="stockInventoryTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row</value>
+				<value>Stock id</value>
+				<value>Stock Name</value>				
+				<value>Packet_no</value>	
+				<value>Weight</value>
+				<value>Number of Seeds</value>
+				<value>Shelf</value>
+				<value>Unit</value>
+				<value>Packet Comments</value>
+				<value>Packet id</value>
+				<value>Operation</value>
+				<!--<value>Stock comments</value>  packet comments? -->
+			</list>
+		</property>
+		
+		<property name="showColumns">
+			<list>
+				<value>Select</value>
+				<value>Stock Name</value>				
+				<value>Packet_no</value>	
+				<value>Weight</value>
+				<value>Number of Seeds</value>
+				<value>Shelf</value>
+				<value>Unit</value>
+				<value>Packet Comments</value>
+				<value>Operation</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="editableColumns">
+		    <list>
+		        <value>4</value>
+		        <value>5</value>
+		        <value>6</value>
+		        <value>7</value>
+		        <value>8</value>
+		        <value>9</value>
+		    </list>
+		</property>
+	</bean>
+    <!-- stockInventory Table Ends -->
+	 
+	<!--  new stockInventory Table Panel Starts -->
+	<bean id="stockInventoryTableToolPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>columnSelector</value>
+	          <value>add</value>
+	          <value>delete</value>
+	          <value>refresh</value>
+	          <value>counter</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="stockInventoryTable" />	
+	</bean>
+	<!-- new stockInventory Table Panel Ends -->
+    
+	
+	<!-- ContainerLocation Table Starts -->
+    <bean id="containerLocationTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row</value>
+				<value>Location</value>
+				<value>Building</value>
+				<value>Room</value>
+				<value>Number of Shelves</value>
+			</list>
+		</property>
+		
+		<property name="showColumns">
+			<list>
+				<value>Select</value>
+				<value>Location</value>
+				<value>Building</value>
+				<value>Room</value>
+				<value>Number of Shelves</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="true" />
+	</bean>
+    <!-- containerLocationTable Table Ends -->
+    
+   <!--  ContainerLocation Table Panel Starts -->
+	<bean id="containerLocationsTableToolPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>gap</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	          <value>refresh</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="containerLocationTable" />	
+	</bean>
+	<!-- ContainerLocation Table Panel Ends -->
+    
+     <!-- ArrangeShelves Table Starts -->
+    <bean id="arrangeShelvesTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row</value>
+				<value>Location_id</value>
+				<value>ContainerLocation_id</value>
+				<value>Building</value>	
+				<value>Room</value>
+				<value>Tier1_position</value>
+				<value>Tier2_position</value>
+			    <value>Tier3_position</value>
+				<value>Shelf</value>
+			</list>
+		</property>
+		
+		<property name="showColumns">
+			<list>
+			    <value>Select</value>
+			    <value>Row</value>
+			    <value>Building</value>	
+			    <value>Room</value>
+			    <value>Tier1_position</value>
+			    <value>Tier2_position</value>
+			    <value>Tier3_position</value>
+				<value>Shelf</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="editableColumns">
+		    <list>
+		        <value>6</value>
+		        <value>7</value>
+		        <value>8</value>
+		    </list>
+		</property>
+	</bean>
+    <!-- ArrangeShelves Table Ends -->
+    
+    <!-- ArrangeShelves Table Panel Starts -->
+	<bean id="arrangeShelvesTableToolPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	   <property name="horizontalList">
+	      <list>
+	          <value>gap</value>
+	          <value>delete</value>
+	          <value>refresh</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="arrangeShelvesTable" />	
+	</bean>
+	<!-- ArrangeShelves Table Panel Ends -->
+	
+	
+	<!-- Child Bean starts -->
+	<bean id="packetsInventoryPanel" class="org.accretegb.modules.germplasm.inventory.PacketsInventoryPanel" init-method="initialize" >
+		<property name="uploadButton" ref="uploadButton" />
+		<property name="searchButton" ref="searchButton" />
+		<property name="filePath" ref="filePath" />
+		<property name="selectStocksPackets" ref="selectStocksPackets" />
+		<property name="currentInventoryAddress" ref="currentInventoryAddress" />
+		<property name="stockInventoryTablePanel" ref="stockInventoryTableToolPanel" />
+	</bean>	
+	<!-- Child Bean ends   -->
+	
+	<!-- Child Bean starts -->
+	<bean id="containerLocationsPanel" class="org.accretegb.modules.germplasm.inventory.ContainerLocationsPanel" init-method="initialize" >
+		<property name="registerButton" ref="registerButton" />
+		<property name="containerLocationTablePanel" ref="containerLocationsTableToolPanel" />
+		<property name="arrangeShelvesTablePanel" ref="arrangeShelvesTableToolPanel" />
+	</bean>	
+	<!-- Child Bean ends   -->
+
+	<bean id="inventoryPanelChild0" class="org.accretegb.modules.germplasm.inventory.Inventory" 
+		  parent="inventoryPanel0" init-method="initialize">
+		<property name="packetsInventoryPanel" ref="packetsInventoryPanel"/>
+	    <property name="containerLocationsPanel" ref="containerLocationsPanel"/>
+	</bean>
+	
+</beans>

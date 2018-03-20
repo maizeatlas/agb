@@ -1,0 +1,21 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 	<import resource="menuManager.xml" />
+	<import resource="mainLayout.xml" />
+	<import resource="toolBar.xml" />
+	<import resource="tabManager.xml" />
+	<import resource="projectExplorer.xml" />
+	<import resource="stocksInfo.xml" />
+	<import resource="outsideSeed.xml" />
+	<import resource="prePlantingInfo.xml" />
+	<import resource="traitsInfo.xml" />
+	<import resource="experimentalDesign.xml" />
+	<import resource="planting.xml" />
+    <import resource="phenotypeInfo.xml" />
+    <import resource="harvesting.xml" />
+    <import resource="inventoryInfo.xml" />
+    <import resource="projectManager.xml" /> 
+    <import resource="stockAnnotation.xml" />   
+</beans>

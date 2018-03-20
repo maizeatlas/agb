@@ -1,0 +1,15 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<bean id="projectPopupListener" class="org.accretegb.modules.projectexplorer.ProjectPanelPopupListener" init-method="initialize" />	      
+    <bean id="projectExplorerPanel" class="org.accretegb.modules.projectexplorer.ProjectExplorerPanel" init-method="initialize">
+	    <property name="projectPopupListener" ref="projectPopupListener" />	    
+	</bean>
+    <bean id="projectExplorerTabbedPane" class="org.accretegb.modules.projectexplorer.ProjectExplorerTabbedPane" init-method="initialize" >
+		<property name="explorerPanel" ref="projectExplorerPanel" />		
+	</bean>	
+	<bean id="createNewProjectPanel" class="org.accretegb.modules.projectexplorer.NewProjectPanel" init-method="initialize" >    
+	</bean>
+</beans>

@@ -1,0 +1,194 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelExperimentalDesign0" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Bean starts -->
+	<bean id="experimentalDesignPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelExperimentalDesign0">
+		<property name="panelIndex" value="0" />
+		
+	</bean>
+		
+	<bean id="experimentalDesignSelectedStocksTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row</value>
+				<value>Stock id</value>
+				<value>Stock Names</value>				
+			</list>
+		</property>
+		
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	
+	<bean id="experimentalDesignSelectedStocksPanel"  class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel" init-method="initialize">
+		<property name="table" ref="experimentalDesignSelectedStocksTable"/>
+		<property name="verticalList">
+	  	    <list>
+	  	        <value>add</value>
+	  	        <value>delete</value>
+	  	    </list>
+	  	</property>
+	</bean>
+
+	<bean id="experimentalOutputTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Plot</value>
+				<value>Stock id</value>
+				<value>Rep</value>
+				<value>Stock Names</value>	
+				<value>Exp_id</value>	
+				<value>Exp_factor_value_ids</value>				
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	
+	<!-- output panel -->
+
+	<bean id="experimentalOutputPanel"  class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel" init-method="initialize">
+	  	<property name="horizontalList">
+	  	    <list>
+	  	        <value>selection</value>
+	  	        <value>search</value>
+	  	        <value>gap</value>
+	  	        <value>columnSelector</value>
+	  	        <value>refresh</value>
+	  	    </list>
+	  	</property>
+	  	<property name="verticalList">
+	  	    <list>
+	  	        <value>delete</value>
+	  	    </list>
+	  	</property>
+		<property name="table" ref="experimentalOutputTable"/>
+	</bean>
+	
+	<!-- RCBD Design Panel Starts -->
+	<bean id="rcbd-reps" class="javax.swing.JTextField" />
+	<bean id="rcbd-seedCount" class="javax.swing.JTextField" />
+	<bean id="rcbd-methods" class="javax.swing.JComboBox">
+		<constructor-arg>
+			<list>
+				<value>Wichmann-Hill</value>
+				<value>Marsaglia-Multicarry</value> 
+				<value>Super-Duper</value>
+				<value>Mersenne-Twister</value> 
+				<value>Knuth-TAOCP</value>
+				<value>user-supplied</value>
+				<value>Knuth-TAOCP-2002</value>
+				<value>default</value>
+    		</list>
+    	</constructor-arg>
+	</bean>
+	<bean id="rcbdDesignPanel" class="org.accretegb.modules.germplasm.experimentaldesign.RandomizedCompleteBlockDesignPanel" init-method="initialize">
+		<property name="reps" ref="rcbd-reps" />
+		<property name="seedCount" ref="rcbd-seedCount" />
+		<property name="methods" ref="rcbd-methods" />
+	</bean>
+	<!-- RCBD Design Panel Stops -->
+
+	<!-- Complete Randomized Design Panel Starts -->
+	<bean id="crd-reps" class="javax.swing.JTextField" />
+	<bean id="crd-seedCount" class="javax.swing.JTextField" />
+	<bean id="crd-methods" class="javax.swing.JComboBox">
+		<constructor-arg>
+			<list>
+				<value>Wichmann-Hill</value>
+				<value>Marsaglia-Multicarry</value> 
+				<value>Super-Duper</value>
+				<value>Mersenne-Twister</value>
+				<value>Knuth-TAOCP</value>
+				<value>user-supplied</value>
+				<value>Knuth-TAOCP-2002</value>
+				<value>default</value>
+    		</list>
+    	</constructor-arg>
+	</bean>
+	<bean id="crdDesignPanel" class="org.accretegb.modules.germplasm.experimentaldesign.CompleteRandomizedDesignPanel" init-method="initialize">
+		<property name="reps" ref="crd-reps" />
+		<property name="seedCount" ref="crd-seedCount" />
+		<property name="methods" ref="crd-methods" />
+	</bean>
+	<!-- Complete Randomized Design Panel Stops -->
+	
+	<!-- Alpha Design Panel Starts -->
+	<bean id="alpha-reps" class="javax.swing.JTextField" />
+	<bean id="alpha-blockSize" class="javax.swing.JTextField" />
+	<bean id="alpha-seedCount" class="javax.swing.JTextField" />
+	<bean id="alpha-methods" class="javax.swing.JComboBox">
+		<constructor-arg>
+			<list>
+				<value>Wichmann-Hill</value>
+				<value>Marsaglia-Multicarry</value> 
+				<value>Super-Duper</value>
+				<value>Mersenne-Twister</value>
+				<value>Knuth-TAOCP</value>
+				<value>user-supplied</value>
+				<value>Knuth-TAOCP-2002</value>
+				<value>default</value>
+    		</list>
+    	</constructor-arg>
+	</bean>
+	<bean id="alphaDesignPanel" class="org.accretegb.modules.germplasm.experimentaldesign.AlphaDesignPanel" init-method="initialize">
+		<property name="reps" ref="alpha-reps" />
+		<property name="blockSize" ref="alpha-blockSize" />
+		<property name="seedCount" ref="alpha-seedCount" />
+		<property name="methods" ref="alpha-methods" />
+	</bean>
+	<!-- Alpha Design Panel Stops -->
+	
+	<!-- Split Design Panel Starts -->
+	<bean id="split-reps" class="javax.swing.JTextField" />
+	<bean id="split-seedCount" class="javax.swing.JTextField" />
+	<bean id="split-methods" class="javax.swing.JComboBox">
+		<constructor-arg>
+			<list>
+				<value>Wichmann-Hill</value>
+				<value>Marsaglia-Multicarry</value> 
+				<value>Super-Duper</value>
+				<value>Mersenne-Twister</value>
+				<value>Knuth-TAOCP</value>
+				<value>user-supplied</value>
+				<value>Knuth-TAOCP-2002</value>
+				<value>default</value>
+    		</list>
+    	</constructor-arg>
+	</bean>
+	<bean id="splitDesignPanel" class="org.accretegb.modules.germplasm.experimentaldesign.SplitDesignPanel" init-method="initialize">
+		<property name="reps" ref="split-reps" />
+		<property name="seedCount" ref="split-seedCount" />
+		<property name="methods" ref="split-methods" />
+	</bean>
+	<!-- Split Design Panel Stops -->
+
+	<bean id="experimentSelectionBox" class="javax.swing.JComboBox"> 
+		<constructor-arg>
+			<list>
+        		<value>Randomized Complete Block</value>
+        		<value>Complete Randomized Block</value>
+        		<value>Alpha Design</value>
+        		<value>Split Design</value>
+    		</list>
+    	</constructor-arg>	
+	</bean>
+	<bean id= "experimentId" class="java.lang.String">
+		<constructor-arg value="0"/>
+	</bean>
+	<bean id="experimentalDesignChildPanel0" class="org.accretegb.modules.germplasm.experimentaldesign.ExperimentSelectionPanel" 
+		  parent="experimentalDesignPanel0" init-method="initialize">
+		  <property name="experimentalSelectedStocksPanel" ref="experimentalDesignSelectedStocksPanel"/>
+		  <property name="designPanel" ref="rcbdDesignPanel" />
+		  <property name="experimentSelectionBox" ref="experimentSelectionBox" />
+		  <property name= "experimentId" ref= "experimentId"/>
+		  <property name="experimentalOutputPanel" ref="experimentalOutputPanel" />
+    </bean>
+    
+</beans>

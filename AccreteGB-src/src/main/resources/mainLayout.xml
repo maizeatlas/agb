@@ -1,0 +1,19 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- MainLayout starts -->
+	<bean id="mainLayoutFrame" class="javax.swing.JFrame" />
+	<bean id="tabbedScrollBarPane" class="javax.swing.JScrollPane" />
+    <bean id="mainLayoutBean" class="org.accretegb.modules.MainLayout" init-method="initialize">
+    	<property name="frame" ref="mainLayoutFrame" />
+    	<property name="menuManager" ref="menuManager" />
+    	<property name="toolBar" ref="toolBar" />
+    	<property name="tabManager" ref="tabManager" />
+    	<property name="tabbedScrollBarPane" ref="tabbedScrollBarPane" />
+    	<property name="projectExplorerTabbedPane"  ref="projectExplorerTabbedPane" />
+    </bean>
+	<!-- MainLayout ends -->
+	
+</beans>

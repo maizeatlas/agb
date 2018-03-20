@@ -1,0 +1,194 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- Search Results Table starts -->
+		<bean id="searchResultsTableStockInfo"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row</value>
+				<value>Stock id</value>
+				<value>Stock Name</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>
+				<value>Generation</value>
+				<value>Cycle</value>
+				<value>Classification Code</value>
+				<value>Population</value>
+				<value>Stock Date</value>		
+				<value>Total Pkts</value>	
+				<value>Packet Number</value>
+				<value>Weight</value>
+				<value>Number of seeds</value>
+				<value>Tier1_position</value>
+				<value>Tier2_position</value>
+				<value>Tier3_position</value>
+				<value>Shelf</value>
+			    <value>Unit</value>		
+			    <value>Room</value>	
+			    <value>Building</value>
+			    <value>Location Name</value>
+			    <value>City</value>
+			    <value>State</value>
+			    <value>Country</value>	
+			    <value>Female Parent Stock</value>		    	
+							
+				
+			</list>
+		</property>
+		  <property name="showColumns"> 
+	      <list>
+	        <value>Select</value>
+			<value>Stock Name</value>			
+			<value>Accession Name</value>
+			<value>Pedigree</value>
+			<value>Generation</value>
+			<value>Classification Code</value>
+			<value>Population</value>
+	      </list>
+	      </property>	
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	<!-- Search Results Table ends -->
+	
+	<!-- TableToolBoxPanel Results Panel -->
+	
+	<bean id="searchResultsPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	 <property name="rangeFilterColumnList"> 
+	      <list>
+	          <value>Weight</value>
+	          <value>Number of seeds</value>
+	      </list>
+	  </property>		    
+	  <property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>expand</value>
+	          <value>columnSelector</value>
+	          <value>counter</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="searchResultsTableStockInfo" />	
+	</bean>
+	<!-- TableToolBoxPanel Results Panel Ends -->
+	
+	<!-- Save Table Results Info starts -->
+	<bean id="saveTableStockInfo"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames" value="#{searchResultsTableStockInfo.columnNames}"/>
+		<property name="showColumns" value="#{searchResultsTableStockInfo.showColumns}"/> 
+		<property name="checkBoxHeader" value="false"/>
+	</bean>
+	<!-- Save Table Results Info ends -->
+	<bean id="saveTableStockInfoPanel"  class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel" init-method="initialize">
+		  <property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>checkDuplicates</value>
+	          <value>gap</value>
+	          <value>expand</value>
+	          <value>columnSelector</value>
+	          <value>counter</value>
+	      </list>
+	  </property>
+		<property name="verticalList" >
+		    <list>
+		        <value>delete</value>
+		        <value>moveup</value>
+		        <value>movedown</value>
+		    </list>
+		</property>
+		<property name="table" ref="saveTableStockInfo"/>
+	</bean>
+	<!-- Save Table Panel  -->
+	
+	<!--  Save Table Panel Ends -->
+	
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelStocksInfo" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Beans start -->
+	<bean id="stocksInfoPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelStocksInfo">
+		<property name="panelIndex" value="0" />
+	</bean>
+	<!-- Parent Beans stop  -->
+	
+	<!-- Child Bean starts  -->
+	<bean id="stockname-stocksInfo"   class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="accession-stocksInfo"    class="javax.swing.JTextField">
+		<constructor-arg index="0" type="int" value="23" />
+	</bean>
+	<bean id="pedigree-stocksInfo"     class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="zipcode-stocksInfo"      class="org.accretegb.modules.customswingcomponent.TextField" >
+		<constructor-arg index="0" type="int" value="23" />
+	</bean>
+	<bean id="personName-stocksInfo"   class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="fromDate-stocksInfo"     class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="toDate-stocksInfo"       class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="generation-stocksInfo"   class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="cycle-stocksInfo"        class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="classificationCodeComboBox-stocksInfo"     class="javax.swing.JComboBox"  >
+	</bean>
+	<bean id="population-stocksInfo"   class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="23" />	
+	</bean>
+	<bean id="buttonClear-stocksInfo"  class="javax.swing.JButton" >
+		<constructor-arg index="0" type="java.lang.String" value="Clear Input" />	
+	</bean>
+	<bean id="buttonSubmit-stocksInfo" class="javax.swing.JButton" >
+		<constructor-arg index="0" type="java.lang.String" value="Search" />	
+	</bean>
+	<bean id="multiplier-stocksInfo"   class="javax.swing.JTextField" >
+		<constructor-arg index="0" type="int" value="3" />	
+	</bean>
+	<bean id="buttonSelect-stocksInfo" class="javax.swing.JButton" >
+		<constructor-arg index="0" type="java.lang.String" value="Add to Cart" />	
+	</bean>
+	<bean id="buttonSave-stocksInfo"   class="javax.swing.JButton" >
+		<constructor-arg index="0" type="java.lang.String" value="Export" />
+	</bean>
+	
+	<bean id="stocksInfoChildPanel0" class="org.accretegb.modules.germplasm.stocksinfo.StocksInfoPanel" 
+		  parent="stocksInfoPanel0"  init-method="initialize">	
+		<property name="stockname"   ref="stockname-stocksInfo" />
+		<property name="accession"   ref="accession-stocksInfo" />
+		<property name="pedigree"    ref="pedigree-stocksInfo" />
+		<property name="zipcode"     ref="zipcode-stocksInfo" />
+		<property name="personName"  ref="personName-stocksInfo" />
+		<property name="fromDate"    ref="fromDate-stocksInfo" />
+		<property name="toDate"      ref="toDate-stocksInfo" />
+		<property name="generation"  ref="generation-stocksInfo" />
+		<property name="cycle"       ref="cycle-stocksInfo" />
+		<property name="classificationCodeComboBox"    ref="classificationCodeComboBox-stocksInfo" />
+		<property name="selectedRows"><list></list></property>
+		<property name="population"  ref="population-stocksInfo" />
+		<property name="buttonClear" ref="buttonClear-stocksInfo" />
+		<property name="buttonSubmit" ref="buttonSubmit-stocksInfo" />
+		<property name="multiplier" ref="multiplier-stocksInfo" />
+		<property name="buttonSelect" ref="buttonSelect-stocksInfo" />
+		<property name="buttonSave"   ref="buttonSave-stocksInfo" />
+		<property name="searchResultsPanel"   ref="searchResultsPanel" />
+		<property name="saveTablePanel" ref="saveTableStockInfoPanel" />
+	</bean>
+	<!--  Child Bean stops  -->
+	
+</beans>

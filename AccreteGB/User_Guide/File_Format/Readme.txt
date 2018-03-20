@@ -1,0 +1,1 @@
+This folder includes the examples that shows the format for the “import” buttons in different modules.

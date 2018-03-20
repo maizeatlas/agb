@@ -1,0 +1,125 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- TabComponent starts -->
+	<bean id="outsideSeed" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="outsideSeedInfoChildPanel0" />
+				<ref bean="outsideSeedInfoChildPanel1" />
+				<ref bean="outsideSeedInfoChildPanel2" />
+				<ref bean="outsideSeedInfoChildPanel3" />
+			</list>
+		</property>
+		<property name="title" value="Outside Seed"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="stocksInfo" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="stocksInfoChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Stock Information"/>
+		<property name="isStatic" value="false"/>
+	</bean>
+	
+	<bean id="preplantingInfo" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="preplantingInfoChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Preplanting Information"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="phenotypeInfo" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="phenotypeInfoChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Phenotype Information"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="plantings" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="plantingChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Planting Information"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="harvestings" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="harvestingChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Harvesting"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="inventoryInfo" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="inventoryPanelChild0" />
+			</list>
+		</property>
+		<property name="title" value="Inventory Information"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="projectManager" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="projectManagerChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Project Manager"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	<bean id="stockAnnotation" class="org.accretegb.modules.tab.TabComponent" init-method="initialize">
+		<property name="componentPanels">
+			<list>
+				<ref bean="stockAnnotationChildPanel0" />
+			</list>
+		</property>
+		<property name="title" value="Stock Annotation"/>
+		<property name="isStatic" value="true"/>
+	</bean>
+	
+	
+	<!-- TabComponent ends -->
+	
+	<!-- Tab Manager starts -->
+	<bean id="tabbedPane" class="javax.swing.JTabbedPane" />	
+	
+	<bean id="tabManager" class="org.accretegb.modules.tab.TabManager" init-method="initialize">
+	    <property name="tabbedPane">
+	    	<ref bean="tabbedPane" />
+	    </property>
+		<property name="tabComponents">
+					<list>
+					    <ref bean="projectManager" />
+					    <ref bean="outsideSeed" />
+					    <ref bean="stocksInfo" /> 
+						<ref bean="preplantingInfo" />
+                        <ref bean="phenotypeInfo" />
+                        <ref bean="plantings" />
+						<ref bean="harvestings" />
+						<ref bean="inventoryInfo" />
+						<ref bean="stockAnnotation" />						
+					</list>
+		</property>
+	</bean>
+	<!-- TabManager ends -->
+</beans>

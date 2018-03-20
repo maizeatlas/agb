@@ -1,0 +1,17 @@
+This is a csv file that can be imported into the table in Packets Inventory of Inventory module. This file is used to add weight and location for packets.
+
+pedit                           —> operation on packet
+1241                            -> container unit label
+17.1.19716.00384.0000000#1      —> packet name
+205.88                          —> weight
+
+pedit                           —> operation on packet
+1243                            -> container unit label
+17.1.19716.00385.0000000#1      —> packet name
+188.56                          —> weight
+
+pedit                           —> operation on packet
+1242                            -> container unit label
+17.1.19716.00385.0000000#1      —> packet name
+123.45                          —> weight
+

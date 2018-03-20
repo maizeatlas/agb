@@ -1,0 +1,313 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelOutsideSeed" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Beans starts -->
+	<bean id="outsideSeedPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelOutsideSeed">
+		<property name="panelIndex"    value="0" />
+	</bean>
+	<!-- Parent Beans ends -->
+
+	<!-- Source Table Starts -->
+    <bean id="sourceTableInfo"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Source id</value>
+				<value>First Name</value>
+				<value>Last Name</value>
+				<value>Institute</value>	
+				<value>Department</value>
+				<value>Street Address</value>
+				<value>City</value>
+				<value>State</value>
+				<value>Country</value>
+				<value>Zipcode</value>
+				<value>Location Name</value>
+				<value>Location Comments</value>
+				<value>Phone</value>
+				<value>Fax</value>
+				<value>Email</value>
+				<value>URL</value>
+				<value>Source Comments</value>
+			</list>
+		</property>
+		 <property name="showColumns"> 
+	      <list>
+	            <value>First Name</value>
+				<value>Last Name</value>
+				<value>Institute</value>	
+				<value>Department</value>
+				<value>Street Address</value>
+				<value>City</value>
+				<value>State</value>
+				<value>Country</value>
+				<value>Zipcode</value>
+				<value>Location Name</value>
+				<value>Phone</value>
+				<value>Email</value>
+	      </list>
+	      </property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="true" />
+	</bean>
+    <!-- Source Table Ends -->
+	
+	<!--  new Source Table Panel Starts -->
+	<bean id="sourceTableToolPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	          <value>columnSelector</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="sourceTableInfo" />	
+	</bean>
+	<!-- new Source Table Panel Ends -->
+	
+	<!-- Child Bean starts -->
+	<bean id="outsideSeedInfoChildPanel0" class="org.accretegb.modules.germplasm.outsideseed.PersonSelectionPanel" 
+		  parent="outsideSeedPanel0" init-method="initialize" >
+	    <property name="sourceTablePanel" ref="sourceTableToolPanel" />
+	</bean>	
+	<!-- Child Bean ends   -->
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelOutsideSeed1" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Beans starts -->
+	<bean id="outsideSeedPanel1" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelOutsideSeed1">
+		<property name="panelIndex"    value="1" />
+	</bean>
+	<!-- Parent Beans ends -->
+	
+	<bean id="downloadButton" class="javax.swing.JButton" >
+	    <constructor-arg index="0" type="java.lang.String" value="Template" />
+	</bean>	
+	<bean id="downloadTemplate" class="javax.swing.JLabel" >
+	    <constructor-arg index="0" type="java.lang.String" value="Download" />	
+	</bean>
+	<bean id="browseButton"	class="javax.swing.JButton" >
+	    <constructor-arg index="0" type="java.lang.String" value="Upload" />	
+	</bean>
+	<bean id="filePath" class="javax.swing.JTextField" />
+	<bean id="uploadTemplate" class="javax.swing.JLabel" >
+	    <constructor-arg index="0" type="java.lang.String" value="stock data from " />	
+	</bean>
+	
+	<!-- StockDetails Table Starts -->
+    <bean id="stockDetailsTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>RowNum</value>
+				<value>Accession Name</value>
+				<value>Accession Identifier</value>
+				<value>Pedigree</value>	
+				<value>Passport Comment</value>	
+				<value>Generation</value>
+				<value>Cycle</value>
+				<value>Generation Comment</value>
+				<value>classification id</value>
+				<value>Classification Type</value>
+				<value>taxonomy id</value>
+				<value>Taxonomy</value>
+			</list>
+		</property>
+		 <property name="showColumns"> 
+	      <list>
+	            <value>Select</value>
+				<value>Accession Name</value>
+				<value>Accession Identifier</value>
+				<value>Pedigree</value>	
+				<value>Generation</value>
+				<value>Cycle</value>
+				<value>Classification Type</value>
+				<value>Taxonomy</value>
+	      </list>
+	      </property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="editableColumns">
+		    <list>
+		        <value>2</value>
+		        <value>3</value>
+		        <value>4</value>
+		        <value>5</value>
+		        <value>6</value>
+		        <value>7</value>
+		        <value>8</value>
+		    </list>
+		</property>
+	</bean>
+    <!-- StockDetails Table Ends -->
+	 
+	<!--  new StockDetails Table Panel Starts -->
+	<bean id="stockDetailsTableToolPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>search</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>delete</value>
+	          <value>columnSelector</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="stockDetailsTable" />	
+	</bean>
+	<!-- new StockDetails Table Panel Ends -->
+	
+	<!-- Classification Code Table Starts -->
+    <bean id="classificationTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>classification id</value>
+				<value>Classification Code</value>
+				<value>Classification Type</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="true" />
+	</bean>
+    <!-- Classification Code Table Ends -->
+    
+    <!--  Classification Code Table Panel Starts -->
+	<bean id="classificationPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>upload</value>
+	          <value>clear</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="classificationTable" />	
+	</bean>
+	<!-- Classification Code Table Panel Ends -->
+    
+    <!-- Taxonomy Table Starts -->
+    <bean id="taxonomyTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>taxonomy id</value>
+				<value>Genus</value>
+				<value>Species</value>	
+				<value>Subspeicies</value>
+				<value>Subtaxa</value>
+				<value>Race</value>
+				<value>Common name</value>
+				<value>Population</value>
+				<value>Gto</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="true" />
+	</bean>
+    <!-- Taxonomy Table Ends -->
+    
+    <!--  Taxonomy Table Panel Starts -->
+	<bean id="taxonomyPanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="horizontalList">
+	      <list>
+	          <value>upload</value>
+	          <value>clear</value>
+	          <value>gap</value>
+	          <value>add</value>
+	          <value>edit</value>
+	          <value>delete</value>
+	      </list>
+	  </property>
+	  <property name="table" ref="taxonomyTable" />	
+	</bean>
+	<!-- Taxonomy Table Panel Ends -->
+	
+	<!-- Custom Calendar begins -->
+	<bean id="customCalendar" class="org.accretegb.modules.customswingcomponent.CustomCalendar" init-method="initialize" />
+	<!-- Custom Calendar ends -->
+	
+	<!-- Child Bean starts -->
+	<bean id="outsideSeedInfoChildPanel1" class="org.accretegb.modules.germplasm.outsideseed.StockSelectionPanel" 
+		  parent="outsideSeedPanel1" init-method="initialize" >
+		<property name="downloadButton" ref="downloadButton" />
+		<property name="downloadTemplate" ref="downloadTemplate" />
+		<property name="browseButton" ref="browseButton" />
+		<property name="filePath" ref="filePath" />
+		<property name="uploadTemplate" ref="uploadTemplate" />
+		<property name="stockDetailsTablePanel" ref="stockDetailsTableToolPanel" />
+		<property name="classificationTablePanel" ref="classificationPanel" />
+		<property name="taxonomyTablePanel" ref="taxonomyPanel" />
+		<property name="customCalendar" ref="customCalendar" />
+	</bean>	
+	<!-- Child Bean ends   -->
+	
+		<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelOutsideSeed2" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Beans starts -->
+	<bean id="outsideSeedPanel2" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelOutsideSeed2">
+		<property name="panelIndex"    value="2" />
+	</bean>
+	<!-- Parent Beans ends -->
+	
+	<!-- stockVerification Table Starts -->
+    <bean id="stockVerificationTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Stock Name</value>
+				<value>Accession Name</value>
+				<value>Accession Identifier</value>
+				<value>Pedigree</value>	
+				<value>Passport Comment</value>	
+				<value>Generation</value>
+				<value>Cycle</value>
+				<value>Generation Comment</value>
+				<value>classification id</value>
+				<value>Classification Type</value>
+				<value>taxonomy id</value>
+				<value>Taxonomy</value>
+			</list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+	</bean>
+    <!-- stockVerification Table Ends -->
+       
+	<!-- Child Bean starts -->
+	<bean id="outsideSeedInfoChildPanel2" class="org.accretegb.modules.germplasm.outsideseed.StockVerificationPanel" 
+		  parent="outsideSeedPanel2" init-method="initialize" >
+		<property name="stockVerificationTable" ref="stockVerificationTable" />
+	</bean>	
+	<!-- Child Bean ends   -->
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelOutsideSeed3" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Beans starts -->
+	<bean id="outsideSeedPanel3" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelOutsideSeed3">
+		<property name="panelIndex"    value="3" />
+	</bean>
+	<!-- Parent Beans ends -->
+		
+	<!-- Child Bean starts -->
+	<bean id="outsideSeedInfoChildPanel3" class="org.accretegb.modules.germplasm.outsideseed.OutsideSeedReportPanel" 
+		  parent="outsideSeedPanel3" init-method="initialize" >
+	</bean>	
+	<!-- Child Bean ends   -->
+	
+</beans>

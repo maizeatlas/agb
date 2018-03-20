@@ -1,0 +1,185 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- Super Parent Bean starts -->
+	<bean id="parentTabComponentPanelHarvesting" class="javax.swing.JPanel" />
+	<!-- Super Parent Bean ends -->
+	
+	<!-- Parent Bean starts -->
+	<bean id="harvestingPanel0" class="org.accretegb.modules.tab.TabComponentPanel" parent="parentTabComponentPanelHarvesting">
+		<property name="panelIndex" value="0" />
+	</bean>
+	<!--  Parent Bean ends  -->
+	
+	<!--  Crossing table starts-->
+	  <bean id="crossingTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row Num</value>
+				<value>Tag id</value>
+				<value>Tag Name</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>
+				<value>Mate Method</value>
+				<value>Mating Type</value>
+				<value>Role</value>	
+				<value>Mate Link</value>
+				<value>Quantity</value>
+				<value>Unit</value>
+				<value>Stock Name</value>
+			</list>
+		</property>
+		<property name="editableColumns">
+		    <list>
+		        <value>10</value>
+		    </list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="false" />
+	</bean>
+    <!-- Crossing Table Ends -->
+	
+	<!--  new Source Table Panel Starts -->
+	<bean id="crossingTablePanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="table" ref="crossingTable" />		  
+		<property name="horizontalList">
+			<list>
+				<value>selection</value>
+				<value>columnSelector</value>
+				<value>gap</value>
+				<value>delete</value>
+			</list>
+		</property>
+	</bean>
+	<!-- new Source Table Panel Ends -->
+	
+	<bean id="fieldGenerated" class="org.accretegb.modules.germplasm.harvesting.FieldGenerated" init-method="initialize">
+		<property name="crossingTablePanel" ref="crossingTablePanel" />
+	</bean>
+	
+	<!--  Bulk Table starts -->
+	<bean id="bulkTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row num</value>
+				<value>Stock id</value>
+				<value>obs unit id</value>
+				<value>Stock Name</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>
+				<value>Quantity</value>	
+				<value>Unit id</value>
+				<value>Unit</value>
+				<value>Mix id</value>
+				<value>Mate Link</value>
+				<value>Final Stock Name</value>
+			</list>
+		</property>
+		<property name="editableColumns">
+		    <list>
+		        <value>7</value>
+		    </list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="false" />
+	</bean>
+	<!--  Bulk Table ends -->
+	
+	<!--  Bulk Table Panel Starts -->
+	<bean id="bulkTablePanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="table" ref="bulkTable" />	
+	  <property name="verticalList">
+	      <list>
+	          <value>add</value>
+	          <value>delete</value>
+	          <value>moveup</value>
+	          <value>movedown</value>
+	      </list>
+	  </property>
+	</bean>
+	<!-- Bulk Table Panel Ends -->
+	
+	<bean id="bulk" class="org.accretegb.modules.germplasm.harvesting.Bulk"  init-method="initialize">
+	    <property name="bulkTablePanel" ref="bulkTablePanel" />
+	    <property name="fieldGenerated" ref="fieldGenerated" />
+	</bean>
+	
+	<!--  Sticker Table starts -->
+	<bean id="stickerTable"  class="org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable" init-method="initialize">
+		<property name="columnNames">
+			<list>
+				<value>Select</value>
+				<value>Row num</value>
+				<value>Packet id</value>
+				<value>Stock Name</value>
+				<value>Packet Name</value>
+				<value>Accession Name</value>
+				<value>Pedigree</value>
+				<value>Generation</value>
+				<value>Mating Type</value>
+				<value>Date</value>			
+				<value>Packet Count</value>	
+				<value>Packet Number</value>			
+				<value>Quantity</value>
+				<value>Unit id</value>
+				<value>Unit</value>
+				<value>Comments</value>
+				<value>Modified</value>
+				<value>Unique id</value>
+			</list>
+		</property>
+		<property name="editableColumns">
+		    <list>
+		        <value>5</value>
+		        <value>6</value>
+		        <value>10</value>
+		        <value>12</value>
+		        <value>15</value>
+		    </list>
+		</property>
+		<property name="checkBoxHeader" value="false" />
+		<property name="singleSelection" value="false" />
+	</bean>
+	<!--  Sticker Table ends -->
+	
+	<!--  Sticker Table Panel Starts -->
+	<bean id="stickerTablePanel" class="org.accretegb.modules.customswingcomponent.TableToolBoxPanel"  init-method="initialize">
+	  <property name="table" ref="stickerTable" />	
+	  <property name="horizontalList">
+	      <list>
+	          <value>selection</value>
+	          <value>columnSelector</value>
+	          <value>gap</value>
+	          <value>refresh</value>
+	      </list>
+	  </property>
+	  <property name="verticalList">
+	      <list>
+	          <value>add</value>
+	          <value>delete</value>
+	      </list>
+	  </property>
+	</bean>
+	<!-- Sticker Table Panel Ends -->
+	
+	<bean id="stickerGenerator" class="org.accretegb.modules.germplasm.harvesting.StickerGenerator" init-method="initialize">
+	    <property name="stickerTablePanel" ref="stickerTablePanel" />
+	    <property name="fieldGenerated" ref="fieldGenerated" />
+		<property name="bulk" ref="bulk" />
+	</bean>
+	
+	<!-- Child Bean starts  -->
+
+	<bean id="harvestingChildPanel0" class="org.accretegb.modules.germplasm.harvesting.Harvesting" 
+		  parent="harvestingPanel0" init-method="initialize">
+		<property name="fieldGenerated" ref="fieldGenerated" />
+		<property name="bulk" ref="bulk" />
+		<property name="stickerGenerator" ref="stickerGenerator" />
+	</bean>
+	
+	<!-- Child Bean ends    -->
+</beans>
