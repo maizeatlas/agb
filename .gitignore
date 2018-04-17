@@ -2,3 +2,6 @@
 .classpath
 .project
 /target/
+AccreteGB-src/credentials.txt
+AccreteGB-src/key.txt
+AccreteGB-src/.settings/*

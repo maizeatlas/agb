@@ -104,6 +104,7 @@ public class ColumnConstants {
 	public static final String COLLECTION_DATE = "Collection Date";
 	public static final String SOURCE_ID = "Source id";
 	public static final String COLLECTOR = "Collector";
+	public static final String FEMALE_PARENT_STOCK = "Female Parent Stock";
 	public static String PASSPORT_ID = "Passport id";
 	public static String CLASSIFICATION_ID = "Classification id";
 	public static String TAXONOMY_ID = "Taxonomy id";

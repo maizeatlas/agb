@@ -106,7 +106,13 @@ public class PassportDAO {
 	public Passport insert(Integer classification_id, Integer taxonomy_id, Integer passport_id,
 			String accession, String pedigree){
 		Session session = hibernateSessionFactory.getSessionFactory().openSession();
-		Passport passport = (Passport)session.get(Passport.class, passport_id);
+		Passport passport = null;
+		if(passport_id == 0){
+			passport = new Passport();
+			passport.setAccession_identifier("NA");
+		}else{
+			passport = (Passport)session.get(Passport.class, passport_id);
+		}
 		if(passport != null){
 			if(classification_id != 0){
 				passport.setClassification((Classification)session.get(Classification.class, classification_id));
@@ -125,7 +131,7 @@ public class PassportDAO {
 		Transaction transaction = session.beginTransaction();
 		transaction.commit();
 		session.close();	
-		return null;
+		return passport;
 	}
 	
 	public  List<Passport> findByTaxonomy(int taxonomyId){

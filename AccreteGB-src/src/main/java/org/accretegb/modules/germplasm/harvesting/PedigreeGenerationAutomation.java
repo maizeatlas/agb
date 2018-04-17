@@ -83,15 +83,20 @@ public class PedigreeGenerationAutomation {
 		for(int i = 0; i < lenOfSlashInFemale; i++){
 			slashes = slashes + "/";
 		}
-		String lastPart ;
-		String[] femaleParts = {this.femalePedigree};
-		if(lenOfSlashInFemale >= 1)
-		{
-			femaleParts = this.femalePedigree.split(slashes);
-			lastPart = femaleParts[femaleParts.length-1];
+		String lastPart;
+		String[] femaleParts = this.femalePedigree.split("-");
+		if (femaleParts.length == 1){
+			if(lenOfSlashInFemale >=1){
+				femaleParts = this.femalePedigree.split(slashes);
+				lastPart = femaleParts[femaleParts.length-1].trim();
+			}else{
+				lastPart = this.femalePedigree.trim();
+			}
 		}else{
-			lastPart = this.femalePedigree;
+			lastPart = femaleParts[femaleParts.length-1].trim();
 		}
+	
+		System.out.println("lastPart " + lastPart);
 		if(this.matingType.equals("CR") || this.matingType.equals("BC")){
 			String revisedLastPart=null;
 			// only use * when its "BC"
@@ -99,22 +104,39 @@ public class PedigreeGenerationAutomation {
 				// already has * -> repeatNum + 1
 				if (lastPart.contains("*")){
 					String[] repeatPartNum = lastPart.split("\\*");
-					String repeatNum = repeatPartNum[repeatPartNum.length-1];
-					int num = 0;
-					try{
-						num = Integer.parseInt(repeatNum);					
-					}catch(Exception e){
-						System.out.println("ERROR");
+					String repeatPart = repeatPartNum[0].trim();
+					if(repeatPart.equals(this.malePedigree.trim())){
+						String repeatNum = repeatPartNum[repeatPartNum.length-1];
+						int num = 0;
+						try{
+							num = Integer.parseInt(repeatNum);					
+						}catch(Exception e){
+							System.out.println("ERROR " + repeatNum);
+						}
+						num = num + 1;
+						if(lastPart.contains("/") && !lastPart.contains("(")){
+							String tmplastPart = "("+repeatPart+")";
+							revisedLastPart = tmplastPart +  String.valueOf(num);
+						}else{
+							revisedLastPart = lastPart.replace(repeatNum, String.valueOf(num));
+						}
+						
 					}
-					num = num + 1;
-					revisedLastPart = lastPart.replace(repeatNum, String.valueOf(num));
 				}
 				// does not has * -> check if parent is already the second generation. 
 	            else if (lastPart.replaceAll("\\s","").equals(this.malePedigree.replaceAll("\\s","")) 
 	            		&& lenOfSlashInFemale == 2){
-					revisedLastPart = lastPart + "*2";
+	            	
+	            	if(lastPart.contains("/") && !lastPart.contains("(")){
+	            		String tmplastPart = "("+lastPart+")";
+						revisedLastPart = tmplastPart + "*2";
+					}else{
+						revisedLastPart = lastPart + "*2";
+					}
+					
 				}
 			}
+			
 			if(revisedLastPart != null){
 				generatedPedigree = replaceLast(this.femalePedigree, lastPart, revisedLastPart);
 			}
@@ -267,17 +289,17 @@ public class PedigreeGenerationAutomation {
 		return max;
 	}
 	
-/*
-	public static void main(String [] args)
+
+	/*public static void main(String [] args)
 	{
-		String F = "Oh7B / LH132";
-		String M = "Oh7B / LH132 // LH132";
-		String MATE = "CR";
-		String GEN = "F0:1";
+		String F = "CML10 / 2369 // 2369 / 123";//"(CML277 / 2369 // 2369*3)-s1*2-h0";
+		String M = "2369 / 123";//"(CML277 / 2369 // 2369*3)-s1*2-h0";
+		String MATE = "BC";
+		String GEN = "BC3F5:7";
 		boolean MADE=false;
-		PedigreeGenerationAutomation p = new PedigreeGenerationAutomation(F,M,MATE,GEN,MADE);
+		PedigreeGenerationAutomation p = new PedigreeGenerationAutomation(F,M,"","",MATE,GEN,MADE);
 		System.out.println(p.childPedigree + " - " + p.childGeneration);
 				
-	}
-*/
+	}*/
+
 }

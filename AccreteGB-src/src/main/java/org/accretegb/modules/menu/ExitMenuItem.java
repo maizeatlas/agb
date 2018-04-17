@@ -79,7 +79,6 @@ public class ExitMenuItem extends MenuItem {
             			if(projectNode.isModified()){
             				projectNode.setModified(false);
             				String projectName = projectNode.getNodeName();
-            				System.out.print("Saving" + projectName);
         					int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
         					ProjectManager.saveOrDeleteProject(projectId,"save");
         					System.exit(0);

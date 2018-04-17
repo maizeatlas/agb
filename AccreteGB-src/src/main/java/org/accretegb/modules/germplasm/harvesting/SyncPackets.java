@@ -21,6 +21,7 @@ import org.accretegb.modules.hibernate.MeasurementUnit;
 import org.accretegb.modules.hibernate.MateMethod;
 import org.accretegb.modules.hibernate.ObservationUnit;
 import org.accretegb.modules.hibernate.StockComposition;
+import org.accretegb.modules.hibernate.StockGeneration;
 import org.accretegb.modules.hibernate.Passport;
 import org.accretegb.modules.hibernate.Stock;
 import org.accretegb.modules.hibernate.StockPacket;
@@ -28,6 +29,7 @@ import org.accretegb.modules.hibernate.dao.MateDAO;
 import org.accretegb.modules.hibernate.dao.MateMethodConnectDAO;
 import org.accretegb.modules.hibernate.dao.PassportDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
+import org.accretegb.modules.hibernate.dao.StockGenerationDAO;
 import org.accretegb.modules.hibernate.dao.StockPacketDAO;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.apache.commons.lang.StringUtils;
@@ -43,6 +45,7 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 	private boolean rollBacked;
 	private Map<String, Stock> stockMap;
 	private Map<String, Stock> newStockMap;
+	private Map<String, StockGeneration> newStockGenerationMap;
 	private Map<String, Integer> mateTypeRoleToID;
 	private HashMap<String, Integer> mateMethodtoID;
 	private List<MateMethodConnect> mateMethodConnects;
@@ -53,6 +56,7 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 		newStockMap = new HashMap<String, Stock>();
 		mateMethodtoID = this.harvesting.getFieldGenerated().mateMethodtoID;
 		getMatesInfo();
+		getGenerarionInfo();
 		progress = harvesting.getStickerGenerator().getProgress();
 	}
 	
@@ -73,6 +77,15 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 			mateTypeRoleToID.put(mate.getMatingType() + "-" + mate.getMateRole(), mate.getMateId());
 		}
 		mateMethodConnects = MateMethodConnectDAO.getInstance().getAllMateConnects();
+	}
+	
+	private void getGenerarionInfo(){
+		newStockGenerationMap = new HashMap<String, StockGeneration>();
+		List<StockGeneration> generations = StockGenerationDAO.getInstance().getGenerations();
+		for(StockGeneration sg : generations){
+			newStockGenerationMap.put(sg.getGeneration()+"-"+sg.getCycle(), sg);
+		}
+		System.out.println(newStockGenerationMap);
 	}
 	
 	@Override
@@ -131,11 +144,12 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 				String stockName = (String) table.getValueAt(row, ColumnConstants.STOCK_NAME);
 				String accession = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.ACCESSION)));
 				String pedigree = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.PEDIGREE)));
+				String generation = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.GENERATION)));
 				objectToSync o = null;
 				if(stockName.contains("m")) {
-					o = syncFromBulk(stockName, row, session, accession, pedigree);
+					o = syncFromBulk(stockName, row, session, accession, pedigree, generation);
 				} else {
-					o = syncFromFieldGenerated(stockName, row, session, accession, pedigree);
+					o = syncFromFieldGenerated(stockName, row, session, accession, pedigree, generation);
 				}
 				session.save(o.stock);
 				session.save(o.packet);
@@ -181,11 +195,12 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 		return null;
 	}
 
-	private objectToSync syncFromBulk(String stockName, int packetRow, Session session, String accession, String pedigree) {
+	private objectToSync syncFromBulk(String stockName, int packetRow, Session session, String accession, 
+			String pedigree, String generation) {
 		CheckBoxIndexColumnTable table = harvesting.getStickerGenerator().getStickerTablePanel().getTable();
 		Stock stock;
 		if(!stockMap.containsKey(stockName)) {
-			stock = createStock(stockName, packetRow, accession, pedigree, session);
+			stock = createStock(stockName, packetRow, accession, pedigree, generation, session);
 			stockMap.put(stockName, stock);
 			newStockMap.put(stockName, stock);
 		} 
@@ -217,12 +232,13 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 		return new objectToSync(stock,packet);
 	}
 	
-	private objectToSync syncFromFieldGenerated(String stockName, int packetRow, Session session, String accession, String pedigree) {
+	private objectToSync syncFromFieldGenerated(String stockName, int packetRow, Session session, String accession, 
+			String pedigree,String generation) {
 		
 		CheckBoxIndexColumnTable table = harvesting.getStickerGenerator().getStickerTablePanel().getTable();
 		Stock stock;
 		if(!stockMap.containsKey(stockName)) {
-			stock = createStock(stockName, packetRow,accession, pedigree, session);
+			stock = createStock(stockName, packetRow,accession, pedigree, generation, session);
 			stockMap.put(stockName, stock);
 			newStockMap.put(stockName, stock);
 		} 
@@ -379,7 +395,7 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 
 	
 
-	private Stock createStock(String stockName, int packetRow, String accession, String pedigree, Session session) {
+	private Stock createStock(String stockName, int packetRow, String accession, String pedigree, String generation,Session session) {
 		CheckBoxIndexColumnTable table = harvesting.getStickerGenerator().getStickerTablePanel().getTable();
 		Stock stock = new Stock();
 		stock.setStockName(stockName);
@@ -405,7 +421,25 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 		passport.setPedigree(pedigree);
 		session.save(passport);
 		stock.setPassport(passport);
+		
+		StockGeneration sg = findOrInsertStockGeneration(generation,null, session);
+		stock.setStockGeneration(sg);
+
 		return stock;
+	}
+	
+	private StockGeneration findOrInsertStockGeneration(String generation, String cycle, Session session){
+		if(newStockGenerationMap.containsKey(generation+"-"+String.valueOf(cycle))){
+			System.out.println("Existing " + generation+"-"+String.valueOf(cycle));
+			return newStockGenerationMap.get(generation);
+		}
+		StockGeneration sg = new StockGeneration();
+		sg.setGeneration(generation);
+		sg.setCycle(cycle);
+		session.save(sg);
+		System.out.println("NEW "+ generation+"-"+String.valueOf(cycle));
+		newStockGenerationMap.put(generation+"-"+String.valueOf(cycle), sg);
+		return sg;
 	}
 	
 	private String validate(String value) {

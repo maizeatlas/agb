@@ -9,9 +9,11 @@ import java.util.Set;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.accretegb.modules.hibernate.Stock;
+import org.accretegb.modules.hibernate.StockGeneration;
 import org.accretegb.modules.hibernate.Field;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.accretegb.modules.hibernate.ObservationUnit;
+import org.accretegb.modules.hibernate.Passport;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -67,6 +69,25 @@ public class StockDAO {
          try {
         	session.saveOrUpdate(stock);
         	//System.out.println(stock.getPassport().getPedigree());
+			transaction.commit();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}
+	}
+	
+	public void update(String stock_id, Passport passport, StockGeneration sg){
+		SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
+        Session session = sessionFactory.openSession();
+		Stock stock = (Stock) session.load(Stock.class, Integer.parseInt(stock_id));
+		stock.setPassport(passport);
+		stock.setStockGeneration(sg);
+		Transaction transaction = (Transaction) session.beginTransaction();        
+        try {
+        	session.update(stock);
+       	//System.out.println(stock.getPassport().getPedigree());
 			transaction.commit();
 		} catch (HibernateException e) {
 			// TODO Auto-generated catch block

@@ -37,7 +37,8 @@ public class TableColumnList {
 		columnNames.add(ColumnConstants.LOCATION_NAME);		
 		columnNames.add(ColumnConstants.CITY);
 		columnNames.add(ColumnConstants.STATE);
-		columnNames.add(ColumnConstants.COUNTRY);				
+		columnNames.add(ColumnConstants.COUNTRY);
+		columnNames.add(ColumnConstants.FEMALE_PARENT_STOCK);
 		TableColumnList.STOCK_SELECTION_TABLE_COLUMN_LIST = columnNames;
 		
 		ArrayList<String> showColumns = new ArrayList<String>();

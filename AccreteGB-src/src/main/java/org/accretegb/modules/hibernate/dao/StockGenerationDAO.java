@@ -3,6 +3,7 @@ package org.accretegb.modules.hibernate.dao;
 import java.util.List;
 
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
+import org.accretegb.modules.hibernate.Mate;
 import org.accretegb.modules.hibernate.Stock;
 import org.accretegb.modules.hibernate.StockGeneration;
 import org.apache.commons.lang.StringUtils;
@@ -28,6 +29,15 @@ public class StockGenerationDAO {
 	@Autowired
 	private  HibernateSessionFactory hibernateSessionFactory;
 	
+	public List<StockGeneration> getGenerations(){
+		Session session = hibernateSessionFactory.getSessionFactory().openSession();		
+		Query query = session.createSQLQuery("select * from stock_generation").addEntity(StockGeneration.class);
+		List<StockGeneration> generations = (List<StockGeneration>)query.list();
+		session.close();
+		return generations;
+
+	}
+	
 	public StockGeneration findStockGeneration(String generation, String cycle) {
 		Session session = hibernateSessionFactory.getSessionFactory().openSession();		
 		 Criteria c = session
@@ -51,6 +61,10 @@ public class StockGenerationDAO {
 	public StockGeneration insert(String generationValue, String cycleValue, String comment){
 		Session session = hibernateSessionFactory.getSessionFactory().openSession();	
 		Transaction transaction = session.beginTransaction();
+		
+		if (generationValue == "") {
+			return null;
+		}
 		StockGeneration generation = new StockGeneration();
         generation.setGeneration(StringUtils.defaultIfBlank(generationValue, null));
         generation.setCycle(StringUtils.defaultIfBlank(cycleValue, null));

@@ -97,8 +97,7 @@ public class Utils {
         if (isCheckBox) {
             row = addBooleanIndexColumn(row);
         }
-        List<String> NumbericColumns = Arrays.asList(new String[]{ColumnConstants.PACKET_COUNT, ColumnConstants.PACKET_NO,ColumnConstants.WEIGHT,ColumnConstants.NUMBER_OF_SEEDS});
-        System.out.println();
+        List<String> NumbericColumns = Arrays.asList(new String[]{ColumnConstants.TAG_ID, ColumnConstants.STOCK_ID, ColumnConstants.PACKET_ID, ColumnConstants.MATE_LINK,ColumnConstants.TOTAL_PACKETS,ColumnConstants.PACKET_NO,ColumnConstants.WEIGHT,ColumnConstants.NUMBER_OF_SEEDS});
         for (int columnIndex = 0, size = row.length; columnIndex < size; columnIndex++) {
              if (row[columnIndex] == null) {
                 if(NumbericColumns.contains(model.getColumnName(columnIndex)))

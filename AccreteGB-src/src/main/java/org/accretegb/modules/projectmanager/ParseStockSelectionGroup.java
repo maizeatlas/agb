@@ -39,7 +39,10 @@ public class ParseStockSelectionGroup implements Serializable {
 				JSONObject stockSelectionCartRowJSON = cartitems.getJSONObject(i);
 				Object[] oneRow = new Object[table.getColumnCount()];
 				for(int objectIndex = 0; objectIndex < table.getColumnCount(); ++objectIndex){
-					oneRow[objectIndex] = stockSelectionCartRowJSON.get(table.getColumnName(objectIndex));
+					if (stockSelectionCartRowJSON.has(table.getColumnName(objectIndex)))
+					{
+						oneRow[objectIndex] = stockSelectionCartRowJSON.get(table.getColumnName(objectIndex));
+					}
 				}
 				cart.add(oneRow);
 			}

@@ -26,49 +26,45 @@ import org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable;
 import org.accretegb.modules.customswingcomponent.TableToolBoxPanel;
 import org.accretegb.modules.customswingcomponent.Utils;
 import org.accretegb.modules.germplasm.harvesting.Harvesting;
-import org.accretegb.modules.germplasm.harvesting.SyncPackets;
-import org.accretegb.modules.germplasm.preplantinginfo.PrePlantingTableWorker;
 import org.accretegb.modules.germplasm.stocksinfo.CreateStocksInfoPanel;
 import org.accretegb.modules.germplasm.stocksinfo.StocksInfoPanel;
 import org.accretegb.modules.hibernate.Classification;
 import org.accretegb.modules.hibernate.HarvestingGroup;
 import org.accretegb.modules.hibernate.PMProject;
 import org.accretegb.modules.hibernate.Passport;
-import org.accretegb.modules.hibernate.Project;
 import org.accretegb.modules.hibernate.Stock;
+import org.accretegb.modules.hibernate.StockGeneration;
 import org.accretegb.modules.hibernate.Taxonomy;
 import org.accretegb.modules.hibernate.dao.ClassificationDAO;
-import org.accretegb.modules.hibernate.dao.FieldDAO;
 import org.accretegb.modules.hibernate.dao.HarvestingGroupDAO;
 import org.accretegb.modules.hibernate.dao.PassportDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.hibernate.dao.TaxonomyDAO;
 import org.accretegb.modules.hibernate.dao.TokenRelationDAO;
 import org.accretegb.modules.main.LoginScreen;
-import org.accretegb.modules.tab.TabComponent;
 import org.accretegb.modules.tab.TabComponentPanel;
 import org.accretegb.modules.util.LoggerUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import static org.accretegb.modules.config.AccreteGBBeanFactory.getContext;
-import static org.accretegb.modules.customswingcomponent.Utils.saveTableToFile;
 
 public class StockAnnotationPanel extends TabComponentPanel {
 
@@ -82,7 +78,8 @@ public class StockAnnotationPanel extends TabComponentPanel {
     private int taxonomySelectedRow = -1;
     private int classificationSelectedRow = -1;
     private JTextField pedigreeField;
-    private JTextField accessionField;    
+    private JTextField accessionField; 
+    private JTextField generarionField; 
     
     public void initializePanel() {
         MigLayout layout = new MigLayout("insets 10, gap 5");
@@ -123,6 +120,7 @@ public class StockAnnotationPanel extends TabComponentPanel {
         List<Integer> editableColumns = new ArrayList<Integer>();
         editableColumns.add(stockTablePanel.getTable().getIndexOf(ColumnConstants.ACCESSION));
         editableColumns.add(stockTablePanel.getTable().getIndexOf(ColumnConstants.PEDIGREE));
+        editableColumns.add(stockTablePanel.getTable().getIndexOf(ColumnConstants.GENERATION));
     	stockTablePanel.getTable().setEditableColumns(editableColumns);;
     	JButton importStockList = new JButton("Import Stocks By Search");
     	JButton importHarvestGroup = new JButton("Import Stocks From Harvest Group");
@@ -154,8 +152,10 @@ public class StockAnnotationPanel extends TabComponentPanel {
 						Object[] rowData = new Object[stockTablePanel.getTable().getColumnCount()];
 			            rowData[0] = new Boolean(false);
 			            Passport passport = stock.getPassport();
+			            StockGeneration generation = stock.getStockGeneration();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.STOCK_NAME)] = stock.getStockName();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.STOCK_ID)] = stock.getStockId();
+			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.GENERATION)] = generation == null ? null : generation.getGeneration();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.PASSPORT_ID)] = passport == null? null : passport.getPassportId();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.ACCESSION)] = passport == null? null :passport.getAccession_name();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.PEDIGREE)] = passport == null? null :passport.getPedigree();		            
@@ -167,6 +167,7 @@ public class StockAnnotationPanel extends TabComponentPanel {
 			            		passport.getTaxonomy() == null ? null : passport.getTaxonomy().getPopulation();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.TAXONOMY_ID)] = 
 			            		passport.getTaxonomy() == null ? null : passport.getTaxonomy().getTaxonomyId();
+			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.MODIFIED)] = new Boolean(false);
 			            model.addRow(rowData);
 					}
 					
@@ -226,8 +227,10 @@ public class StockAnnotationPanel extends TabComponentPanel {
 						Object[] rowData = new Object[stockTablePanel.getTable().getColumnCount()];
 			            rowData[0] = new Boolean(false);
 			            Passport passport = stock.getPassport();
+			            StockGeneration generation = stock.getStockGeneration();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.STOCK_NAME)] = stock.getStockName();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.STOCK_ID)] = stock.getStockId();
+			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.GENERATION)] = generation == null ? null : generation.getGeneration();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.PASSPORT_ID)] = passport == null? null : passport.getPassportId();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.ACCESSION)] = passport == null? null :passport.getAccession_name();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.PEDIGREE)] = passport == null? null :passport.getPedigree();
@@ -240,6 +243,7 @@ public class StockAnnotationPanel extends TabComponentPanel {
 			            		passport.getTaxonomy() == null ? null : passport.getTaxonomy().getPopulation();
 			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.TAXONOMY_ID)] = 
 			            		passport.getTaxonomy() == null ? null : passport.getTaxonomy().getTaxonomyId();
+			            rowData[stockTablePanel.getTable().getIndexOf(ColumnConstants.MODIFIED)] = new Boolean(false);
 			            model.addRow(rowData);
 					}
 				}
@@ -247,34 +251,58 @@ public class StockAnnotationPanel extends TabComponentPanel {
 			}
     		
     	});
+    	getstockTablePanel().getTable().addFocusListener(new FocusAdapter() {
+    	    public void focusLost(FocusEvent e) {
+    	        int row = getstockTablePanel().getTable().getSelectionModel().getAnchorSelectionIndex();
+    	        getstockTablePanel().getTable().setValueAt(true, row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.MODIFIED));
+    	    }
+    	});
     	JPanel subPanel2 = new JPanel();
     	subPanel2.setLayout(new MigLayout("insets 0 0 0 0 , gapx 0"));
     	subPanel2.add(new JLabel("Pedigree: "));
-    	this.pedigreeField = new JTextField(20);
+    	this.pedigreeField = new JTextField(10);
     	subPanel2.add(pedigreeField);
     	JButton setPedigree = new JButton("set");
     	setPedigree.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				for(int row : getstockTablePanel().getTable().getSelectedRows()) {
 					getstockTablePanel().getTable().setValueAt(pedigreeField.getText(), row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.PEDIGREE));
+					getstockTablePanel().getTable().setValueAt(true, row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.MODIFIED));
 				}		
 			}		
-    	});
-    		
+    	});    		
     	subPanel2.add(setPedigree, "gapRight 15");
+    	
     	subPanel2.add(new JLabel("Accession: "));
-    	this.accessionField = new JTextField(20);
+    	this.accessionField = new JTextField(10);
     	subPanel2.add(accessionField);
     	JButton setAccession = new JButton("set");
     	setAccession.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				for(int row : getstockTablePanel().getTable().getSelectedRows()) {
 					getstockTablePanel().getTable().setValueAt(accessionField.getText(), row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.ACCESSION));
+					getstockTablePanel().getTable().setValueAt(true, row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.MODIFIED));
+
 				}		
 			}		
     	});
-    	subPanel2.add(setAccession);
-    	panel.add(subPanel2, "gapLeft 10");
+    	subPanel2.add(setAccession,"gapRight 15");
+    	
+    	subPanel2.add(new JLabel("Generarion: "));
+    	this.generarionField = new JTextField(10);
+    	subPanel2.add(generarionField);
+    	JButton setGeneration = new JButton("set");
+    	setGeneration.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				for(int row : getstockTablePanel().getTable().getSelectedRows()) {
+					getstockTablePanel().getTable().setValueAt(generarionField.getText(), row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.GENERATION));
+					getstockTablePanel().getTable().setValueAt(true, row, getstockTablePanel().getTable().getIndexOf(ColumnConstants.MODIFIED));
+				}		
+			}		
+    	});
+    	subPanel2.add(setGeneration);
+    	
+    	panel.add(subPanel2, "gapLeft 10,spanx");
     	return panel;
     	
     }  

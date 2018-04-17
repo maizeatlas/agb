@@ -27,6 +27,7 @@ import org.accretegb.modules.hibernate.MeasurementUnit;
 import org.accretegb.modules.hibernate.MateMethod;
 import org.accretegb.modules.hibernate.ObservationUnit;
 import org.accretegb.modules.hibernate.StockComposition;
+import org.accretegb.modules.hibernate.StockGeneration;
 import org.accretegb.modules.hibernate.Passport;
 import org.accretegb.modules.hibernate.Stock;
 import org.accretegb.modules.hibernate.StockPacket;
@@ -36,6 +37,7 @@ import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.PassportDAO;
 import org.accretegb.modules.hibernate.dao.StockCompositionDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
+import org.accretegb.modules.hibernate.dao.StockGenerationDAO;
 import org.accretegb.modules.hibernate.dao.StockPacketDAO;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.apache.commons.lang.StringUtils;
@@ -63,6 +65,8 @@ public class SyncPassport extends SwingWorker<Void, Void> {
 		try {
 			CheckBoxIndexColumnTable table = stockAnnotation.getStockTablePanel().getTable();
 			for(int row=0; row<table.getRowCount(); row++) {
+				if(!(Boolean)table.getValueAt(row, ColumnConstants.MODIFIED))
+					continue;
 				String passport_id = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.PASSPORT_ID)));
 				String classification_id = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.CLASSIFICATION_ID)));
 				String taxonomy_id = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.TAXONOMY_ID)));
@@ -78,10 +82,16 @@ public class SyncPassport extends SwingWorker<Void, Void> {
 					taxonomy_id = "0";
 				}
 				
-				PassportDAO.getInstance().insert(Integer.parseInt(classification_id), 
+				Passport passport = PassportDAO.getInstance().insert(Integer.parseInt(classification_id), 
 						Integer.parseInt(taxonomy_id), Integer.parseInt(passport_id),
 						accession, pedigree);
 				progress.setValue((int) ((row*1.0/table.getRowCount())*100));
+				
+				String sg = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.GENERATION)));
+				StockGeneration stockGeneration = StockGenerationDAO.getInstance().insert(sg, null, null);
+				String stock_id = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.STOCK_ID)));
+				StockDAO.getInstance().update(stock_id, passport, stockGeneration);
+				table.setValueAt(false, row, table.getIndexOf(ColumnConstants.MODIFIED));
 			    rollBacked = false;
 			}
 			
