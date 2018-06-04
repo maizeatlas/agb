@@ -172,7 +172,6 @@ public class PhenotypeInfoPanel extends TabComponentPanel {
         subsetListComboBox.setPrototypeDisplayValue("xxxxxxxxxxxxxxxxxxx");
         subsetListComboBox.addItemListener(new ItemListener(){
 
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				fieldTablePanel.getTable().clearSelection();
 				tagname.setText("");
