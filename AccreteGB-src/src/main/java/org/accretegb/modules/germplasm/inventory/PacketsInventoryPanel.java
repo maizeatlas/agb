@@ -5,6 +5,10 @@ import static org.accretegb.modules.config.AccreteGBBeanFactory.getContext;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -781,6 +785,9 @@ public class PacketsInventoryPanel extends JPanel {
 					skippedmessage = skippedmessage +  packet+ "\n";
 				}
 				JTextArea textArea = new JTextArea(skippedmessage);
+				StringSelection data = new StringSelection(textArea.getText());
+				Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+				cb.setContents(data, data);
 				JScrollPane scrollPane = new JScrollPane(textArea);  
 				textArea.setLineWrap(true);  
 				textArea.setWrapStyleWord(true); 
@@ -839,7 +846,6 @@ public class PacketsInventoryPanel extends JPanel {
 						if (existingStockPacket != null) {
 							values[7] = String.valueOf(existingStockPacket.getStockPacketId());
 						}
-
 					}
 					// create new packet when stock packet id is null
 					if (values[7].equalsIgnoreCase("NULL")) { 

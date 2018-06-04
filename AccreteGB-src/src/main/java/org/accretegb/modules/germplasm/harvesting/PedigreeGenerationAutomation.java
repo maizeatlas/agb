@@ -95,8 +95,6 @@ public class PedigreeGenerationAutomation {
 		}else{
 			lastPart = femaleParts[femaleParts.length-1].trim();
 		}
-	
-		System.out.println("lastPart " + lastPart);
 		if(this.matingType.equals("CR") || this.matingType.equals("BC")){
 			String revisedLastPart=null;
 			// only use * when its "BC"
@@ -225,15 +223,14 @@ public class PedigreeGenerationAutomation {
 					}else{
 						last_generation = addSelf(last_generation,"p0");
 					}
-		    	}
-		    	
+		    	}   	
 		    }
 		    if (generatedPedigree == "")
 		    {
+		    	
 		    	generations[generations.length-1] = last_generation;
-		    	lastPart = StringUtils.join(generations, "-"); 	
-			    femaleParts[femaleParts.length-1] =lastPart;
-				generatedPedigree = StringUtils.join(femaleParts, slashes);
+		    	String newLastPart = StringUtils.join(generations, "-"); 	
+				generatedPedigree = this.femalePedigree.replace(lastPart, newLastPart);
 		    }
 		   
 		}
@@ -292,10 +289,10 @@ public class PedigreeGenerationAutomation {
 
 	/*public static void main(String [] args)
 	{
-		String F = "CML10 / 2369 // 2369 / 123";//"(CML277 / 2369 // 2369*3)-s1*2-h0";
-		String M = "2369 / 123";//"(CML277 / 2369 // 2369*3)-s1*2-h0";
-		String MATE = "BC";
-		String GEN = "BC3F5:7";
+		String F = "(T9 / C258 / C373 / C341 /// T8 / C10 / C341 / C277)-p0*2-p1*2";//"CML10 / 2369 // 2369 / 123";//"(CML277 / 2369 // 2369*3)-s1*2-h0";
+		String M = ""; //"2369 / 123";//"(CML277 / 2369 // 2369*3)-s1*2-h0";
+		String MATE = "PP";
+		String GEN = null;
 		boolean MADE=false;
 		PedigreeGenerationAutomation p = new PedigreeGenerationAutomation(F,M,"","",MATE,GEN,MADE);
 		System.out.println(p.childPedigree + " - " + p.childGeneration);

@@ -229,6 +229,7 @@ public class StickerGenerator extends JPanel {
 							newRow[1] = selectedStockName;
 							newRow[2] = list.get(1);
 							newRow[3] = list.get(2);
+							System.out.println("??"+list.get(2));
 							newRow[4] = list.get(4);
 							newRow[5] = list.get(5);
 							newRow[6] = list.get(6);
@@ -242,7 +243,7 @@ public class StickerGenerator extends JPanel {
 					{
 						compositionTable.hideColumn(ColumnConstants.SELECT);	
 						JScrollPane tableSP = new JScrollPane(compositionTable);
-						compositionTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+						compositionTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 						int width = 0;
 						DefaultTableColumnModel colModel = (DefaultTableColumnModel) compositionTable.getColumnModel();
 						for (int i = 0; i < compositionTable.getColumnCount(); i++) {
@@ -251,7 +252,7 @@ public class StickerGenerator extends JPanel {
 							width = width + col.getWidth();
 						}
 						stockCompositionPanel.add(tableSP,"span, h 100%, w 100%");
-						stockCompositionPanel.setPreferredSize(new Dimension(width + 2, (compositionTable.getRowHeight() * (compositionTable.getRowCount() + 2))));
+						stockCompositionPanel.setPreferredSize(new Dimension(width + 2, 300));
 						JOptionPane.showConfirmDialog(stickerTablePanel, stockCompositionPanel, "Stock Composition", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 					}
@@ -562,9 +563,7 @@ public class StickerGenerator extends JPanel {
 		}
 		return state;
 	}
-	public ArrayList<String> generateAccessions(String state, int count){
-		Date today = new Date();
-		String year = String.valueOf(today.getYear()+1900).substring(2);
+	public ArrayList<String> generateAccessions(String state, String year, int count){
 		ArrayList<String> accessions = new ArrayList<String>();
 		for(int i = 0; i < count; ++i ){
 			String accession = 	state+year+Gpw.generate(5,5);	
@@ -615,7 +614,8 @@ public class StickerGenerator extends JPanel {
 		ArrayList<String> accessions = new ArrayList<String>();
 		if(genNewAccs){
 			String state = getSavedState();
-			accessions = generateAccessions(state, fieldTable.getRowCount());
+			String year = fieldTable.getValueAt(0, ColumnConstants.TAG_NAME).toString().split("\\.")[0];
+			accessions = generateAccessions(state, year,fieldTable.getRowCount());
 		}
 		for(int row=0; row<fieldTable.getRowCount(); row++) {
 			// SB, PP, SF
@@ -714,7 +714,7 @@ public class StickerGenerator extends JPanel {
 
 		calendar = new CustomCalendar();
 		dateApply = new JButton("Set");
-		dateApply.setToolTipText("Set date for selected stocks");
+		dateApply.setToolTipText("Set date for selected stocks, default is today.");
 
 		quantity = new JTextField(10);
 		setQuantity = new JButton("Set");

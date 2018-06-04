@@ -39,10 +39,6 @@ public class AccreteGBConfiguration {
 
     private String rPath;
 
-    private AccreteGBConfiguration() {
-        loadConfigs();
-    }
-
     public static synchronized AccreteGBConfiguration getConfiguration() {
         if (accreteGBConfiguration == null) {
             accreteGBConfiguration = new AccreteGBConfiguration();

@@ -29,6 +29,7 @@
 				<value>Classification id</value>
 				<value>Population</value>
 				<value>Taxonomy id</value>
+				<value>Modified</value>
 			</list>
 		</property>
 		 <property name="showColumns"> 
@@ -40,6 +41,7 @@
 				<value>Generation</value>
 				<value>Classification Code</value>
 				<value>Population</value>
+				<value>Modified</value>
 	      </list>
 	      </property>
 		<property name="checkBoxHeader" value="false"/>

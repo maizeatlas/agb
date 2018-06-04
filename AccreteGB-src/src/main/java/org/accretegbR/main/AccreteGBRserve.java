@@ -18,12 +18,13 @@ public class AccreteGBRserve {
 	{ 	
 		if(startRserve.checkLocalRserve()){
 			try{
-				 RConnection c = new RConnection();			 
+				 RConnection c = new RConnection();	
+				 System.out.println(getRcode());
 				 RList results = c.eval(getRcode()).asList();
 			     c.close();
 			     return results;
 			 }catch(Exception e){
-			    System.out.println("not connected");
+			    System.out.println("Unable to get result:" + e.getMessage());
 			 }	
 		}
 		 return null; 	 	    

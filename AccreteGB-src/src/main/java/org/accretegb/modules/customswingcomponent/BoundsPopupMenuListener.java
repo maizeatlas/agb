@@ -169,6 +169,7 @@ public class BoundsPopupMenuListener implements PopupMenuListener
 	/**
 	 *  Alter the bounds of the popup just before it is made visible.
 	 */
+	@Override
 	public void popupMenuWillBecomeVisible(PopupMenuEvent e)
 	{
 		JComboBox comboBox = (JComboBox)e.getSource();
@@ -336,8 +337,10 @@ public class BoundsPopupMenuListener implements PopupMenuListener
 		return popupWidth > scrollPane.getPreferredSize().width;
 	}
 
+	@Override
 	public void popupMenuCanceled(PopupMenuEvent e) {}
 
+	@Override
 	public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
 	{
 		//  In its normal state the scrollpane does not have a scrollbar

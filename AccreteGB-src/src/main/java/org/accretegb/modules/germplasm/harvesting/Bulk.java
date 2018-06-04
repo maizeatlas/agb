@@ -115,6 +115,10 @@ public class Bulk extends JPanel {
 
 		final CheckBoxIndexColumnTable table = getBulkTablePanel().getTable();
 		Utils.removeAllRowsFromTable((DefaultTableModel)table.getModel());
+		table.getModel().addTableModelListener(new TableModelListener() {
+			public void tableChanged(TableModelEvent e) {
+				getBulkTablePanel().getNumberOfRows().setText(String.valueOf(getBulkTablePanel().getTable().getRowCount()));			
+			}});
 		importStocks.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showPopup();
@@ -329,27 +333,6 @@ public class Bulk extends JPanel {
 				}
 			}
 		});
-      table.getModel().addTableModelListener(new TableModelListener() {
-			public void tableChanged(TableModelEvent e) {
-				bulkTablePanel.getNumberOfRows().setText(String.valueOf(bulkTablePanel.getTable().getRowCount()));
-				int quantityColumn = table.getIndexOf(ColumnConstants.QUANTITY);
-				if(e.getColumn() != quantityColumn)
-					return;
-				int unitIdColumn = table.getIndexOf(ColumnConstants.UNIT_ID);
-				int unitColumn = table.getIndexOf(ColumnConstants.UNIT);
-				MeasurementUnit count = unitsList.get(1);
-				for(MeasurementUnit unit : unitsList) {
-					if(unit.getUnitType().equals("count"))
-						count = unit;
-				}
-				for(int row : table.getSelectedRows()) {
-					if(table.getValueAt(row, unitColumn) == null && Utils.isInteger(String.valueOf(table.getValueAt(row, quantityColumn)))) {
-						table.setValueAt(count.getMeasurementUnitId(), row, unitIdColumn);
-						table.setValueAt(count.getUnitType(), row, unitColumn);
-					}// if not null
-				}//for					
-			}			
-		});
 		
 		getBulkTablePanel().getTable().addMouseListener(new MouseAdapter() {
 			@Override
@@ -558,7 +541,6 @@ public class Bulk extends JPanel {
 		buttonsPanel.add(multiply);
 		buttonsPanel.add(mixButton);
 		buttonsPanel.add(unmixButton, "wrap");
-		
 		return buttonsPanel;
 	}
 

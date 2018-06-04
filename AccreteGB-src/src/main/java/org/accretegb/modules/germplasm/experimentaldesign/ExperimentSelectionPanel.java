@@ -10,14 +10,18 @@ import org.accretegb.modules.customswingcomponent.TextField;
 import org.accretegb.modules.customswingcomponent.Utils;
 import org.accretegb.modules.germplasm.stocksinfo.CreateStocksInfoPanel;
 import org.accretegb.modules.germplasm.stocksinfo.StocksInfoPanel;
+import org.accretegb.modules.hibernate.Classification;
 import org.accretegb.modules.hibernate.ExperimentFactor;
 import org.accretegb.modules.hibernate.ExperimentFactorValue;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.accretegb.modules.hibernate.MeasurementUnit;
+import org.accretegb.modules.hibernate.Passport;
+import org.accretegb.modules.hibernate.Stock;
 import org.accretegb.modules.hibernate.dao.ExperimentDAO;
 import org.accretegb.modules.hibernate.dao.ExperimentFactorDAO;
 import org.accretegb.modules.hibernate.dao.ExperimentFactorValueDAO;
 import org.accretegb.modules.hibernate.dao.MeasurementUnitDAO;
+import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.tab.TabComponentPanel;
 import org.accretegbR.experimental.AlphaDesign;
 import org.accretegbR.experimental.CompleteRandomizedDesign;
@@ -32,6 +36,7 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.JTextComponent;
 
@@ -51,6 +56,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -460,9 +471,191 @@ public class ExperimentSelectionPanel extends TabComponentPanel {
             }
         });
         randomizeButton.setName("Button");
-        designSelectionPanel.add(randomizeButton, "tag submit, sizegroup bttn, alignx right");
+        JPanel subPanel = new JPanel();
+        subPanel.add(randomizeButton, "pushx, align right");
         setRandomizeButton(randomizeButton);
+        JButton importButton = new JButton("Import");
+        importButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {                 
+            	importDesignButtonActionPerformed();                  		       
+            }
+        });
+        subPanel.add(importButton,"pushx, align right");
+        designSelectionPanel.add(subPanel, "w 100%, spanx");
         return designSelectionPanel;
+    }
+    
+    /**
+     * import design
+     */
+    public void importDesignButtonActionPerformed(){
+    	int option = JOptionPane.showOptionDialog(null, 
+		        "Choose an option to proceed", 
+		        "",
+		        JOptionPane.YES_NO_CANCEL_OPTION, 
+		        JOptionPane.INFORMATION_MESSAGE, 
+		        null, 
+		        new String[]{"Import a file","Download a template","Cancel"},
+		        "default");
+    	String selectedExperiment = (String) experimentSelectionBox.getSelectedItem();
+    	if(option ==JOptionPane.OK_OPTION )
+        {	
+        	//import a file		
+        	if (selectedExperiment.equalsIgnoreCase(ExperimentConstants.SPLIT_DESIGN)){
+        		if(!isSplitDesignInputValid()){
+        			return;
+        		}
+        	}
+        	if(isStockNameEmpty()){
+        		try {
+        			final JFileChooser fc = new JFileChooser();
+        			fc.setFileFilter(new FileNameExtensionFilter("Comma separated files(.csv)", "csv"));
+        			int status = fc.showOpenDialog(this);				
+        			if (fc.getSelectedFile() == null)
+        			{
+        				return;
+        			}
+        			String filename = fc.getSelectedFile().toString();
+        			if (status == JFileChooser.APPROVE_OPTION) {
+        				if (!(filename.trim().endsWith(".csv"))) {
+        					JLabel errorFields = new JLabel("<HTML><FONT COLOR = Blue>"
+        							+ "File should have a .csv extension only"
+        							+ ".</FONT></HTML>");
+        					JOptionPane.showMessageDialog(null,errorFields);
+        				} else {
+        					DefaultTableModel model = (DefaultTableModel) getExperimentalOutputPanel().getTable().getModel(); 
+        					Utils.removeAllRowsFromTable(model);
+        					BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
+        					// skip first line
+        					String first = br.readLine();
+        					String line = br.readLine().trim();
+        					HashMap<String, Stock> stockNames = new HashMap<String, Stock>();
+        					if (!selectedExperiment.equalsIgnoreCase(ExperimentConstants.SPLIT_DESIGN)){
+        						while (line != null) {
+        							System.out.println(line);
+        							line = line.trim();
+        							String[] row = line.split(",");
+        							if(row.length != 3 ){
+        								line = br.readLine();
+        								continue;
+        							}
+        							Object[] newRow = new Object[model.getColumnCount()];
+        							newRow[0] = new Boolean(false);
+        							newRow[1] = row[0]; //plot
+        							newRow[2] = row[1]; //replication
+        							newRow[3] = null; //Exp_id
+        							newRow[4] = null; //Exp_factor_value_id
+        							String stockName = row[2];
+        							if(stockNames.containsKey(stockName)){
+        								newRow[5] = stockNames.get(stockName).getStockId(); //stock_id
+        							}else{
+        								System.out.println("\nlooking for "+stockName);
+        								List<Stock> stocks = StockDAO.getInstance().findStockByName(stockName);
+        								if(stocks.size() == 0){
+        									continue;
+        								}
+        								newRow[5] = stocks.get(0).getStockId(); //stock_id
+        								stockNames.put(stockName,  stocks.get(0));
+        							}
+        							newRow[6] = stockName; //stockName
+        							Stock s = stockNames.get(stockName);
+        							Passport p =  s.getPassport();
+        							if (p != null ){
+        								newRow[7] = p.getAccession_name(); //Accession_name
+        								newRow[8] = p.getPedigree(); //pedigree
+        								newRow[11] = p.getClassification() == null ? "NULL" : p.getClassification().getClassificationCode(); //ClassificationCode
+        								newRow[12] = p.getTaxonomy() == null ? "NULL" : p.getTaxonomy().getPopulation();// Population
+        							}
+        							newRow[9] = s.getStockGeneration() == null ? "NULL" : s.getStockGeneration().getGeneration(); //generation
+        							newRow[10] = s.getStockGeneration() == null ? "NULL" : s.getStockGeneration().getCycle(); //cycle
+        							model.addRow(newRow);
+        							line = br.readLine();
+        						}
+        					}else{
+        						while (line != null) {
+        							System.out.println(line);
+        							line = line.trim();
+        							String[] row = line.split(",");
+        							if(row.length != 6 ){
+        								line = br.readLine();
+        								continue;
+        							}
+        							Object[] newRow = new Object[model.getColumnCount()];
+        							newRow[0] = new Boolean(false);
+        							newRow[1] = row[0]; //plot
+        							newRow[2] = row[1]; //splot
+        							newRow[3] = row[2]; //replication
+        							newRow[4] = row[3]; //tr1
+        							newRow[5] = row[4]; //tr2
+        							newRow[6] = null; //Exp_id
+        							newRow[7] = null; //Exp_factor_value_id
+        							String stockName = row[5];
+        							if(stockNames.containsKey(stockName)){
+        								newRow[8] = stockNames.get(stockName).getStockId(); //stock_id
+        							}else{
+        								System.out.println("\nlooking for "+stockName);
+        								List<Stock> stocks = StockDAO.getInstance().findStockByName(stockName);
+        								if(stocks.size() == 0){
+        									continue;
+        								}
+        								newRow[8] = stocks.get(0).getStockId(); //stock_id
+        								stockNames.put(stockName,  stocks.get(0));
+        							}
+        							newRow[9] = stockName; //stockName
+        							Stock s = stockNames.get(stockName);
+        							Passport p =  s.getPassport();
+        							if (p != null ){
+        								newRow[10] = p.getAccession_name(); //Accession_name
+        								newRow[11] = p.getPedigree(); //pedigree
+        								newRow[14] = p.getClassification() == null ? "NULL" : p.getClassification().getClassificationCode(); //ClassificationCode
+        								newRow[15] = p.getTaxonomy() == null ? "NULL" : p.getTaxonomy().getPopulation();// Population
+        							}
+        							newRow[12] = s.getStockGeneration() == null ? "NULL" : s.getStockGeneration().getGeneration(); //generation
+        							newRow[13] = s.getStockGeneration() == null ? "NULL" : s.getStockGeneration().getCycle(); //cycle
+        							model.addRow(newRow);
+        							line = br.readLine();
+        						}
+        					}
+        					getExperimentalOutputPanel().getTable().setModel(model);
+        					br.close();
+        					setNumberOfItems();
+        				}
+        			}
+
+        		}catch (Exception E) {
+        			System.out.println(E.toString());
+        			E.printStackTrace();
+        		}
+        	}
+
+        }else if(option == JOptionPane.NO_OPTION){
+        	//download a template
+        	JFileChooser fileChooser = new JFileChooser();
+            File file = new File(System.getProperty("java.io.tmpdir") + "/" + selectedExperiment.replace("\\s+", "_")+".csv");
+            fileChooser.setSelectedFile(file);
+            int approve = fileChooser.showSaveDialog(this);
+            if (approve != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+            file = fileChooser.getSelectedFile();
+            BufferedWriter writer;
+			try {
+				writer = new BufferedWriter(new FileWriter(file));
+				if (!selectedExperiment.equalsIgnoreCase(ExperimentConstants.SPLIT_DESIGN)){
+					writer.write("Plot,Replication,Stock Name");
+				}else{
+					writer.write("Plot,Splot,Replication,tr1,tr2,Stock Name");
+				}
+				writer.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	return ;			 
+        }else{
+        	return;
+        }
+    	
     }
     
     /**

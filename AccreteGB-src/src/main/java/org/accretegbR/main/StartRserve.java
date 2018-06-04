@@ -2,7 +2,12 @@ package org.accretegbR.main;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 
+import javax.swing.JOptionPane;
+
+import org.accretegb.modules.config.AccreteGBLogger;
+import org.accretegb.modules.util.LoggerUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -22,6 +27,7 @@ class StreamHog extends Thread {
 	public void run()
 	{
 		try {
+			AccreteGBLogger.getTextAreaLogHandler().setLoggingEnabled(true);
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			String line = null;
 			while ( (line = br.readLine()) != null) {
@@ -34,9 +40,17 @@ class StreamHog extends Thread {
 							s = s.substring(j + 6).trim();
 						installPath = s;
 						System.out.println("R InstallPath = "+s);
+						if (LoggerUtils.isLogEnabled()) {
+			                LoggerUtils.log(Level.INFO, "R InstallPath = "+s);
+			            }
 					}
-				} else 
+				} else {
 					System.out.println("Rserve>" + line);
+					if (LoggerUtils.isLogEnabled()) {
+		                LoggerUtils.log(Level.INFO, "R >" + line);
+		            }
+				}
+					
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -82,14 +96,14 @@ public class StartRserve {
 			}
 			System.out.println("call terminated, let us try to connect ...");
 		} catch (Exception x) {
-			System.out.println("failed to start Rserve process with "+x.getMessage());
+			JOptionPane.showConfirmDialog(null,"failed to start Rserve process with "+x.getMessage());
 			return false;
 		}
 		int attempts = 5; /* try up to 5 times before giving up. We can be conservative here, because at this point the process execution itself was successful and the start up is usually asynchronous */
 		while (attempts > 0) {
 			try {
 				RConnection c = new RConnection();
-				System.out.println("Rserve is running.");
+				System.out.println("Rserve connnected.");
 				c.close();
 				return true;
 			} catch (Exception e2) {
@@ -115,11 +129,11 @@ public class StartRserve {
 				regHog.join();
 				installPath = regHog.getInstallPath();
 			} catch (Exception rge) {
-				System.out.println("ERROR: unable to run REG to find the location of R: "+rge);
+				JOptionPane.showConfirmDialog(null, "ERROR: unable to run REG to find the location of R: "+rge);
 				return false;
 			}
 			if (installPath == null) {
-				System.out.println("ERROR: canot find path to R. Make sure reg is available and R was installed with registry settings.");
+				JOptionPane.showConfirmDialog(null, "ERROR: cannot find path to R. Make sure reg is available and R was installed with registry settings.");
 				return false;
 			}
 			return launchRserve(installPath+"\\bin\\R.exe");
@@ -150,12 +164,5 @@ public class StartRserve {
 		return false;
 	}
 	
-	/** just a demo main method which starts Rserve and shuts it down again 
-	public static void main(String[] args) {
-		System.out.println("result="+checkLocalRserve());
-		try {
-			RConnection c=new RConnection();
-			//c.shutdown();
-		} catch (Exception x) {};
-	}*/
+
 }

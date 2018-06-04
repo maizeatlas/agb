@@ -194,5 +194,14 @@ public class StockDAO {
         session.close();
         return results;	
 	}
+	
+	public List<String> getAllStockNames() {
+		SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
+        Session session = sessionFactory.openSession();    
+        Query query = session.createSQLQuery("select stock_name from stock");
+        List<String> results = query.list();
+        session.close();
+        return results;	
+	}
 
 }

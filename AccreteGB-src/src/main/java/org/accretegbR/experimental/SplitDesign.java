@@ -6,7 +6,7 @@ public class SplitDesign extends ExperimentDesign {
 	public StringBuffer buildRCode() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("library(agricolae);");
-		sb.append("require(\"Runiversal\");");
+		//sb.append("require(\"Runiversal\");");
 		sb.append("trt1<-c(" + convertListToString(getTreatments().get(0)) + ");");
 		sb.append("trt2<-c(" + convertListToString(getTreatments().get(1)) + ");");
 		sb.append("outdesign<- design.split(trt1,trt2, "+ getReps() + ", serie=2, seed=" + getSeeds() + ", kinds=\"" + getMethodName() + "\");");

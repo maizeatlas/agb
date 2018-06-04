@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
@@ -85,7 +86,6 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 		for(StockGeneration sg : generations){
 			newStockGenerationMap.put(sg.getGeneration()+"-"+sg.getCycle(), sg);
 		}
-		System.out.println(newStockGenerationMap);
 	}
 	
 	@Override
@@ -185,9 +185,9 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 			for(int row = 0; row < size; ++row)
 			{
 				table.setValueAt(-1, row, table.getIndexOf(ColumnConstants.PACKET_ID));	
-				table.setValueAt(true, 0, table.getIndexOf(ColumnConstants.MODIFIED));
+				table.setValueAt(true, row, table.getIndexOf(ColumnConstants.MODIFIED));
 			}
-			e.printStackTrace();
+			//e.printStackTrace();
 			transaction.rollback();
 			rollBacked = true;
 			session.close();
@@ -277,38 +277,13 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 		{
 			progress.setValue((int) (((row+size)*1.0/(size*2))*100));
 			progress.setString("Syncing..." + progress.getValue() + "%");
-			String stockName = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.STOCK_NAME)));
-			 // only generate stock compositions for new stock
-            if(!this.newStockMap.containsKey(stockName)){
-            	continue;
-            }
-            Stock stock = newStockMap.get(stockName);
-			if(harvesting.getStickerGenerator().getStockCompositionByBulk().containsKey(stockName)){
-				List<ArrayList<String>>  compositions = harvesting.getStickerGenerator().getStockCompositionByBulk().get(stockName);
-				for(ArrayList<String> composition : compositions){					
-					StockComposition stockComposition =  new StockComposition();
-					//stock can come from old new harvest or old years
-					String stockstring = composition.get(1);
-					Stock mixFrom = null;
-					if (this.stockMap.containsKey(stockstring))
-					{
-						mixFrom = stockMap.get(stockstring);
-					}else{
-						String stockid = composition.get(0);
-						mixFrom = (Stock) session.load(Stock.class, Integer.parseInt(stockid));
-					}
-					
-					int quantity = composition.get(2).equals("null")? 0 : Integer.parseInt(composition.get(2));
-					MeasurementUnit unit = composition.get(3).equals("null")? null : (MeasurementUnit)session.load(MeasurementUnit.class, Integer.parseInt(composition.get(3)));
-					stockComposition.setStockByStockId(stock);
-					stockComposition.setStockByMixFromStockId(mixFrom);
-					stockComposition.setMixQuantity(quantity == 0 ? null : quantity);
-					stockComposition.setMeasurementUnit(unit);	
-					session.save(stockComposition);
-				}				
-			}
-			
+			String stockName = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.STOCK_NAME)));		
 			if(harvesting.getStickerGenerator().getStockCompositionByMate().containsKey(stockName)){
+				 // only generate stock compositions for new stock
+	            if(!this.newStockMap.containsKey(stockName)){
+	            	continue;
+	            }
+	            Stock stock = newStockMap.get(stockName);	
 				List<ArrayList<String>>  compositions = harvesting.getStickerGenerator().getStockCompositionByMate().get(stockName);
 				for(ArrayList<String> composition : compositions){
 					StockComposition stockComposition =  new StockComposition();;
@@ -320,16 +295,19 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 					Mate mate = null;
 					boolean createNewConnect = false;
 					if(this.mateTypeRoleToID.containsKey(type+"-"+role)){
-						 mate = (Mate)session.load(Mate.class, this.mateTypeRoleToID.get(type+"-"+role));
+						mate = (Mate)session.load(Mate.class, this.mateTypeRoleToID.get(type+"-"+role));
 					}else{
 						//create new one
-						 mate = new Mate(type, role, null);
-						 session.save(mate);
-						 createNewConnect = true;
+						mate = new Mate(type, role, null);
+						session.save(mate);
+						this.mateTypeRoleToID.put(type+"-"+role,mate.getMateId());
+						createNewConnect = true;
 					}
 					MateMethod mateMethod = null;
-					if (String.valueOf(methodName) != "null"){
-						mateMethod = (MateMethod) session.load(MateMethod.class, this.mateMethodtoID.get(methodName));
+					if (!String.valueOf(methodName).equalsIgnoreCase("null")){
+						if ( this.mateMethodtoID.containsKey(methodName)){
+							mateMethod = (MateMethod) session.load(MateMethod.class, this.mateMethodtoID.get(methodName));
+						}
 					}
 					MateMethodConnect  mateMethodConnect = null;
 					for(MateMethodConnect m : this.mateMethodConnects){
@@ -373,6 +351,48 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 				}				
 			}		
 			if ( row % 500 == 0 ) { 
+		        session.flush();
+		        session.clear();
+		    }
+		}
+		
+		// sync the bulks last
+		for(int row = 0; row < size; ++row)
+		{
+			String stockName = String.valueOf(table.getValueAt(row, table.getIndexOf(ColumnConstants.STOCK_NAME)));
+			if(harvesting.getStickerGenerator().getStockCompositionByBulk().containsKey(stockName)){
+				 // only generate stock compositions for new stock
+	            if(!this.newStockMap.containsKey(stockName)){
+	            	continue;
+	            }
+	            Stock stock = newStockMap.get(stockName);
+				List<ArrayList<String>>  compositions = harvesting.getStickerGenerator().getStockCompositionByBulk().get(stockName);
+				for(ArrayList<String> composition : compositions){					
+					StockComposition stockComposition =  new StockComposition();
+					//stock can come from old new harvest or old years
+					String stockstring = composition.get(1);
+					Stock mixFrom = null;
+					if (this.stockMap.containsKey(stockstring))
+					{
+						mixFrom = stockMap.get(stockstring);
+					}else{
+						String stockid = composition.get(0);
+						if (String.valueOf(stockid).equalsIgnoreCase("null")){
+							JOptionPane.showMessageDialog(null, "Please make sure the stocks in the bulks exist(sync the stocks first). ", "Error", JOptionPane.ERROR_MESSAGE);
+						}
+						mixFrom = (Stock) session.load(Stock.class, Integer.parseInt(String.valueOf(stockid)));
+					}
+					
+					int quantity = composition.get(2).equals("null")? 0 : Integer.parseInt(composition.get(2));
+					MeasurementUnit unit = composition.get(3).equals("null")? null : (MeasurementUnit)session.load(MeasurementUnit.class, Integer.parseInt(composition.get(3)));
+					stockComposition.setStockByStockId(stock);
+					stockComposition.setStockByMixFromStockId(mixFrom);
+					stockComposition.setMixQuantity(quantity == 0 ? null : quantity);
+					stockComposition.setMeasurementUnit(unit);	
+					session.save(stockComposition);
+				}				
+			}
+			if ( row % 100 == 0 ) { 
 		        session.flush();
 		        session.clear();
 		    }
@@ -429,16 +449,15 @@ public class SyncPackets extends SwingWorker<Void, Void> {
 	}
 	
 	private StockGeneration findOrInsertStockGeneration(String generation, String cycle, Session session){
-		if(newStockGenerationMap.containsKey(generation+"-"+String.valueOf(cycle))){
-			System.out.println("Existing " + generation+"-"+String.valueOf(cycle));
-			return newStockGenerationMap.get(generation);
+		String key = generation+"-"+String.valueOf(cycle);
+		if(newStockGenerationMap.containsKey(key)){
+			return newStockGenerationMap.get(key);
 		}
 		StockGeneration sg = new StockGeneration();
 		sg.setGeneration(generation);
 		sg.setCycle(cycle);
 		session.save(sg);
-		System.out.println("NEW "+ generation+"-"+String.valueOf(cycle));
-		newStockGenerationMap.put(generation+"-"+String.valueOf(cycle), sg);
+		newStockGenerationMap.put(key, sg);
 		return sg;
 	}
 	

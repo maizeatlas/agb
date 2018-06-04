@@ -58,9 +58,7 @@ public class SyncTags extends SwingWorker<Void, Void> {
 
 	private void syncWithDatabase() {
 		fillExperimentFactorValueTableForPlants();
-		if(rollbacked == true){
-
-		}else{
+		if(rollbacked != true){
 			SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
 			Session session = sessionFactory.openSession();
 			Transaction transaction = session.beginTransaction();
@@ -148,9 +146,10 @@ public class SyncTags extends SwingWorker<Void, Void> {
 				System.out.println("That took " + (endTime - startTime) + " milliseconds");
 			}catch(Exception e) {
 				transaction.rollback(); //table info need to rollback too.
+				System.out.println("syncWithDatabase " + e.getMessage());
 				for(int row=0; row<table.getRowCount(); row++) {
 					table.setValueAt(true, row, table.getIndexOf(ColumnConstants.MODIFIED));
-					table.setValueAt(null, row, table.getIndexOf(ColumnConstants.TAG));
+					table.setValueAt(null, row, table.getIndexOf(ColumnConstants.TAG_ID));
 				} 
 				if(LoggerUtils.isLogEnabled())
 					LoggerUtils.log(Level.INFO,  e.toString());
@@ -208,7 +207,8 @@ public class SyncTags extends SwingWorker<Void, Void> {
 
 			transaction.commit();
 		}catch(Exception e) {
-			if(LoggerUtils.isLogEnabled()) LoggerUtils.log(Level.INFO,  e.toString());
+			System.out.println("fillExperimentFactorValueTableForPlants " + e.getMessage());
+			if(LoggerUtils.isLogEnabled()) LoggerUtils.log(Level.INFO,  e.getMessage());
 			rollbacked = true; 
 			for(int row=0; row<table.getRowCount(); row++) {
 				if(!String.valueOf(table.getValueAt(row, ColumnConstants.REP)).equals("null")){

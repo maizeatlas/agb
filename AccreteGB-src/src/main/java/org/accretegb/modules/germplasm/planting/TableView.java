@@ -536,6 +536,9 @@ public class TableView extends JPanel {
 					// skip first line
 					String first = br.readLine();
 					String line = br.readLine().trim();
+					int stockIdIndex = getStocksOrderPanel().getTable().getIndexOf(ColumnConstants.STOCK_ID);
+					int stockNameIndex = getStocksOrderPanel().getTable().getIndexOf(ColumnConstants.STOCK_NAME);
+					HashMap<String, Integer> stockNames = new HashMap<String, Integer>();
 					while (line != null) {
 						line = line.trim();
 						String[] row = line.split(",");
@@ -550,6 +553,16 @@ public class TableView extends JPanel {
 							else{
 								newRow[i] = row[i];							
 							}
+							
+						}
+						String stockName = (String) newRow[stockNameIndex];
+						if(stockNames.containsKey(stockName)){
+							newRow[stockIdIndex] = stockNames.get(stockName);
+						}else{
+							System.out.println("looking for "+stockName);
+							int stockId = StockDAO.getInstance().findStockByName(stockName).get(0).getStockId();
+							newRow[stockIdIndex] = stockId;
+							stockNames.put(stockName, stockId);
 						}
 						model.addRow(newRow);
 						line = br.readLine();

@@ -36,6 +36,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 	public HarvestingImportWorker(FieldGenerated fieldGenerated, JFileChooser fc) {
 		this.fieldGenerated = fieldGenerated;
 		this.fc = fc;
+		existingStockList = new HashSet<String>(StockDAO.getInstance().getAllStockNames());
 	}
 	@Override
 	protected Void doInBackground() throws Exception {
@@ -105,7 +106,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 			    		String stockName = line;
 						boolean boolvalue = !existingStockList.contains(stockName);
 						if(!boolvalue) {
-							duplicate.add("group with female tag " + stockName + " has duplicates in the table.");
+							duplicate.add("group with female tag " + stockName + " has duplicates.");
 						}else{
 							mateLink++;
 							fieldGenerated.nextLink = mateLink;
@@ -125,14 +126,17 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 			    			if (line.split("\\.").length == 5){
 			    				maleTag = line;
 			    			}else{
-			    				if(line.split("\\.").length != 2){
-			    					invalidFormat.add(line);
-			    				}else{
-						    		array = line.split(("\\."));
+			    				if (line.split("\\.").length == 1){
+			    					String rowNumber = line.trim();
+									maleTag = tagPrefix+"."+df.format(Integer.parseInt(rowNumber))+"."+df2.format(0);
+			    				}else if(line.split("\\.").length == 2){
+			    					array = line.split(("\\."));
 									String rowNumber = array[0];
 									String plantNumber = array[1];
 									maleTag = tagPrefix+"."+df.format(Integer.parseInt(rowNumber))
 													 +"."+df2.format(Integer.parseInt(plantNumber));
+			    				}else{
+			    					invalidFormat.add(line);
 			    				}
 			    			}
 							
@@ -152,7 +156,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 							if(result == null || result1 == null){
 								nonExist.add("group with female tag " + stockName + ", mating type "+matingType+".");		
 							}
-							if(boolvalue && result != null && result1 != null)
+							if(boolvalue && result != null && result1 != null )
 							{
 								Object[] rowDataFemale = new Object[crossingTablePanel.getTable().getColumnCount()];
 								rowDataFemale[selectIndex] = new Boolean(false);
@@ -209,7 +213,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 							for (String name : sfStockNames){
 								boolvalue = !existingStockList.contains(name);
 								if(!boolvalue) {
-									duplicate.add("group with female tag " + stockName + " has duplicates in the table.");
+									duplicate.add("group with female tag " + stockName + " has duplicates.");
 								}else{
 									mateLink++;
 									fieldGenerated.nextLink = mateLink;
@@ -227,7 +231,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 								if(result == null){
 									nonExist.add("group with female tag " + name + ", mating type "+matingType+".");	
 								}
-								if(boolvalue && result != null)
+								if(boolvalue && result != null )
 								{
 									rowDataFemale[obsUnitIndex] = result[0];
 									rowDataFemale[accessionIndex] = result[1];
@@ -251,14 +255,18 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 					    			if (line.split("\\.").length == 5){
 					    				maleTag = line;
 					    			}else{
-					    				if(line.split("\\.").length != 2){
+					    				if (line.split("\\.").length == 1){
+					    					String rowNumber = line.trim();
+											maleTag = tagPrefix+"."+df.format(Integer.parseInt(rowNumber))+"."+df2.format(0);
+					    				}else if(line.split("\\.").length == 2){
+					    					array = line.split(("\\."));
+											String rowNumber = array[0];
+											String plantNumber = array[1];
+											maleTag = tagPrefix+"."+df.format(Integer.parseInt(rowNumber))
+															 +"."+df2.format(Integer.parseInt(plantNumber));
+					    				}else{
 					    					invalidFormat.add(line);
 					    				}
-							    		array = line.split(("\\."));
-										String rowNumber = array[0];
-										String plantNumber = array[1];
-										maleTag = tagPrefix+"."+df.format(Integer.parseInt(rowNumber))
-														 +"."+df2.format(Integer.parseInt(plantNumber));
 					    			}
 									males.add(maleTag);
 			    				}else{
@@ -277,11 +285,6 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 								rowDataMale[linkIndex] = mateLink;
 								Object[] result = ObservationUnitDAO.getInstance().searchByTagname(maleTag);
 								
-								if (result == null) 
-									System.out.print("male <"+maleTag+">");
-									
-								
-								
 								if(boolvalue && result != null)
 								{
 									rowDataMale[obsUnitIndex] = result[0];
@@ -296,12 +299,10 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 								}
 							}
 							Object[] result = ObservationUnitDAO.getInstance().searchByTagname(stockName);
-							if (result == null) 
-							    System.out.print("female <"+stockName+">");
-							if(rows_to_add.size() == 0 || result == null){
+							if(result == null){
 								nonExist.add("group with female tag " + stockName + ", mating type "+matingType+".");		
 							}
-							if(boolvalue && rows_to_add.size()!=0 && result != null){
+							if(boolvalue && rows_to_add.size()!=0 && result != null ){
 								Object[] rowDataFemale = new Object[crossingTablePanel.getTable().getColumnCount()];
 								rowDataFemale[selectIndex] = new Boolean(false);
 								rowDataFemale[roleIndex] = "F";
@@ -350,6 +351,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 					    			
 					    			if(this.existingStockList.contains(femaleTag)){
 					    				boolvalue = false;
+					    				duplicate.add("group with female tag " + femaleTag + " has duplicates.");
 					    			}
 					    			
 									females.add(femaleTag);
@@ -390,7 +392,7 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 								nonExist.add("group with male tag " + stockName + ", mating type "+matingType+".");		
 							}
 							if(boolvalue && rows_to_add.size()!=0 && result != null){
-								for(Object[] femaleRow: rows_to_add){
+								for(Object[] femaleRow: rows_to_add){				
 									Object[] rowDataMale = new Object[crossingTablePanel.getTable().getColumnCount()];
 									rowDataMale[selectIndex] = new Boolean(false);
 									rowDataMale[roleIndex] = "M";
@@ -404,13 +406,14 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 									rowDataMale[generationIndex] = String.valueOf(result[3]).toUpperCase();
 									rowDataMale[selectionIndex] = new Boolean(selectionApplied);
 									model.addRow(rowDataMale);
-									
+
 									femaleRow[linkIndex] = mateLink;
 									model.addRow(femaleRow);
 									existingStockList.add(String.valueOf(femaleRow[stockNameIndex]));
 									mateLink++;
 									this.fieldGenerated.nextLink = mateLink;
 								}
+	
 							}
 			    		}
 			    		/*else if (matingType.equals("1FNM")){
@@ -453,13 +456,6 @@ public class HarvestingImportWorker extends SwingWorker<Void, Void> {
 	
 	@Override
 	protected void done() {
-		ArrayList list = new ArrayList(existingStockList);
-		List<Stock> stocks = StockDAO.getInstance().getStocksByNames(list);
-		if (stocks.size() != 0){
-			for(Stock s : stocks){
-				duplicate.add("group with female tag " + s.getStockName() + " found in database.");
-			}
-		}
 		fieldGenerated.modified = true;
 		fieldGenerated.finishedImport(duplicate, nonExist, invalidFormat);
 	}
