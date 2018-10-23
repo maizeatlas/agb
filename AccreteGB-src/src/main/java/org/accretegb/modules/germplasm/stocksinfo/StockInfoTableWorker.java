@@ -63,7 +63,7 @@ public class StockInfoTableWorker extends PopulateTableWorker {
         
         
         
-        queryBuff.append("select distinct 1, stock.stock_id, stock.stock_name, accession_name, pedigree, generation, cycle,"
+        queryBuff.append("select distinct 1, stock.stock_id, stock.stock_name, accession_name, accession_identifier, pedigree, generation, cycle,"
         		+ " classification.classification_code, population, stock.stock_date,");
         queryBuff.append("( SELECT  COUNT(*) FROM stock_packet stock_packet2 "
         		+ "WHERE stock.stock_id = stock_packet2.stock_id ) as total_pkts,"
@@ -93,7 +93,7 @@ public class StockInfoTableWorker extends PopulateTableWorker {
         
         if (sqlParameters.get("zipcode") != null) {
         	queryBuff = new StringBuffer();
-        	queryBuff.append("select distinct 1, stock.stock_id, stock.stock_name, accession_name, pedigree, generation, cycle, "
+        	queryBuff.append("select distinct 1, stock.stock_id, stock.stock_name, accession_name, accession_identifier, pedigree, generation, cycle, "
         			+ "classification.classification_code, population, stock.stock_date, ");
         	queryBuff.append("( SELECT  COUNT(*) FROM stock_packet stock_packet2 "
             		+ "WHERE stock.stock_id = stock_packet2.stock_id ) as total_pkts,"

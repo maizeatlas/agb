@@ -30,6 +30,7 @@ public class ColumnConstants {
     public static final String STOCK_NAME = "Stock Name";
     public static final String TOTAL_PACKETS = "Total Pkts";
     public static final String ACCESSION = "Accession Name";
+    public static final String ACCESSION_ID = "Accession Identifier";
 	public static final String PEDIGREE = "Pedigree";
 	public static final String GENERATION ="Generation";
 	public static final String CYCLE ="Cycle";

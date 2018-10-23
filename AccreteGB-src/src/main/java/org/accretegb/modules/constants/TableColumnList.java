@@ -17,6 +17,7 @@ public class TableColumnList {
 		columnNames.add(ColumnConstants.STOCK_ID);
 		columnNames.add(ColumnConstants.STOCK_NAME);
 		columnNames.add(ColumnConstants.ACCESSION);
+		columnNames.add(ColumnConstants.ACCESSION_ID);
 		columnNames.add(ColumnConstants.PEDIGREE);
 		columnNames.add(ColumnConstants.GENERATION);
 		columnNames.add(ColumnConstants.CYCLE);
