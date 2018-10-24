@@ -12,6 +12,7 @@
 				<value>Stock id</value>
 				<value>Stock Name</value>
 				<value>Accession Name</value>
+                <value>Accession Identifier</value>
 				<value>Pedigree</value>
 				<value>Generation</value>
 				<value>Cycle</value>
