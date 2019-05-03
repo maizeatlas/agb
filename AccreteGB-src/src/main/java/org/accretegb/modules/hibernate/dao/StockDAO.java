@@ -142,7 +142,7 @@ public class StockDAO {
 		stocknamesSql.append(" )");
 		
 		 StringBuffer queryBuff = new StringBuffer();
-	     queryBuff.append("select distinct 1, stock.stock_id, stock_name, accession_name, pedigree, generation, cycle, classification.classification_code, population,stock_date,count(packet_no) as total_pkts, packet_no, weight, no_seed, tier1_position, tier2_position, tier3_position, shelf, unit, room, building, location_name, city, state_province, country "
+	     queryBuff.append("select distinct 1, stock.stock_id, stock_name, accession_name, accession_identifier, pedigree, generation, cycle, classification.classification_code, population,stock_date,count(packet_no) as total_pkts, packet_no, weight, no_seed, tier1_position, tier2_position, tier3_position, shelf, unit, room, building, location_name, city, state_province, country "
 	        		+ "from stock "
 	        		+ "left join passport on stock.passport_id = passport.passport_id "
 	        		+ "left join classification on passport.classification_id = classification.classification_id "
