@@ -5,3 +5,5 @@
 AccreteGB-src/credentials.txt
 AccreteGB-src/key.txt
 AccreteGB-src/.settings/*
+.DS_Store
+AccreteGB-src/.DS_Store

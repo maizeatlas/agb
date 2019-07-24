@@ -47,7 +47,7 @@ public class Sampling extends TabComponentPanel {
 	
 	public void updateSubsets(){
 		JComboBox subset = sampleSettingPanel.getSampleSettingTablePanel().getTableSubset();
-		DefaultComboBoxModel model = (DefaultComboBoxModel)subset.getModel();
+		DefaultComboBoxModel subsetNamemodel = (DefaultComboBoxModel)subset.getModel();
 		for(String key :sampleSelectionPanel.getSubsetTableMap().keySet()){
 			if(!sampleSettingPanel.getSubsetTableMap().keySet().contains(key)){
 				sampleSettingPanel.getSubsetTableMap().put(key, sampleSelectionPanel.getSubsetTableMap().get(key));
@@ -56,12 +56,20 @@ public class Sampling extends TabComponentPanel {
 				tmp.put("date", new Date());
 				sampleSettingPanel.getSubsetInfo().put(key, tmp);				
 				sampleSettingPanel.populateSelectionSubset(key);
-				if(model.getIndexOf(key) == -1)
+				if(subsetNamemodel.getIndexOf(key) == -1)
 				{
 					sampleSettingPanel.getSampleSettingTablePanel().getTableSubset().addItem(key);
 				}
 				sampleSettingPanel.getSampleSettingTablePanel().getTableSubset().setSelectedItem(key);
 				
+			}else {
+				if (sampleSettingPanel.currentSubset == null ) {
+					sampleSettingPanel.getSampleSettingTablePanel().getTableSubset().setSelectedItem(key);
+					sampleSettingPanel.currentSubset = key;
+				}
+				if (sampleSettingPanel.location == null) {
+					sampleSettingPanel.setZipcode();
+				}
 			}
 		}
 	}

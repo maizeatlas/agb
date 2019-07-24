@@ -204,7 +204,6 @@ public class ParseSamplingGroup {
 		    if(json.has("synced")){
 		    	synced = json.getBoolean("synced");
 		    }
-		    SamplingPanel.getSampleSettingPanel().synced = synced;
 
 		    SamplingPanel.getSampleSettingPanel().setSubsetTableMap(subsetTableMap);
 		    SamplingPanel.getSampleSettingPanel().populateSettingSubset("All");
@@ -309,7 +308,6 @@ public class ParseSamplingGroup {
 				 settingTableMainObject.put("subset", settingTableSubsetObject);
 				 settingTableMainObject.put("subsetInfo", settingTableSubsetInfoObject);
 				 settingTableMainObject.put("prefixIndex", prefixIndexObject);
-				 settingTableMainObject.put("synced", SamplingPanel.getSampleSettingPanel().synced);
 				 } catch (JSONException e) {
 					e.printStackTrace();
 			}		

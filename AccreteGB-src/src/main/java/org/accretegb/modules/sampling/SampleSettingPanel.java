@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,18 +70,18 @@ import net.miginfocom.swing.MigLayout;
  * @author Ningjing
  */
 public class SampleSettingPanel extends JPanel {
-	private static TableToolBoxPanel sampleSettingTablePanel;
+	private TableToolBoxPanel sampleSettingTablePanel;
 	private LinkedHashMap<String, Object[][]> subsetTableMap = new LinkedHashMap<String, Object[][]>();
 	//private Date collectionDate = null;
 	private LinkedHashMap<String, HashMap<String, Object>> subsetInfo = new LinkedHashMap<String,HashMap<String, Object>>();
 	private LinkedHashMap<String, Integer> prefixIndex = new LinkedHashMap<String, Integer>();
-	private JTextField setSampleNames = new JTextField(30);
+	public final JTextField setSampleNames = new JTextField(30);;
+	public final JCheckBox ignoreRows = new JCheckBox("Ignore Rows");;
 	private HashMap<String, Integer> nameSourceid= new HashMap<String, Integer>();
 	private LinkedHashMap<String, String> subsetCommentMap = new LinkedHashMap<String, String>();
-	private String location = "";
-	private String currentSubset = null;
+	public String location = null;
+	public String currentSubset = null;
 	private JProgressBar progress ;
-	public boolean synced = false;
 	
 	public void initialize() {
 		setLayout(new MigLayout("insets 10, gap 10"));
@@ -101,9 +102,7 @@ public class SampleSettingPanel extends JPanel {
 	public void setZipcode(){
 		String zipcode = ((String) getSampleSettingTablePanel().getTable().getValueAt(0,
 									getSampleSettingTablePanel().getTable().getIndexOf(ColumnConstants.TAG))).split("\\.")[2];
-		System.out.println(zipcode);
 		location = LocationDAO.getInstance().findLocationByZipcode(zipcode).get(0).getStateProvince();
-		System.out.println("?? " + location);
 	}
 	
 	public void populateSelectionSubset(String subsetName){
@@ -151,69 +150,28 @@ public class SampleSettingPanel extends JPanel {
 			table.setModel(model);	
 		}
 		updateNumofItems();
-		table.setHasSynced(synced);
+		table.setHasSynced((Boolean) this.subsetInfo.get(subsetName).get("syncstatus"));
 	}
 	
-	public void updateAllSamplaNamesSubsets(){
-		//System.out.println("SET BY updateAllSamplaNamesSubsets");
-		final CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();
-		for(String subsetName : subsetInfo.keySet()){
-			if(!currentSubset.equals(subsetName)){
-				String prefix = (String) subsetInfo.get(subsetName).get("prefix");
-				Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
-				SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
-				String dateString = sdf.format(collectionDate);
-				prefixIndex.put(prefix+"-"+dateString, 1);
-			}
-			
-		}
-		for(String subsetName : subsetTableMap.keySet()){
-			if(!currentSubset.equals(subsetName)){
-				Object[][] subsetData =	(Object[][]) getSubsetTableMap().get(subsetName);
-				if (subsetData != null){
-					int rows = subsetData.length;
-					String prefix = (String) subsetInfo.get(subsetName).get("prefix");
-					Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
-					SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
-					String dateString = sdf.format(collectionDate);
-					int cols = subsetData[0].length;
-					for(int row = 0; row < rows; row ++){
-						for(int col = 0 ; col < cols; ++col){
-							if (col == table.getIndexOf(ColumnConstants.SAMPLENAME)){
-								subsetData[row][col] = prefix+"."+dateString+"."+String.valueOf(prefixIndex.get(prefix+"-"+dateString)+row);
-							}
-						}
-					}
-					int updatedIndex = prefixIndex.get(prefix+"-"+dateString) + rows;
-					prefixIndex.put(prefix+"-"+dateString, updatedIndex);
-					
-				}
-			}
-		}
-		
-	}
-	
+
 	public void updateSettingTableSubset(String subsetName){
-		//System.out.println("SET BY updateSettingTableSubset" + subsetName);
 		final CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();
 		Object subsetData[][] = new Object[table.getRowCount()][table.getColumnCount()];
 		if(subsetInfo.size()>=1){
 			if(subsetInfo.get(subsetName).get("date") == null){
 				subsetInfo.get(subsetName).put("date",new Date());
 			}
-			Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
-			SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
-			String dateString = sdf.format(collectionDate);
+			if(subsetInfo.get(subsetName).get("ignorerows") == null){
+				subsetInfo.get(subsetName).put("ignorerows",false);
+			}
 			if((String) subsetInfo.get(subsetName).get("prefix") == null){
 				subsetInfo.get(subsetName).put("prefix","sample");
 			}
+			Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
+			SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
+			String dateString = sdf.format(collectionDate);
 			String prefix = (String) subsetInfo.get(subsetName).get("prefix");
-			int indexDB = ObservationUnitSampleDAO.getInstance().getSeasonIndex(dateString, prefix);
-			int indexLocal = 1;
-			if(prefixIndex.containsKey(prefix+"-"+dateString)){
-				 indexLocal = prefixIndex.get(prefix+"-"+dateString);
-			}
-			int index = indexDB <= indexLocal ? indexLocal : indexDB;
+			int index = this.getInitialIndex(subsetName);
 			for(int row = 0; row < table.getRowCount(); row++){
 				subsetData[row][0] = new Boolean(false);
 				for(int col = 1; col < table.getColumnCount(); col++){
@@ -221,41 +179,35 @@ public class SampleSettingPanel extends JPanel {
 						subsetData[row][col] = collectionDate;
 					}
 					else if (col == table.getIndexOf(ColumnConstants.SAMPLENAME)){
-						subsetData[row][col] = prefix+"."+dateString+"."+String.valueOf(index+row);
+						if(table.getValueAt(row, table.getIndexOf(ColumnConstants.TYPES)).equals("Row")
+								&& (Boolean)subsetInfo.get(subsetName).get("ignorerows")) {
+							subsetData[row][col] = "";
+						}else {
+							subsetData[row][col] = prefix+"."+dateString+"."+String.valueOf(index);
+							index++;
+						}
+						
 					}
 					else if(col == table.getIndexOf(ColumnConstants.LOCATION)){
 						subsetData[row][col] = location;
+						table.setValueAt(location, row, col);
 					}
 					else{
 						subsetData[row][col] = table.getValueAt(row, col);
 					}
 				}						
 			}
-			//System.out.println("???"+subsetData.length);
+			System.out.println("updated SubsetTableMap " + subsetName);
 			getSubsetTableMap().put(subsetName, subsetData);
-			prefixIndex.put(prefix+"-"+dateString, index + table.getRowCount());
+			prefixIndex.put(prefix+"-"+dateString, index);
 		}
 		
+		this.subsetInfo.get(subsetName).put("syncstatus",false);
 		table.setHasSynced(false);
-		synced = false;
+		table.repaint();
+		
 	}
 	
-	
-	
-	public void setNewSampleName(String prefix, Date date, int row, int iter){
-		//System.out.println("SET BY setNewSampleName" + prefix);
-		SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
-		String dateString = sdf.format(date);
-		CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();
-		int indexDB = ObservationUnitSampleDAO.getInstance().getSeasonIndex(dateString, prefix);
-		int indexLocal = -1;
-		 if(prefixIndex.containsKey(prefix+"-"+dateString)){
-			 indexLocal = prefixIndex.get(prefix+"-"+dateString);
-		 }  
-		int index = indexDB < indexLocal ? indexLocal : indexDB;
-		table.setValueAt(prefix+"."+dateString+"."+String.valueOf(index+iter), row, table.getIndexOf(ColumnConstants.SAMPLENAME));
-		prefixIndex.put(prefix+"-"+dateString, index+iter);
-	}
 	
 	public void initializeSubsetComboBox(){
 		final JComboBox subset = getSampleSettingTablePanel().getTableSubset();
@@ -273,7 +225,11 @@ public class SampleSettingPanel extends JPanel {
 					}else{
 						setSampleNames.setText("sample");
 					}
-					
+					ignoreRows.setSelected((Boolean)subsetInfo.get(currentSubset).get("ignorerows"));
+					if(!(Boolean) subsetInfo.get(currentSubset).get("syncstatus"))
+					{
+						updateSettingTableSubset(currentSubset);
+					}
 				}
 			}
 		});
@@ -295,20 +251,19 @@ public class SampleSettingPanel extends JPanel {
 			JPanel subpanel = new JPanel(new MigLayout("insets 0, gapx 0"));
 			final CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();
 			JLabel subsetPrefix = new JLabel("Subset Prefix: ");
-			JButton setSampleNamesButton = new ImageButton("checkmarkColor.png");;
+			JButton setSampleNamesButton = new ImageButton("checkmarkColor.png");
 			setSampleNames.setToolTipText("Customize prefix for sample names");
 			setSampleNamesButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String value = setSampleNames.getText();
 					subsetInfo.get(currentSubset).put("prefix", value);
 					updateSampleNames(value);
-					updateAllSamplaNamesSubsets();
 					updateSettingTableSubset(currentSubset);
 						
 				}
 			});
 			
-			if(currentSubset !=null)
+			if(currentSubset != null)
 			{     if(!subsetInfo.get(currentSubset).containsKey("prefix")){
 	            	subsetInfo.get(currentSubset).put("prefix", "sample");
 	            }
@@ -316,29 +271,62 @@ public class SampleSettingPanel extends JPanel {
 			}else{
 				setSampleNames.setText("sample");
 			}
+			ignoreRows.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					subsetInfo.get(currentSubset).put("ignorerows",ignoreRows.isSelected() );
+				}
+			});
+			
 			
 			subpanel.add(subsetPrefix);
 			subpanel.add(setSampleNames);
 			subpanel.add(setSampleNamesButton, "gapleft 3,h 24:24:24, w 24:24:24");
+			subpanel.add(ignoreRows);
 			samplesSetterPanel.add(subpanel, "gapleft 10, w 33%, pushx");
 		}
 	 
+	 private int getInitialIndex(String subsetName) {
+		 Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
+		 SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
+		 String dateString = sdf.format(collectionDate);
+		 String prefix = (String) subsetInfo.get(subsetName).get("prefix");
+		 int indexDB = ObservationUnitSampleDAO.getInstance().getSeasonIndex(dateString, prefix);
+		 int indexLocal = 1;
+		 for(String sn : subsetTableMap.keySet()){
+			 if(!sn.equals(subsetName)) {
+				 if (!((String)subsetInfo.get(sn).get("prefix")).equals(prefix)) {
+					 continue;
+				 }else if (!(sdf.format(subsetInfo.get(sn).get("date"))).equals(dateString)) {
+					 continue;
+				 }else {
+					 //prefix and date are same
+					 if(subsetInfo.get(sn).get("syncstatus") != null && (Boolean) subsetInfo.get(sn).get("syncstatus")) {
+						 Object[][] subsetData =(Object[][]) getSubsetTableMap().get(sn);
+						 indexLocal += subsetData.length;
+					 }
+				 }
+			 }
+		 }
+		 return indexLocal < indexDB ? indexDB :indexLocal;
+	 }
+
 	 private void updateSampleNames(String prefix){
 		 //System.out.println("SET BY updateSampleNames" + prefix);
 		 SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
 		 String currentSubset = (String)getSampleSettingTablePanel().getTableSubset().getSelectedItem();
 		 Date collectionDate = (Date) subsetInfo.get(currentSubset).get("date");
 		 String dateString = sdf.format(collectionDate);
-		 int indexDB = ObservationUnitSampleDAO.getInstance().getSeasonIndex(dateString, prefix);
-		 int indexLocal = -1;
-		 if(prefixIndex.containsKey(prefix+"-"+dateString)){
-			 indexLocal = prefixIndex.get(prefix+"-"+dateString);
-		 }  
-		 int index = indexDB < indexLocal ? indexLocal : indexDB;
-		 CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();		 
+		 int index = this.getInitialIndex(currentSubset);
+		 CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();	
 		 for (int row = 0; row < table.getRowCount(); row++){
-			table.setValueAt(prefix+"."+dateString+"."+String.valueOf(index+row), row, table.getIndexOf(ColumnConstants.SAMPLENAME));	
-		}
+			 if(table.getValueAt(row, table.getIndexOf(ColumnConstants.TYPES)).equals("Row") 
+					 && (Boolean)subsetInfo.get(currentSubset).get("ignorerows")) {
+				 table.setValueAt("", row, table.getIndexOf(ColumnConstants.SAMPLENAME));
+			 }else{
+				 table.setValueAt(prefix+"."+dateString+"."+String.valueOf(index), row, table.getIndexOf(ColumnConstants.SAMPLENAME));	
+				 index++;
+			 }
+		 }
 		 
 		 updateSettingTableSubset(currentSubset);
 	 }
@@ -362,7 +350,7 @@ public class SampleSettingPanel extends JPanel {
 					String prefix = (String) subsetInfo.get(currentSubset).get("prefix");
 					subsetInfo.get(currentSubset).put("date", date);
 					updateSampleNames(prefix);
-					updateAllSamplaNamesSubsets();
+					//updateAllSamplaNamesSubsets();
 					updateSettingTableSubset(currentSubset);
 					
 				}			
@@ -515,8 +503,10 @@ public class SampleSettingPanel extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					if(!collectors.getSelectedItem().equals("Select"))
 					{
-						for(int row: table.getSelectedRows()) {
-							table.setValueAt(collectors.getSelectedItem(), row, table.getIndexOf(ColumnConstants.COLLECTOR));
+						String collector = (String) collectors.getSelectedItem();
+						int collectorCol = table.getIndexOf(ColumnConstants.COLLECTOR);
+						for(int row = 0; row < table.getRowCount(); ++row){
+							table.setValueAt(collector, row, collectorCol );
 						}							
 					}	
 					updateSettingTableSubset(currentSubset);
@@ -533,7 +523,6 @@ public class SampleSettingPanel extends JPanel {
 	 
 	 private void saveSubsetsToFile(String fileName, Boolean printTable) {
 		 	CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();
-		 	JPanel panel = this.getSamplesSetterPanel();
 	        try {
 	            if (table == null || fileName == null) {
 	                return;
@@ -541,7 +530,7 @@ public class SampleSettingPanel extends JPanel {
 	            JFileChooser fileChooser = new JFileChooser();
 	            File file = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
 	            fileChooser.setSelectedFile(file);
-	            int approve = fileChooser.showSaveDialog(panel);
+	            int approve = fileChooser.showSaveDialog(this);
 	            if (approve != JFileChooser.APPROVE_OPTION) {
 	                return;
 	            }
@@ -550,7 +539,8 @@ public class SampleSettingPanel extends JPanel {
 	            String[] colNames = {ColumnConstants.TAG, ColumnConstants.PLANT, ColumnConstants.ACCESSION, ColumnConstants.PEDIGREE,
 			              ColumnConstants.STOCK_NAME, ColumnConstants.LOCATION,ColumnConstants.COLLECTION_DATE, 
 			              ColumnConstants.COLLECTOR};
-	          //write the column names first
+	            writer.write("Subset:,"+this.currentSubset + ", Subset Comment:,"+ getSubsetCommentMap().get(this.currentSubset));
+	            writer.newLine();
 	            if(printTable){
 		            for (int columnCounter = 0; columnCounter < table.getColumnCount(); columnCounter++) {
 		                writer.write(table.getColumnName(columnCounter));
@@ -562,48 +552,43 @@ public class SampleSettingPanel extends JPanel {
 			             writer.write(",");
 	            	}
 	            }
-	            writer.newLine();
-	            for(String subsetName : subsetTableMap.keySet()){
-	            	Object[][] subsetData =	(Object[][]) getSubsetTableMap().get(subsetName);
-	 				writer.write(">>>> Subset: "+subsetName + ". Subset Comment: "+ getSubsetCommentMap().get(subsetName));
-	 				if (subsetData != null){
-	 					int rows = subsetData.length;
-	 					int cols = subsetData[0].length;
-	 					for(int row = 0; row < rows; row ++){
-	 						writer.newLine();
-	 						if(printTable){
-		 						for(int col = 0 ; col < cols; ++col){
-		 							String value = "";
-		 							if (subsetData[row][col] instanceof java.sql.Timestamp) {
-		 		                        java.sql.Timestamp timeStamp = (java.sql.Timestamp) subsetData[row][col];
-		 		                        value = (timeStamp.getYear() + 1900) + "-" + (timeStamp.getMonth() + 1) + "-"
-		 		                                + timeStamp.getDate();
-		 		                    } else {
-		 		                        value = String.valueOf(subsetData[row][col]);
-		 		                    }
-		 							writer.write(value);
-		 		                    writer.write(",");
-		 						}
-	 						}else{
-	 							
-	 							for(String colName :colNames ){
-	 								int col = table.getIndexOf(colName);
-		 							String value = "";
-		 							if (subsetData[row][col] instanceof java.sql.Timestamp) {
-		 		                        java.sql.Timestamp timeStamp = (java.sql.Timestamp) subsetData[row][col];
-		 		                        value = (timeStamp.getYear() + 1900) + "-" + (timeStamp.getMonth() + 1) + "-"
-		 		                                + timeStamp.getDate();
-		 		                    } else {
-		 		                        value = String.valueOf(subsetData[row][col]);
-		 		                    }
-		 							writer.write(value);
-		 		                    writer.write(",");
-		 						}
-	 						}
-	 					}
-	 					
-	 				}
-	 				 writer.newLine();
+	            Object[][] subsetData =	(Object[][]) getSubsetTableMap().get(this.currentSubset);
+	            if (subsetData != null){
+	            	int rows = subsetData.length;
+	            	int cols = subsetData[0].length;
+	            	for(int row = 0; row < rows; row ++){
+	            		writer.newLine();
+	            		if(printTable){
+	            			for(int col = 0 ; col < cols; ++col){
+	            				String value = "";
+	            				if (subsetData[row][col] instanceof java.sql.Timestamp) {
+	            					java.sql.Timestamp timeStamp = (java.sql.Timestamp) subsetData[row][col];
+	            					value = (timeStamp.getYear() + 1900) + "-" + (timeStamp.getMonth() + 1) + "-"
+	            							+ timeStamp.getDate();
+	            				} else {
+	            					value = String.valueOf(subsetData[row][col]);
+	            				}
+	            				writer.write(value);
+	            				writer.write(",");
+	            			}
+	            		}else{
+
+	            			for(String colName :colNames ){
+	            				int col = table.getIndexOf(colName);
+	            				String value = "";
+	            				if (subsetData[row][col] instanceof java.sql.Timestamp) {
+	            					java.sql.Timestamp timeStamp = (java.sql.Timestamp) subsetData[row][col];
+	            					value = (timeStamp.getYear() + 1900) + "-" + (timeStamp.getMonth() + 1) + "-"
+	            							+ timeStamp.getDate();
+	            				} else {
+	            					value = String.valueOf(subsetData[row][col]);
+	            				}
+	            				writer.write(value);
+	            				writer.write(",");
+	            			}
+	            		}
+	            	}
+
 	            }
 	            writer.close();
 	        } catch (Exception ex) {
@@ -615,12 +600,10 @@ public class SampleSettingPanel extends JPanel {
 			JPanel exportButtonsPanel = getSampleSettingTablePanel().getBottomHorizonPanel();
 			JButton printLabel = new JButton("Print Labels");
 			JButton printTable = new JButton("Print table");
-			
-			
 			printTable.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent actionEvent) {
 					try {
-						saveSubsetsToFile("samples_table.csv", true);
+						saveSubsetsToFile("samples_table_"+currentSubset+".csv", true);
 					} catch (Exception e) {
 						if (LoggerUtils.isLogEnabled()) {
 							LoggerUtils.log(Level.INFO,  e.toString());
@@ -635,7 +618,7 @@ public class SampleSettingPanel extends JPanel {
 			printLabel.addActionListener(new ActionListener() {			
 				public void actionPerformed(ActionEvent actionEvent) {
 					try {
-						saveSubsetsToFile("sample_labels.csv", false);
+						saveSubsetsToFile("sample_labels_"+currentSubset+".csv", false);
 					} catch (Exception e) {
 						if (LoggerUtils.isLogEnabled()) {
 							LoggerUtils.log(Level.INFO,  e.toString());
@@ -655,24 +638,21 @@ public class SampleSettingPanel extends JPanel {
 		getSampleSettingTablePanel().getRefreshButton().addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent actionEvent) {
 				CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();
-				System.out.println(table.getModel().getColumnCount() + "," + table.getColumnNames());
+				//System.out.println(table.getModel().getColumnCount() + "," + table.getColumnNames());
 				progress.setVisible(true);
 				boolean flag = true;
-				for(String subsetName : getSubsetTableMap().keySet()){
-		        	Object[][] subsetData =	(Object[][])getSubsetTableMap().get(subsetName);
-						if (subsetData != null){
-							int rows = subsetData.length;
-							System.out.println("subset rows " + rows);
-							for(int row = 0; row < rows; row ++){
-								System.out.println("row " + row);
-								int collector_index = table.getIndexOf(ColumnConstants.COLLECTOR);
-								
-								if(String.valueOf(subsetData[row][collector_index]).equalsIgnoreCase("null"))
-								{
-									flag = false;
-								}
-							}
+				Object[][] subsetData =	(Object[][])getSubsetTableMap().get(currentSubset);
+				if (subsetData != null){
+					int rows = subsetData.length;
+
+					for(int row = 0; row < rows; row ++){
+						int collector_index = table.getIndexOf(ColumnConstants.COLLECTOR);
+						if(String.valueOf(subsetData[row][collector_index]).equalsIgnoreCase("null"))
+						{
+							flag = false;
+							break;
 						}
+					}
 				}
 				if(flag){
 					new syncSampling(progress, SampleSettingPanel.this).execute();
@@ -688,7 +668,7 @@ public class SampleSettingPanel extends JPanel {
 	
 	public void finishedSync(boolean rollbacked) {
 		getSampleSettingTablePanel().getTable().setHasSynced(true);
-		synced = true;
+		this.subsetInfo.get(this.currentSubset).put("syncstatus",true);
 		progress.setVisible(false);
 	}
 	
@@ -782,12 +762,12 @@ public class SampleSettingPanel extends JPanel {
 	public void updateNumofItems(){
 		getSampleSettingTablePanel().getNumberOfRows().setText(String.valueOf(getSampleSettingTablePanel().getTable().getRowCount()));
 	}
-	public static TableToolBoxPanel getSampleSettingTablePanel() {
+	public TableToolBoxPanel getSampleSettingTablePanel() {
 		return sampleSettingTablePanel;
 	}
 
-	public static void setSampleSettingTablePanel(TableToolBoxPanel sampleSettingTablePanel) {
-		SampleSettingPanel.sampleSettingTablePanel = sampleSettingTablePanel;
+	public void setSampleSettingTablePanel(TableToolBoxPanel sampleSettingTablePanel) {
+		this.sampleSettingTablePanel = sampleSettingTablePanel;
 	}
 
 	public LinkedHashMap<String, Object[][]> getSubsetTableMap() {
