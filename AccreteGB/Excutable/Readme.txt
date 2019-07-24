@@ -1,4 +1,4 @@
 Before using the jars, please read the user manual in User_Guide to set up the environment. 
 
-AccreteGB_1.0.0_demo.jar has a connection to a demo database we hosted in AWS for people to try out this software. Database setup is no needed for using this jar. 
+AccreteGB_*_demo.jar was set to connect to a demo database we hosted in AWS for people who want to try out this software. Database connection setup is not needed for using this jar. 
 
