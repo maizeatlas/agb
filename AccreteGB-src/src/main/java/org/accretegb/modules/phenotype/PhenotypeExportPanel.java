@@ -1052,7 +1052,7 @@ public class PhenotypeExportPanel extends JPanel {
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);	
 		if(option ==  JOptionPane.OK_OPTION){
-			saveTableToFile(table, null, "Phenotype.csv",firstRow);
+			saveTableToFile(table, null, "Phenotyping.csv",firstRow);
 		}					
 
 	}

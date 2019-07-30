@@ -32,12 +32,12 @@ public class ProjectConstants {
     public static final String EXPERIMENTS_NODE = "Experiments Node";
     public static final String PLANTINGS = "Plantings";
     public static final String PLANTINGS_NODE = "Plantings Node";
-    public static final String PHENOTYPE = "Phenotype";
-    public static final String PHENOTYPE_NODE = "Phenotype Node";
+    public static final String PHENOTYPE = "Phenotyping";
+    public static final String PHENOTYPE_NODE = "Phenotyping Node";
     public static final String SAMPLING = "Sampling";
 	public static final String SAMPLING_NODE = "Sampling Node";
-    public static final String HARVESTINGS = "Harvestings";
-    public static final String HARVESTINGS_NODE = "Harvestings Node";
+    public static final String HARVESTINGS = "Harvests";
+    public static final String HARVESTINGS_NODE = "Harvests Node";
     public static final String STOCK_PACKAGING =  "Stock Packaging";
     public static final String STOCK_PACKAGING_NODE =  "Stock Packaging Node";
     public static final String SEND_TO = "Send To";

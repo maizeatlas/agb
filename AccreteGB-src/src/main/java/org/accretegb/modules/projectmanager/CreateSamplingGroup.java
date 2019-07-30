@@ -56,6 +56,12 @@ public class CreateSamplingGroup {
      	{     	
      		for(SamplingGroup samplingGroup : samplingGroups){
      			String groupName = samplingGroup.getSamplingGroupName();
+     			if(groupName.contains("sampling_")) {
+     				//for backward compatibility, "sampling_" was removed from sampling_ group names
+     				String oldGroupName = groupName;
+     				groupName = oldGroupName.replace("sampling_", "");
+     				SamplingGroupDAO.getInstance().updateGroupName(projectId, oldGroupName, groupName);
+     			}
      			ProjectTreeNode samplingNode = projectTree.getSamplingNode();
      			samplingNode.setParent(projectTree.getProjectRootNode());
 		    	ProjectTreeNode groupNode = new ProjectTreeNode(groupName);
@@ -66,7 +72,6 @@ public class CreateSamplingGroup {
 		        samplingNode.insert(groupNode,samplingNode.getChildCount());
 		        String groupPath = Utils.getPathStr(groupNode.getPath());
 			   try{
-			        //System.out.println(groupName +"\njson 1:"+samplingGroup.getSampleSelectionJson() + "\njson 2:" +  samplingGroup.getSampleSettingJson());
 			        TabComponent sampleTab = createsamplingPanel(projectId, groupPath,groupName, samplingGroup.getSampleSelectionJson(), samplingGroup.getSampleSettingJson());
 			        groupNode.setTabComponent(sampleTab); 
      			}catch (Exception e){
@@ -283,11 +288,11 @@ public class CreateSamplingGroup {
 		TabManager tabManager = (TabManager) getContext().getBean("tabManager");
 		tabManager.getTabComponents().add(tabComponent);  
 		
-	    String plantingGroupName = groupName.replace("sampling_", "");
+	    String plantingGroupName = groupName;
 		Planting plantingPanel = (Planting) getContext().getBean("Planting - " + projectId + plantingGroupName);
 		plantingPanel.getTagGenerator().setSampleSelectionPanel(samplingTab.getSampleSelectionPanel());
-		String phenotypeGroupName = groupName.replace("sampling", "phenotype");
-		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotype - " + projectId + phenotypeGroupName);
+		String phenotypeGroupName = groupName;
+		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotyping - " + projectId + phenotypeGroupName);
 		phenotypePanel.getPhenotypeExportPanel().setSampleSelectionPanel(samplingTab.getSampleSelectionPanel());
 		samplingTab.getSampleSelectionPanel().setPhenotypeExportPanel(phenotypePanel.getPhenotypeExportPanel());
 	

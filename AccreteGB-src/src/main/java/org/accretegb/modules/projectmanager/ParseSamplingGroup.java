@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
@@ -28,6 +29,7 @@ import org.accretegb.modules.constants.JsonConstants;
 import org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable;
 import org.accretegb.modules.hibernate.dao.SamplingGroupDAO;
 import org.accretegb.modules.sampling.Sampling;
+import org.accretegb.modules.util.LoggerUtils;
 import org.apache.avro.data.Json;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -104,7 +106,7 @@ public class ParseSamplingGroup {
 		    }
 		    SamplingPanel.getSampleSelectionPanel().populateSubset("All");
 		  } catch (Exception e) {
-			  System.out.println(e.toString());
+			  e.printStackTrace();
 		}
 	}
 	
@@ -211,7 +213,7 @@ public class ParseSamplingGroup {
 		   		    
 		    
 		  } catch (Exception e) {
-			  System.out.println(e.toString());
+			  e.printStackTrace();
 		}
 	}
 	
@@ -290,7 +292,7 @@ public class ParseSamplingGroup {
 		
 		JSONObject selectionTableMainObject = null;		 
 		JSONObject settingTableMainObject = null;
-		if(selectionTableSubsetObject != null){
+		if(selectionTableSubsetObject != null && selectionTableSubsetObject.length() > 0){
 			 try {
 				 	selectionTableMainObject = new JSONObject();
 				 	selectionTableMainObject.put("allcomment",selectionSubsetCommentMap.get("All") ==null 
@@ -302,7 +304,7 @@ public class ParseSamplingGroup {
 				 }	 
 			 
 		 }
-		if(settingTableSubsetObject != null){
+		if(settingTableSubsetObject != null && settingTableSubsetObject.length() > 0){
 			 try {
 				 settingTableMainObject = new JSONObject();
 				 settingTableMainObject.put("subset", settingTableSubsetObject);

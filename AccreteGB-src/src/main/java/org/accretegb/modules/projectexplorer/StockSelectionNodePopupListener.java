@@ -692,7 +692,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
             for (int counter = 0; counter < childCount; counter++) {
                 ProjectTreeNode node = (ProjectTreeNode) rootNode.getChildAt(counter);
                 String nodeName = node.getUserObject().toString();
-                if (nodeName.equalsIgnoreCase("Phenotype")) {
+                if (nodeName.equalsIgnoreCase("Phenotyping")) {
                     return node;
                 }
             }
@@ -788,7 +788,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
 
                         // create Phenotype Node also with Planting
                         ProjectTreeNode phenotypenode = getPhenotypeNode((ProjectTreeNode) getTreeNode().getParent().getParent());                        
-                        String phenotypeNodeName = "phenotype_"+nodeName;
+                        String phenotypeNodeName = nodeName;
                         groupNode = new ProjectTreeNode(phenotypeNodeName);
                         groupNode.setType(ProjectTreeNode.NodeType.PHENOTYPE_NODE);
                         groupNode.setParentNodes(parentNodes);
@@ -805,7 +805,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
                         
                         // create Sampling Node also with Planting
                         ProjectTreeNode samplingnode = getSamplingNode((ProjectTreeNode) getTreeNode().getParent().getParent());                        
-                        String samplingNodeName = "sampling_"+nodeName;
+                        String samplingNodeName = nodeName;
                         groupNode = new ProjectTreeNode(samplingNodeName);
                         groupNode.setType(ProjectTreeNode.NodeType.SAMPLING_NODE);
                         groupNode.setParentNodes(parentNodes);
@@ -1185,17 +1185,17 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
 					.addPropertyValue("phenotypeImportPanel", getContext().getBean("phenotypeImportPanel" + groupPath))
 					.setInitMethodName("initialize");
 			
-			((GenericXmlApplicationContext) getContext()).registerBeanDefinition("Phenotype - " + projectId + nodeName,
+			((GenericXmlApplicationContext) getContext()).registerBeanDefinition("Phenotyping - " + projectId + nodeName,
 					phenotypeChildPanel0DefinitionBuilder.getBeanDefinition());
 
 	    	// TabComponent
-			Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotype - " + projectId + nodeName);
+			Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotyping - " + projectId + nodeName);
 			phenotypePanel.setName(groupPath);
 			List<TabComponentPanel> componentPanels = new ArrayList<TabComponentPanel>();
 			componentPanels.add(phenotypePanel);
 
 			BeanDefinitionBuilder phenotypeTabDefinitionBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition(TabComponent.class).addPropertyValue("title", "Phenotype - " + nodeName)
+					.genericBeanDefinition(TabComponent.class).addPropertyValue("title", "Phenotyping - " + nodeName)
 					.addPropertyValue("isStatic", false).addPropertyValue("componentPanels", componentPanels)
 					.setInitMethodName("initialize");			
 			

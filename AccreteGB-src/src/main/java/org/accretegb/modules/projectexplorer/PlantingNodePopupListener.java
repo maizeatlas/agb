@@ -30,6 +30,7 @@ import org.accretegb.modules.germplasm.harvesting.StickerGenerator;
 import org.accretegb.modules.germplasm.planting.Planting;
 import org.accretegb.modules.hibernate.dao.PhenotypeGroupDAO;
 import org.accretegb.modules.hibernate.dao.PlantingGroupDAO;
+import org.accretegb.modules.hibernate.dao.SamplingGroupDAO;
 import org.accretegb.modules.hibernate.dao.PMProjectDAO;
 import org.accretegb.modules.hibernate.dao.StockSelectionGroupDAO;
 import org.accretegb.modules.projectmanager.ProjectManager;
@@ -127,9 +128,6 @@ public class PlantingNodePopupListener extends MouseAdapter {
 							  DefaultTreeModel model = (DefaultTreeModel)getProjectsTree().getModel();
 							  model.nodeChanged(getTreeNode());
 							  
-							  
-							  oldGroupName = "phenotype_" + oldGroupName;
-							  newGroupName = "phenotype_" + newGroupName;	
 							  PhenotypeGroupDAO.getInstance().updateGroupName(projectId, oldGroupName, newGroupName);
 							  
 							  //change phenotype beans
@@ -137,10 +135,21 @@ public class PlantingNodePopupListener extends MouseAdapter {
 							  newTabBeanName = "phenotypeTab" + projectId + newGroupName;
 							  ((GenericXmlApplicationContext) getContext()).registerAlias(oldTabBeanName, newTabBeanName);							  
 							  tabComponent = (TabComponent) getContext().getBean(newTabBeanName);
-							  tabComponent.setTitle("Phenotype - " + newGroupName);						        
-							  ((JLabel)tabComponent.getComponent(0)).setText("Phenotype - " + newGroupName);
-							  oldPanelBeanName = "Phenotype - " + projectId + oldGroupName;
-							  newPanelBeanName = "Phenotype - " + projectId + newGroupName;
+							  tabComponent.setTitle("Phenotyping - " + newGroupName);						        
+							  ((JLabel)tabComponent.getComponent(0)).setText("Phenotyping - " + newGroupName);
+							  oldPanelBeanName = "Phenotyping - " + projectId + oldGroupName;
+							  newPanelBeanName = "Phenotyping - " + projectId + newGroupName;
+							  ((GenericXmlApplicationContext) getContext()).registerAlias(oldPanelBeanName, newPanelBeanName);							  
+							 
+							  //change sampling beans
+							  oldTabBeanName = "samplingTab" + projectId + oldGroupName;
+							  newTabBeanName = "samplingTab" + projectId + newGroupName;
+							  ((GenericXmlApplicationContext) getContext()).registerAlias(oldTabBeanName, newTabBeanName);							  
+							  tabComponent = (TabComponent) getContext().getBean(newTabBeanName);
+							  tabComponent.setTitle("Sampling - " + newGroupName);						        
+							  ((JLabel)tabComponent.getComponent(0)).setText("Sampling - " + newGroupName);
+							  oldPanelBeanName = "Sampling - " + projectId + oldGroupName;
+							  newPanelBeanName = "Sampling - " + projectId + newGroupName;
 							  ((GenericXmlApplicationContext) getContext()).registerAlias(oldPanelBeanName, newPanelBeanName);							  
 							 
 							 
@@ -155,7 +164,18 @@ public class PlantingNodePopupListener extends MouseAdapter {
 									    child.setUserObject(newGroupName);
 									    model.nodeChanged(child);
 									}
-							  }					  
+							  }	
+							  
+							  SamplingGroupDAO.getInstance().updateGroupName(projectId, oldGroupName, newGroupName);
+							  ProjectTreeNode samplingNode = (ProjectTreeNode) phenotypeNode.getNextSibling();
+							  for(int index = 0; index < samplingNode.getChildCount(); ++ index){
+									ProjectTreeNode child = (ProjectTreeNode) samplingNode.getChildAt(index);
+									if(child.getNodeName().equals(oldGroupName)){
+										child.setNodeName(newGroupName);
+									    child.setUserObject(newGroupName);
+									    model.nodeChanged(child);
+									}
+							  }	
 						  }
 	                    }else {
 	                    	newGroupName = "";
@@ -164,38 +184,6 @@ public class PlantingNodePopupListener extends MouseAdapter {
 			}
         	
         });
-        /*menuItem = new JMenuItem(ProjectConstants.EXPORT_GROUP);
-        plantingSelectionPopupMenu.add(menuItem);
-        menuItem = new JMenuItem("Delete Group");
-        menuItem.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				int option = option = JOptionPane.showConfirmDialog(null, "Are you sure to delete the selected planting group and corresponding phenotype group?", "", JOptionPane.OK_OPTION);
-				if(option == JOptionPane.OK_OPTION){
-					String groupName = getTreeNode().getNodeName();
-					String projectName = getTreeNode().getParent().getParent().toString();
-					ProjectTreeNode stockNode = (ProjectTreeNode) getTreeNode().getParent();
-					ProjectTreeNode phenotypeNode = (ProjectTreeNode) stockNode.getNextSibling();
-					int projectId = ProjectDAO.getInstance().findProjectId(projectName);
-					PlantingGroupDAO.getInstance().delete(projectId, groupName);					
-					TabComponent tabComponent = (TabComponent) getContext().getBean("plantingTab" +projectId+groupName);
-					ProjectManager.removeTab(tabComponent);
-					DefaultTreeModel model = (DefaultTreeModel)getProjectsTree().getModel();
-					model.removeNodeFromParent(getTreeNode());
-					
-					groupName = "phenotype_"+groupName;
-					PhenotypeGroupDAO.getInstance().delete(projectId, groupName);
-					tabComponent = (TabComponent) getContext().getBean("phenotypeTab" +projectId+groupName);
-					ProjectManager.removeTab(tabComponent);
-					for(int index = 0; index < phenotypeNode.getChildCount(); ++ index){
-						ProjectTreeNode child = (ProjectTreeNode) phenotypeNode.getChildAt(index);
-						if(child.getNodeName().equals(groupName)){
-							model.removeNodeFromParent(child);
-						}
-					}					
-				}				
-			}       	
-        });
-        plantingSelectionPopupMenu.add(menuItem);*/
     }
 
     public void mousePressed(MouseEvent e) {

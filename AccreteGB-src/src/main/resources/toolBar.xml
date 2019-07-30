@@ -20,7 +20,7 @@
 	</bean>
 
     <bean id="phenotypeToolBarButton" class="javax.swing.JButton">
-        <constructor-arg index="0" type="java.lang.String" value="Phenotype Information" />
+        <constructor-arg index="0" type="java.lang.String" value="Phenotyping Information" />
     </bean>
 
     <bean id="plantingToolBarButton" class="javax.swing.JButton">
@@ -57,7 +57,7 @@
 				<entry key="Preplanting Information">
 					<ref bean="previousPlantingToolBarButton" />
 				</entry>
-                <entry key="Phenotype Information">
+                <entry key="Phenotyping Information">
                     <ref bean="phenotypeToolBarButton" />
                 </entry>
  				<!--  entry key="Planting Information">

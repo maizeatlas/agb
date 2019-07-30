@@ -716,7 +716,6 @@ public class SampleSettingPanel extends JPanel {
 			}
 			
 		}catch (Exception E) {
-				System.out.println(E.toString());
 				E.printStackTrace();
 		}
 		    

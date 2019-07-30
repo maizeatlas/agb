@@ -43,7 +43,7 @@
 				<ref bean="phenotypeInfoChildPanel0" />
 			</list>
 		</property>
-		<property name="title" value="Phenotype Information"/>
+		<property name="title" value="Phenotyping Information"/>
 		<property name="isStatic" value="true"/>
 	</bean>
 	

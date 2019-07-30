@@ -155,7 +155,7 @@ public class PhenotypeInfoPanel extends TabComponentPanel {
         searchComponentsPanel.add(new JLabel("Tag Name:"), "align label");
         searchComponentsPanel.add(tagname, "growx,spanx, wrap");
         tagname.setToolTipText("Use '*' to indicate regex");
-        searchComponentsPanel.add(new JLabel("Phenotype Subsets:"), "align label");
+        searchComponentsPanel.add(new JLabel("Phenotyping Subsets:"), "align label");
         searchComponentsPanel.add(subsetListComboBox, "wrap");
         searchComponentsPanel.add(new JLabel("Traits:"), "align label");
         searchComponentsPanel.add(getParameterNameButton(), "growx,spanx, wrap");

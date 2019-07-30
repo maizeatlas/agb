@@ -43,6 +43,7 @@ import javax.swing.UIManager;
 
 import org.accretegb.modules.MainLayout;
 import org.accretegb.modules.config.AccreteGBBeanFactory;
+import org.accretegb.modules.config.AccreteGBLogger;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.accretegb.modules.hibernate.dao.UserDAO;
 import org.accretegb.modules.projectmanager.PopulateProjectTree;
@@ -501,6 +502,7 @@ public class LoginScreen extends JFrame {
            LoginScreen login = new LoginScreen();
            login.initialize();
            login.setVisible(true);
+           AccreteGBLogger.setLogEnabled(true);
         } catch (Exception ex) {
             if (LoggerUtils.isLogEnabled()) {
                 LoggerUtils.log(Level.INFO, "Not able to verify user : " + ex);

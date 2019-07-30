@@ -56,7 +56,13 @@ public class CreatePhenotypeGroup {
 		if(phenotypeGroups.size() > 0)
      	{     	
      		for(PhenotypeGroup phenotypeGroup : phenotypeGroups){
-     			String groupName = phenotypeGroup.getPhenotypeGroupName();   			
+     			String groupName = phenotypeGroup.getPhenotypeGroupName();   	
+     			if(groupName.contains("phenotype_")) {
+     				//for backward compatibility, "phenotype_" was removed from phenotype group names
+     				String oldGroupName = groupName;
+     				groupName = oldGroupName.replace("phenotype_", "");
+     				PhenotypeGroupDAO.getInstance().updateGroupName(projectId, oldGroupName, groupName);
+     			}
      			ProjectTreeNode phenotypeNode = projectTree.getPhenotypeNode();
      			phenotypeNode.setParent(projectTree.getProjectRootNode());
 		    	ProjectTreeNode groupNode = new ProjectTreeNode(groupName);
@@ -191,18 +197,18 @@ public class CreatePhenotypeGroup {
 				.addPropertyValue("phenotypeImportPanel", getContext().getBean("phenotypeImportPanel" + groupPath))
 				.setInitMethodName("initialize");
 		
-		((GenericXmlApplicationContext) getContext()).registerBeanDefinition("Phenotype - " + projectId + groupName,
+		((GenericXmlApplicationContext) getContext()).registerBeanDefinition("Phenotyping - " + projectId + groupName,
 				phenotypeChildPanel0DefinitionBuilder.getBeanDefinition());
 		
     	// TabComponent
-		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotype - " + projectId + groupName);
+		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotyping - " + projectId + groupName);
 		
 		phenotypePanel.setName(groupPath);
 		List<TabComponentPanel> componentPanels = new ArrayList<TabComponentPanel>();
 		componentPanels.add(phenotypePanel);
 
 		BeanDefinitionBuilder phenotypeTabDefinitionBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(TabComponent.class).addPropertyValue("title", "Phenotype - " + groupName)
+				.genericBeanDefinition(TabComponent.class).addPropertyValue("title", "Phenotyping - " + groupName)
 				.addPropertyValue("isStatic", false).addPropertyValue("componentPanels", componentPanels)
 				.setInitMethodName("initialize");	
 		
@@ -213,7 +219,7 @@ public class CreatePhenotypeGroup {
 		TabManager tabManager = (TabManager) getContext().getBean("tabManager");
 		tabManager.getTabComponents().add(tabComponent);  
 		
-		String plantingGroupName = groupName.replace("phenotype_", "");
+		String plantingGroupName = groupName;
 
 		Planting plantingPanel = (Planting) getContext().getBean("Planting - " + projectId + plantingGroupName);
 		plantingPanel.getTagGenerator().setPhenotypeExportPanel(phenotypePanel.getPhenotypeExportPanel());		

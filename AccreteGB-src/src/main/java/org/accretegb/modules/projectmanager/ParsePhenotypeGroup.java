@@ -47,7 +47,7 @@ public class ParsePhenotypeGroup {
 	
 	
 	public List<Object[]> getExportTagsTable(String exportTableJson, String groupName) {
-		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotype - " + projectId + groupName);
+		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotyping - " + projectId + groupName);
 		PhenotypeInfoPanel phenotyInfoPanel = (PhenotypeInfoPanel) getContext().getBean("phenotypeInfoChildPanel0");
 		CheckBoxIndexColumnTable exportTable = phenotypePanel.getPhenotypeExportPanel().getPhenotypeTagsTablePanel().getTable();
 		LinkedHashMap<String, String> subsetCommentMap = new LinkedHashMap<String, String>();
@@ -204,7 +204,7 @@ public class ParsePhenotypeGroup {
 	}
 	
 	public  List<Object[]>  getImportTable(String importTableJson, String groupName){
-		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotype - " + projectId + groupName);
+		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotyping - " + projectId + groupName);
 		JTable importTable = phenotypePanel.getPhenotypeImportPanel().getCurrentTable();
 		List<Object[]> importTableRows = new ArrayList<Object[]>();
 		try {
@@ -239,7 +239,7 @@ public class ParsePhenotypeGroup {
 		return importTableRows;
 	}
 	public void saveTables(String groupName){
-		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotype - " + projectId + groupName);
+		Phenotype phenotypePanel = (Phenotype) getContext().getBean("Phenotyping - " + projectId + groupName);
 		CheckBoxIndexColumnTable exportTable = phenotypePanel.getPhenotypeExportPanel().getPhenotypeTagsTablePanel().getTable();			
 		
 		//save export panel table
