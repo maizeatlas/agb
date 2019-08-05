@@ -65,12 +65,12 @@ public class RestoreDBMenuItem extends MenuItem{
             String username = Utils.getAuthorizationStrs().get("username");
             String password = Utils.getAuthorizationStrs().get("password");          
             String AGBcmd = " --host=" + server + " --port=" + port 
-            		+" --user=\"" + username + "\" --password=\"" + password 
-            		+"\"  " + LoginScreen.MAIN_DATABASE_NAME + " < " + AGBmainPath;
+            		+" --user=\"" + username + "\" --password='" + password 
+            		+"'  " + LoginScreen.MAIN_DATABASE_NAME + " < " + AGBmainPath;
             
             String PMcmd = " --host=" + server + " --port=" + port 
-            		+" --user=\"" + username + "\" --password=\"" + password 
-            		+"\"  " + LoginScreen.PROJECT_MANAGER_DB_NAME + " < " + AGBpmPath;
+            		+" --user=\"" + username + "\" --password='" + password 
+            		+"'  " + LoginScreen.PROJECT_MANAGER_DB_NAME + " < " + AGBpmPath;
             
            
            //String mysql = this.getClass().getClassLoader().getResource("mysqlcmds/mysql").getPath();
