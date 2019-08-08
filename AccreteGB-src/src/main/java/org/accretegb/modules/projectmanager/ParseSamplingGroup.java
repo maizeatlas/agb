@@ -180,11 +180,13 @@ public class ParseSamplingGroup {
 									sampleSettingTable.getColumnName(col).equals("Planting Date")){
 								DateFormat dateFormatRead = new SimpleDateFormat("EEE MMM dd hh:mm:ss Z yyyy",Locale.getDefault());		
 					    		Date date = null;
-					    		try {
-					    			date = new Date(dateFormatRead.parse(String.valueOf(object)).getTime());
-					    		} catch (ParseException e) {
-					    			// TODO Auto-generated catch block
-					    			e.printStackTrace();
+					    		if (!String.valueOf(object).equalsIgnoreCase("space")) {
+					    			try {
+					    				date = new Date(dateFormatRead.parse(String.valueOf(object)).getTime());
+					    			} catch (ParseException e) {
+					    				// TODO Auto-generated catch block
+					    				e.printStackTrace();
+					    			}
 					    		}
 					    		subsetTable[row][col]= date;
 							}else{

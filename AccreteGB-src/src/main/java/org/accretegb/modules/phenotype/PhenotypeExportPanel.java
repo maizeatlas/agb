@@ -874,11 +874,15 @@ public class PhenotypeExportPanel extends JPanel {
 		int numberOfFactor = 0;
 		if(columnames.size()>0){					
 			CheckBoxIndexColumnTable table = getPhenotypeTagsTablePanel().getTable();
+			int tagIndex = table.getColumnModel().getColumnIndex(ColumnConstants.TAG_ID);
 			progressBar.setVisible(true);
 			for(int row = 0; row < table.getRowCount(); ++ row){
 				int currentProgress = (row + 1) * 100 / table.getRowCount();
                 progressBar.setValue(currentProgress);
-				int obsUnitId = (Integer)table.getValueAt(row, table.getColumnModel().getColumnIndex(ColumnConstants.TAG_ID));
+				if(!Utils.isInteger(String.valueOf(table.getValueAt(row, tagIndex)))) {
+					continue;// skip filler
+				}
+				int obsUnitId = (Integer)table.getValueAt(row, tagIndex);
 				List<Object[]> results = ObservationUnitDAO.getInstance().getObsRelatedInfo(obsUnitId,tempColumnames);
 				obsDataMap.put(obsUnitId, results);
 				if(results.size() > numberOfFactor)
