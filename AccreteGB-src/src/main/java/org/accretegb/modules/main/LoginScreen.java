@@ -6,49 +6,40 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.Vector;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import org.accretegb.modules.MainLayout;
-import org.accretegb.modules.config.AccreteGBBeanFactory;
 import org.accretegb.modules.config.AccreteGBLogger;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.accretegb.modules.hibernate.dao.UserDAO;
 import org.accretegb.modules.projectmanager.PopulateProjectTree;
 import org.accretegb.modules.util.LoggerUtils;
-import org.apache.commons.io.IOUtils;
 import org.hibernate.cfg.Configuration;
 
 import com.jtattoo.plaf.smart.SmartLookAndFeel;
@@ -63,11 +54,20 @@ public class LoginScreen extends JFrame {
 	public static final String MAIN_DATABASE_NAME = "agbv2";
 	public static final String PROJECT_MANAGER_DB_NAME = "projectmanager";
 	private static final String CONNECTION_IS_VALID = "Connection is valid !";
+	private static final int CONNECTION_FLAG = 1;
+	private static final int USER_VALIDATION_FLAG = 2;
+	private static final int USER_SIGNUP_FLAG = 3;
+	private static final int AGB_INIT_FLAG = 4;
+	
 	final static String USER_DB_FILE = "credentials.txt";
 	private static String KEY_FILE = "key.txt";
     private static String CREDENTIALS_REGEX = "UDEL19716ACCRETEGB";
     private boolean hibernateReconfigured = false;
-    public static int loginUserId;
+    public static int loginUserId = -1;
+    private int validConnection = -99;
+    private int newUserId = -1;
+    private boolean doneInit = false;
+    private boolean doneSignup = false;
 	ArrayList<String> readloginInfo= new ArrayList<String>();
 	StringEncrypter stringEncrypter;
 	JTextField serverName;
@@ -84,7 +84,7 @@ public class LoginScreen extends JFrame {
 		Dimension screenDims = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenDims.width / 2 - getSize().width / 2, screenDims.height / 2- getSize().height / 2);
         setResizable(false);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
 		JPanel main = new JPanel(new MigLayout("insets 10, gap 5"));
 		getContentPane().add(main);
@@ -145,29 +145,89 @@ public class LoginScreen extends JFrame {
 	
 	public void validateDBconnection(){
 		
-		int valid = validateDBsetting(serverName.getText().trim(),port.getText().trim(),dbUserName.getText().trim(),dbPwd.getText().trim());								
-		
-		switch(valid){
-			case 0: 
-				dbMsg.setText(CONNECTION_IS_VALID);
-				dbMsg.setVisible(true);	
-				loginMsg.setText("");
-				signupMsg.setText("");
-				break;
-			case -1:
-				dbMsg.setText("Connection settings can not be empty");
-				break;
-			case -2:
-				dbMsg.setText("<HTML>Connection failed!<br>Ensure the server host both databases \""+ MAIN_DATABASE_NAME + "\" and \""+ PROJECT_MANAGER_DB_NAME +"\"</HTML>");
-			    break;
-			case -3:
-				dbMsg.setText("<HTML>Connection can not be established!<br>Please check database settings, internet settings and database server");
-				break;
+		if(validConnection == 0) {
+			// connection was validated.
+			return;
+		}else {
+			validConnection = -99;
 		}
-		if(valid < 0){	
-			dbMsg.setVisible(true);
-			hibernateReconfigured=false;
-	    }
+		
+		getProgressBarWorker("Validating the database connection", CONNECTION_FLAG);
+		SwingWorker connectionWorker = new SwingWorker() {
+	        @Override
+	        protected Object doInBackground() throws Exception {
+	        	validConnection = validateDBsetting(serverName.getText().trim(),port.getText().trim(),dbUserName.getText().trim(),dbPwd.getText().trim());									
+	            return null;
+	        }
+
+	        @Override
+	        public void done(){
+	        	switch(validConnection){
+	        	case 0: 
+	        		dbMsg.setText(CONNECTION_IS_VALID);
+	        		dbMsg.setVisible(true);	
+	        		loginMsg.setText("");
+	        		signupMsg.setText("");
+	        		break;
+	        	case -1:
+	        		dbMsg.setText("Connection settings can not be empty");
+	        		break;
+	        	case -2:
+	        		dbMsg.setText("<HTML>Connection failed!<br>Ensure the server host both databases \""+ MAIN_DATABASE_NAME + "\" and \""+ PROJECT_MANAGER_DB_NAME +"\"</HTML>");
+	        		break;
+	        	case -3:
+	        		dbMsg.setText("<HTML>Connection can not be established!<br>Please check database settings, internet settings and database server");
+	        		break;
+	        	}
+	        	if(validConnection < 0){	
+	        		dbMsg.setVisible(true);
+	        		hibernateReconfigured=false;
+	        	}
+	        }
+	    };
+	    connectionWorker.execute(); 
+	}
+	
+	private void getProgressBarWorker(String label, final int flag) {
+		final JDialog frame = new JDialog();
+	    frame.setLayout(new FlowLayout());
+	    frame.setAlwaysOnTop(true);
+	    frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+	    final JProgressBar jProgressBar = new JProgressBar();
+	    final JLabel status = new JLabel(label +": ");
+	    frame.add(status);
+	    frame.add("jProgressBar", jProgressBar);
+
+	    frame.pack();
+	    frame.setLocationRelativeTo(this);
+	    frame.setVisible(true);
+	    SwingWorker barWorker = new SwingWorker() {
+	        @Override
+	        protected Object doInBackground() throws Exception {
+	        	for (int i = 0; i < 100; i++) {
+	        		jProgressBar.setValue(i);
+	        		Thread.sleep(1000);
+	        		if (flag == CONNECTION_FLAG && validConnection != -99) {
+	        			break;
+	        		}else if (flag == USER_VALIDATION_FLAG && loginUserId  != -1) {
+	        			break;
+	        		}else if (flag == AGB_INIT_FLAG && doneInit) {
+	        			break;
+	        		}else if (flag == USER_SIGNUP_FLAG && doneSignup) {
+	        			break;
+	        		}
+	        	}
+	            return null;
+	        }
+
+	        @Override
+	        public void done(){
+	            frame.setVisible(false);
+	            jProgressBar.setValue(100); // 100%
+	        }
+	    };
+	    barWorker.execute(); 
 		
 	}
 	
@@ -187,7 +247,6 @@ public class LoginScreen extends JFrame {
 		config.setProperty("hibernate.connection.username", dbUserName.getText());		
 		HibernateSessionFactory.setPmSessionFactory(config.buildSessionFactory());
 		hibernateReconfigured = true;
-		
 	}
 	public void addLoginPanel(JPanel main){
 		JPanel loginPanel = new JPanel(new MigLayout("insets 5, gap 5"));
@@ -216,41 +275,73 @@ public class LoginScreen extends JFrame {
 
 			public void actionPerformed(ActionEvent e) {
 				login.setEnabled(false);
-				validateDBconnection();
-				if(!dbMsg.getText().equals(CONNECTION_IS_VALID))
-				{
-					loginMsg.setText(DATABASE_CONNECTION_FAILED);
-					login.setEnabled(true);
-				}else{
-					if(!hibernateReconfigured){
-						reConfigHibernate();						
-					}
-					int userId = UserDAO.getInstance().findByUserNamePwd(userName.getText().trim(), pwd.getText().trim());
-					if(userId > 0){
-						loginMsg.setText("Valid user! initializing...");
-						signupMsg.setText("");
-						loginUserId = userId;
-						writeCredentialsFile(serverName.getText().trim(), port.getText().trim(), dbUserName.getText().trim(),dbPwd.getText().trim(),userName.getText().trim(), pwd.getText().trim());
-						SwingUtilities.invokeLater(new Runnable() {
-					        public void run() {
-					        	MainLayout mainLayout = (MainLayout) getContext().getBean("mainLayoutBean");
-			    	            mainLayout.getFrame().setVisible(true);
-			    	            setVisible(false);
-			    	            dispose();
-			    	            PopulateProjectTree populateProjectTree = new PopulateProjectTree(loginUserId);
-					        }
-					    });	      	            
-					}else{
-						loginMsg.setText("Invalid user name or password!");
-						login.setEnabled(true);
-					}
-				}
+				loginUserId = -1;
+				SwingWorker loginWorkder = new SwingWorker() {
+			        @Override
+			        protected Object doInBackground() throws Exception {
+			        	validateDBconnection();
+			        	while(validConnection == -99) {
+			        		Thread.sleep(500);
+			        	}
+			        	if(validConnection == 0){
+							getProgressBarWorker("Validating the user", USER_VALIDATION_FLAG);
+							if( !hibernateReconfigured){
+								reConfigHibernate();
+							}
+							loginUserId = UserDAO.getInstance().findByUserNamePwd(userName.getText().trim(), pwd.getText().trim());
+						}else {
+			        		loginMsg.setText(DATABASE_CONNECTION_FAILED);
+							login.setEnabled(true);		
+						}
+			        	
+			        	return null;
+			        }
+
+			        @Override
+			        public void done(){
+			        	if(loginUserId > 0){
+							loginMsg.setText("Valid user!");
+							signupMsg.setText("");
+							writeCredentialsFile(serverName.getText().trim(), port.getText().trim(), dbUserName.getText().trim(),dbPwd.getText().trim(),userName.getText().trim(), pwd.getText().trim());
+			        	}else{
+			        		loginUserId= -2;
+							loginMsg.setText("Invalid user name or password! ");
+							login.setEnabled(true);
+						}
+			        }
+			    };
+			    loginWorkder.execute(); 
 			}			
 		});
+		
+		
+		SwingWorker mainFrameWorker = new SwingWorker() {
+	        @Override
+	        protected Object doInBackground() throws Exception {
+	        	while(loginUserId < 0) {
+	        		Thread.sleep(1000);
+	        	}
+	        	getProgressBarWorker("Initializing AccreteGB", AGB_INIT_FLAG);
+	        	MainLayout mainLayout = (MainLayout) getContext().getBean("mainLayoutBean");
+	        	mainLayout.getFrame().setVisible(true);
+	        	return null;
+	        }
+
+	        @Override
+	        public void done(){
+	        	doneInit = true;
+	        	setVisible(false);
+	        	dispose();
+	        	PopulateProjectTree populateProjectTree = new PopulateProjectTree(loginUserId);
+	        }
+	    };
+	    mainFrameWorker.execute(); 
+		
 		
 		main.add(loginPanel,"w 100%, wrap");
 		
 	}
+	
 	public void addSignPanel(JPanel main){
 		JPanel signupPanel = new JPanel(new MigLayout("insets 5, gap 5"));
 		signupPanel.setBorder(BorderFactory.createTitledBorder("Signup"));
@@ -281,7 +372,6 @@ public class LoginScreen extends JFrame {
 		signupMsg.setForeground(Color.red);
 		signupMsg.setFont(new Font("Verdana", Font.PLAIN, 10));
 		signupPanel.add(signupMsg,"span,split 2,  al right, hidemode 1");
-		System.out.println(signupPanel.isFocusTraversalPolicyProvider());
 		Vector<Component> order = new Vector<Component>(5);
 	    order.add(userName);
 	    order.add(firstName);
@@ -293,40 +383,54 @@ public class LoginScreen extends JFrame {
 	    signupPanel.setFocusCycleRoot(true);
 	    signupPanel.setFocusTraversalPolicy(newPolicy);
 	    
-	    JButton signup = new JButton("Sign up");
+	    final JButton signup = new JButton("Sign up");
 		signupPanel.add(signup);
 		
 		signup.addActionListener(new ActionListener(){
 
 			public void actionPerformed(ActionEvent e) {
-				
-				validateDBconnection();
-				if(!dbMsg.getText().equals(CONNECTION_IS_VALID))
+				if(userName.getText().trim().equals("") || firstName.getText().trim().equals("")
+						|| lastName.getText().trim().equals("") || pwd.getText().trim().equals(""))
 				{
-					signupMsg.setText(DATABASE_CONNECTION_FAILED);
-				}else if(!pwd.getText().trim().equals(confirmPwd.getText().trim())){
-					signupMsg.setText("Password mismatch !");
-					
+					signupMsg.setText("All fields are required! ");
+					return;
 				}
-				else{
-					if(userName.getText().trim().equals("") || firstName.getText().trim().equals("")
-							|| lastName.getText().trim().equals("") || pwd.getText().trim().equals(""))
-					{
-						signupMsg.setText("All fields are required! ");
-					}else{
-						if(!hibernateReconfigured){
-							reConfigHibernate();							
+				if(!pwd.getText().trim().equals(confirmPwd.getText().trim())){
+					signupMsg.setText("Password mismatch !");
+					return;
+				}
+				doneSignup = false;
+				signup.setEnabled(false);
+				SwingWorker signupWorkder = new SwingWorker() {
+			        @Override
+			        protected Object doInBackground() throws Exception {
+			        	validateDBconnection();
+			        	while(validConnection == -99) {
+			        		Thread.sleep(500);
+			        	}
+			        	if(validConnection == 0){
+							getProgressBarWorker("Signing up the user", USER_SIGNUP_FLAG);
+							if( !hibernateReconfigured){
+								reConfigHibernate();
+							}
+							newUserId = UserDAO.getInstance().insert(userName.getText().trim(), pwd.getText().trim(), 
+									firstName.getText().trim(),lastName.getText().trim(), email.getText().trim());
 						}
-						int msg = UserDAO.getInstance().insert(userName.getText().trim(), pwd.getText().trim(), 
-								firstName.getText().trim(),lastName.getText().trim(), email.getText().trim());
-						if(msg == 0){
-							signupMsg.setText("Username already exsit!");
+			        	return null;
+			        }
+
+			        @Override
+			        public void done(){
+			        	doneSignup = true;
+			        	if(newUserId == 0){
+							signupMsg.setText("Username already exsits!");
 						}else{
-							signupMsg.setText("User profile is saved!");
+							signupMsg.setText("User profile was saved!");
 						}
-						
-					}					
-				}							
+			        	signup.setEnabled(true);
+			        }
+			    };
+			    signupWorkder.execute(); 						
 			}
 			
 		});
@@ -498,7 +602,7 @@ public class LoginScreen extends JFrame {
            Properties props = new Properties();
            props.put("logoString", "");
            SmartLookAndFeel.setCurrentTheme(props);
-        	UIManager.setLookAndFeel("com.jtattoo.plaf.smart.SmartLookAndFeel");
+           UIManager.setLookAndFeel("com.jtattoo.plaf.smart.SmartLookAndFeel");
            LoginScreen login = new LoginScreen();
            login.initialize();
            login.setVisible(true);
