@@ -11,7 +11,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
 import org.accretegb.modules.MainLayout;
@@ -37,31 +39,50 @@ public class PopulateProjectTree {
 		return AccreteGBBeanFactory.getContext().getBean("projectExplorerTabbedPane", ProjectExplorerTabbedPane.class);
 	}
 
+	/**
+	 * Open a progress bar in a separate thread
+	 * */
+	public static JDialog ProjectsLoadingBar() {
+		final JDialog barDialog = new JDialog();
+		barDialog.setLayout(new FlowLayout());
+		barDialog.setAlwaysOnTop(true);
+		barDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+	    final JProgressBar jProgressBar = new JProgressBar(0, 100);
+	    final JLabel status = new JLabel("Loading Projects:");
+	    barDialog.add(status);
+	    barDialog.add("jProgressBar", jProgressBar);
+
+	    barDialog.pack();
+	    barDialog.setVisible(true);
+	    SwingWorker barWorker = new SwingWorker() {
+	        @Override
+	        protected Object doInBackground() throws Exception {
+	        	int i = 0;
+	        	while (i < 100) {
+	        		i++;
+	        		jProgressBar.setValue(i);
+	        		Thread.sleep(500);
+	        		if (i == 99) {
+	        			i = 0;
+	        		}
+	        	}
+	            return null;
+	        }
+	    };
+	    barWorker.execute(); 
+	    return barDialog;
+	}
 	
 	/**
 	 * Retrieve projects that login user has token on to project tree.
 	 * */
-	public  PopulateProjectTree(final int userId) {	
-		final JDialog dialog =  new JDialog();
-		
-	    Thread loading = new Thread() {
-		      public void run() {
-		    	JPanel pan = new JPanel();
-		  		pan.setLayout(new FlowLayout());
-		  		JLabel label = new JLabel("Loading Projects...");
-		  		pan.add(label);
-		  		dialog.add(pan);
-		  		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		  		dialog.setVisible(true);
-		  		dialog.setSize(new Dimension(250, 80));
-		  		dialog.setResizable(false);
-		      }
-		    };
-		 loading.start();
-		
-		Thread populating = new Thread() {
-		      public void run() {
-		    	getProjectExplorerTabbedPane().getExplorerPanel().getProjectsTree().disable();
+	public  PopulateProjectTree(final int userId ) {			
+		final JDialog barDialog = ProjectsLoadingBar();
+	    SwingWorker pmWorker = new SwingWorker() {
+	        @Override
+	        protected Object doInBackground() throws Exception {
+	        	getProjectExplorerTabbedPane().getExplorerPanel().getProjectsTree().disable();
 		    	ArrayList<Integer> projectIds = TokenRelationDAO.getInstance().findProjects(userId);
 		  		if(projectIds.size() > 0){
 		  			for(Integer projectId :projectIds ){				
@@ -77,11 +98,18 @@ public class PopulateProjectTree {
 
 		  			}
 		  		}
-		  		dialog.setVisible(false);
+	            return null;
+	        }
+
+	        @Override
+	        public void done(){
+	        	barDialog.setVisible(false);
+	            barDialog.dispose();
 		  		getProjectExplorerTabbedPane().getExplorerPanel().getProjectsTree().enable();
-		      }
-		    };
-		 populating.start();
+	        }
+	    };
+	    pmWorker.execute();
+		
 	}
 
 }

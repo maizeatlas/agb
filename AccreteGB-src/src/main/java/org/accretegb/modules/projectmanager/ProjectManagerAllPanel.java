@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -375,20 +376,11 @@ public class ProjectManagerAllPanel extends JPanel {
 		return new ActionListener() {	
 			public void actionPerformed(ActionEvent e) {
 				if(!validateSelectedTables()) return;
-				final JDialog dialog =  new JDialog();
-				Thread populating = new Thread() {
-				      public void run() {
-				    	JPanel pan = new JPanel();
-				  		pan.setLayout(new FlowLayout());
-				  		JLabel label = new JLabel("Loading Projects...");
-				  		pan.add(label);
-				  		dialog.add(pan);
-				  		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-				  		dialog.setVisible(true);
-				  		dialog.setSize(new Dimension(250, 80));
-				  		dialog.setResizable(false);
-				
-						getProjectExplorerTabbedPane().getExplorerPanel().getProjectsTree().disable();
+				final JDialog barDialog = PopulateProjectTree.ProjectsLoadingBar();
+			    SwingWorker pmWorker = new SwingWorker() {
+			        @Override
+			        protected Object doInBackground() throws Exception {
+			        	getProjectExplorerTabbedPane().getExplorerPanel().getProjectsTree().disable();
 						for (int row : getAllTablePanel().getTable().getSelectedRows()) {
 							String projectName = getProjectName(row);
 							int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
@@ -418,11 +410,17 @@ public class ProjectManagerAllPanel extends JPanel {
 								populateTable();
 							}
 						}
-						dialog.setVisible(false);
+			            return null;
+			        }
+
+			        @Override
+			        public void done(){
+			        	barDialog.setVisible(false);
+			            barDialog.dispose();
 				  		getProjectExplorerTabbedPane().getExplorerPanel().getProjectsTree().enable();
-				      }
-				 };
-				 populating.start();
+			        }
+			    };
+			    pmWorker.execute();
 			}
 		};
 	}
