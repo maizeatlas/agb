@@ -53,7 +53,6 @@ public class LoginScreen extends JFrame {
 	private static final String LOGIN_TITLE = "AccreteGB - The Breeder's ToolBox Login";
 	public static final String MAIN_DATABASE_NAME = "agbv2";
 	public static final String PROJECT_MANAGER_DB_NAME = "projectmanager";
-	private static final String CONNECTION_IS_VALID = "Connection is valid !";
 	private static final int CONNECTION_FLAG = 1;
 	private static final int USER_VALIDATION_FLAG = 2;
 	private static final int USER_SIGNUP_FLAG = 3;
@@ -164,7 +163,7 @@ public class LoginScreen extends JFrame {
 	        public void done(){
 	        	switch(validConnection){
 	        	case 0: 
-	        		dbMsg.setText(CONNECTION_IS_VALID);
+	        		dbMsg.setText("Valid connection!");
 	        		dbMsg.setVisible(true);	
 	        		loginMsg.setText("");
 	        		signupMsg.setText("");
@@ -189,23 +188,25 @@ public class LoginScreen extends JFrame {
 	}
 	
 	private void getProgressBarWorker(String label, final int flag) {
-		final JDialog frame = new JDialog();
-	    frame.setLayout(new FlowLayout());
-	    frame.setAlwaysOnTop(true);
-	    frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		final JDialog barDialog = new JDialog();
+		barDialog.setLayout(new FlowLayout());
+		barDialog.setAlwaysOnTop(true);
+		barDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-	    final JProgressBar jProgressBar = new JProgressBar();
+	    final JProgressBar jProgressBar = new JProgressBar(0, 100);
 	    final JLabel status = new JLabel(label +": ");
-	    frame.add(status);
-	    frame.add("jProgressBar", jProgressBar);
+	    barDialog.add(status);
+	    barDialog.add("jProgressBar", jProgressBar);
 
-	    frame.pack();
-	    frame.setLocationRelativeTo(this);
-	    frame.setVisible(true);
+	    barDialog.pack();
+	    barDialog.setLocationRelativeTo(this);
+	    barDialog.setVisible(true);
 	    SwingWorker barWorker = new SwingWorker() {
 	        @Override
 	        protected Object doInBackground() throws Exception {
-	        	for (int i = 0; i < 100; i++) {
+	        	int i = 0;
+	        	while (i < 100) {
+	        		i++;
 	        		jProgressBar.setValue(i);
 	        		Thread.sleep(1000);
 	        		if (flag == CONNECTION_FLAG && validConnection != -99) {
@@ -217,14 +218,17 @@ public class LoginScreen extends JFrame {
 	        		}else if (flag == USER_SIGNUP_FLAG && doneSignup) {
 	        			break;
 	        		}
+	        		if (i == 99 ) {
+	        			i = 1;
+	        		}
 	        	}
 	            return null;
 	        }
 
 	        @Override
 	        public void done(){
-	            frame.setVisible(false);
-	            jProgressBar.setValue(100); // 100%
+	        	barDialog.setVisible(false);
+	        	barDialog.dispose();
 	        }
 	    };
 	    barWorker.execute(); 
@@ -292,8 +296,7 @@ public class LoginScreen extends JFrame {
 						}else {
 			        		loginMsg.setText(DATABASE_CONNECTION_FAILED);
 							login.setEnabled(true);		
-						}
-			        	
+						}		        	
 			        	return null;
 			        }
 
@@ -324,6 +327,7 @@ public class LoginScreen extends JFrame {
 	        	getProgressBarWorker("Initializing AccreteGB", AGB_INIT_FLAG);
 	        	MainLayout mainLayout = (MainLayout) getContext().getBean("mainLayoutBean");
 	        	mainLayout.getFrame().setVisible(true);
+	        	
 	        	return null;
 	        }
 
