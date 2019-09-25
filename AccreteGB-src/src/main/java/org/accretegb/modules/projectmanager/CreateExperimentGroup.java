@@ -236,6 +236,7 @@ public class CreateExperimentGroup {
         
         BeanDefinitionBuilder experimentalDesignDefinitionBuilder = BeanDefinitionBuilder
                 .genericBeanDefinition(ExperimentSelectionPanel.class)
+                .addPropertyValue("projectID", projectId)
                 .addPropertyValue("experimentalSelectedStocksPanel",
                         getContext().getBean("experimentalDesignSelectedStocksPanel" + groupPath))
                 .addPropertyValue("designPanel", getContext().getBean("rcbdDesignPanel" + groupPath))

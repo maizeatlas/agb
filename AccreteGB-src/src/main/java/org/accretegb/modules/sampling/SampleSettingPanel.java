@@ -61,6 +61,7 @@ import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.ObservationUnitSampleDAO;
 import org.accretegb.modules.hibernate.dao.SourceDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.util.LoggerUtils;
 import org.hibernate.HibernateException;
 
@@ -82,6 +83,8 @@ public class SampleSettingPanel extends JPanel {
 	public String location = null;
 	public String currentSubset = null;
 	private JProgressBar progress ;
+	private int projectID = -1;
+
 	
 	public void initialize() {
 		setLayout(new MigLayout("insets 10, gap 10"));
@@ -150,7 +153,9 @@ public class SampleSettingPanel extends JPanel {
 			table.setModel(model);	
 		}
 		updateNumofItems();
-		table.setHasSynced((Boolean) this.subsetInfo.get(subsetName).get("syncstatus"));
+		if (this.subsetInfo != null && this.subsetInfo.get(subsetName)!= null) {
+			table.setHasSynced((Boolean) this.subsetInfo.get(subsetName).get("syncstatus"));
+		}
 	}
 	
 
@@ -259,7 +264,7 @@ public class SampleSettingPanel extends JPanel {
 					subsetInfo.get(currentSubset).put("prefix", value);
 					updateSampleNames(value);
 					updateSettingTableSubset(currentSubset);
-						
+					ChangeMonitor.markAsChanged(projectID);
 				}
 			});
 			
@@ -274,6 +279,7 @@ public class SampleSettingPanel extends JPanel {
 			ignoreRows.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					subsetInfo.get(currentSubset).put("ignorerows",ignoreRows.isSelected() );
+					ChangeMonitor.markAsChanged(projectID);
 				}
 			});
 			
@@ -352,6 +358,7 @@ public class SampleSettingPanel extends JPanel {
 					updateSampleNames(prefix);
 					//updateAllSamplaNamesSubsets();
 					updateSettingTableSubset(currentSubset);
+					ChangeMonitor.markAsChanged(projectID);
 					
 				}			
 			});
@@ -510,6 +517,7 @@ public class SampleSettingPanel extends JPanel {
 						}							
 					}	
 					updateSettingTableSubset(currentSubset);
+					ChangeMonitor.markAsChanged(projectID);
 				}
 			});
 			
@@ -679,6 +687,7 @@ public class SampleSettingPanel extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				importButtonActionPerformed();
+				ChangeMonitor.markAsChanged(projectID);
 			}				
     		
 		});
@@ -808,6 +817,12 @@ public class SampleSettingPanel extends JPanel {
 		this.nameSourceid = nameSourceid;
 	}
 
-	
+	public int getProjectID() {
+		return projectID;
+	}
+
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
+	}
 
 }

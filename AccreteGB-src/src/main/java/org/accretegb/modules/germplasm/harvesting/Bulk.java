@@ -52,6 +52,7 @@ import org.accretegb.modules.hibernate.Stock;
 import org.accretegb.modules.hibernate.dao.MeasurementUnitDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.tab.TabComponentPanel;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -72,8 +73,16 @@ public class Bulk extends JPanel {
 	private List<MeasurementUnit> unitsList;
 	private FieldGenerated fieldGenerated;
 	private StickerGenerator stickerGenerator;
+	private int projectID = -1;
 	public boolean modified;
 	
+	public int getProjectID() {
+		return projectID;
+	}
+
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
+	}
 	public TableToolBoxPanel getBulkTablePanel() {
 		return bulkTablePanel;
 	}
@@ -117,11 +126,16 @@ public class Bulk extends JPanel {
 		Utils.removeAllRowsFromTable((DefaultTableModel)table.getModel());
 		table.getModel().addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
-				getBulkTablePanel().getNumberOfRows().setText(String.valueOf(getBulkTablePanel().getTable().getRowCount()));			
+				if (e.getType() == TableModelEvent.DELETE || e.getType() == TableModelEvent.INSERT) {
+					getBulkTablePanel().getNumberOfRows().setText(String.valueOf(getBulkTablePanel().getTable().getRowCount()));	
+					ChangeMonitor.markAsChanged(projectID);
+				}
+				
 			}});
 		importStocks.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showPopup();
+				ChangeMonitor.markAsChanged(projectID);
 			}			
 		});
 		mixButton.addActionListener(new ActionListener() {
@@ -201,7 +215,7 @@ public class Bulk extends JPanel {
 				}else{
 					nextLink++;
 				}
-				
+				ChangeMonitor.markAsChanged(projectID);
 				
 			}			
 		});
@@ -221,7 +235,7 @@ public class Bulk extends JPanel {
 						table.setValueAt(null, i, table.getIndexOf(ColumnConstants.FINAL_STOCK_NAME));
 					}
 				}
-				
+				ChangeMonitor.markAsChanged(projectID);
 			}
 			
 		});
@@ -234,7 +248,7 @@ public class Bulk extends JPanel {
 						table.setValueAt(quantity, row, table.getIndexOf(ColumnConstants.QUANTITY));
 					}
 				}
-				
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 		setUnit.addActionListener(new ActionListener() {
@@ -253,7 +267,7 @@ public class Bulk extends JPanel {
 					table.setValueAt(unit, row, table.getIndexOf(ColumnConstants.UNIT));
 					table.setValueAt(unitId, row, table.getIndexOf(ColumnConstants.UNIT_ID));
 				}
-				
+				ChangeMonitor.markAsChanged(projectID);
 			}			
 		});
 		mixUnit.addActionListener(new ActionListener() {
@@ -278,7 +292,7 @@ public class Bulk extends JPanel {
 						}
 						else break;
 					}//while
-
+					ChangeMonitor.markAsChanged(projectID);
 				}//if last element
 			}
 		});

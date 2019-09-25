@@ -140,6 +140,7 @@ public class CreateStockSelectionGroup {
 
         BeanDefinitionBuilder stocksInfoDefinitionBuilder = BeanDefinitionBuilder
                 .genericBeanDefinition(StocksInfoPanel.class)
+                .addPropertyValue("projectID", projectId)
                 .addPropertyValue("stockname", new JTextField(23))
                 .addPropertyValue("accession", new JTextField(23))
                 .addPropertyValue("pedigree", new JTextField(23))

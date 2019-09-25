@@ -55,7 +55,7 @@ public class ProjectManager {
 		int projectsCount = projectTree.getModel().getChildCount(projectTree.getModel().getRoot());
 		for(int index = 0; index < projectsCount; ++ index){			
 			String projectName = projectTree.getModel().getChild(projectTree.getModel().getRoot(), index).toString();
-			if(projectName.equals(PMProjectDAO.getInstance().findProjectName(projectId).getProjectName())){
+			if(projectName.equals(PMProjectDAO.getInstance().findProjectObj(projectId).getProjectName())){
 				ProjectTreeNode projectRootNode = (ProjectTreeNode) projectTree.getModel().getChild(projectTree.getModel().getRoot(), index);
 				stockSelectionNode = (ProjectTreeNode) projectTree.getModel().getChild(projectRootNode,0);
 				experimentNode = (ProjectTreeNode) projectTree.getModel().getChild(projectRootNode,1);
@@ -203,7 +203,7 @@ public class ProjectManager {
 				int projectsCount = projectTree.getModel().getChildCount(projectTree.getModel().getRoot());
 				for(int index = 0; index < projectsCount; ++ index){			
 					String projectName = projectTree.getModel().getChild(projectTree.getModel().getRoot(), index).toString();
-					if(projectName.equals(PMProjectDAO.getInstance().findProjectName(projectId).getProjectName())){
+					if(projectName.equals(PMProjectDAO.getInstance().findProjectObj(projectId).getProjectName())){
 						ProjectTreeNode projectRootNode = (ProjectTreeNode) projectTree.getModel().getChild(projectTree.getModel().getRoot(), index);
 						stockSelectionNode = (ProjectTreeNode) projectTree.getModel().getChild(projectRootNode,0);
 						experimentNode = (ProjectTreeNode) projectTree.getModel().getChild(projectRootNode,1);

@@ -47,6 +47,7 @@ import org.accretegb.modules.main.SendEmail;
 import org.accretegb.modules.projectexplorer.ProjectExplorerPanel;
 import org.accretegb.modules.projectexplorer.ProjectExplorerTabbedPane;
 import org.accretegb.modules.projectexplorer.ProjectTree;
+import org.accretegb.modules.util.ChangeMonitor;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -282,24 +283,33 @@ public class ProjectManagerAllPanel extends JPanel {
 					int projectId = PMProjectDAO.getInstance().findProjectId(projectName);						
 					if (token != null && token.equals(userName)) {	
 						if(CollaborateRelationDAO.getInstance().isCollaborator(projectId,userId)){
-							int option = JOptionPane.showConfirmDialog(null, "Do you want to save the project groups?", "", JOptionPane.OK_OPTION);	
-							if(option ==JOptionPane.OK_OPTION )
-							{
-								ProjectManager.saveOrDeleteProject(projectId, "save");	
-								Date lastModified = PMProjectDAO.getInstance().updateLastModifiedDate(projectId);
-								getAllTablePanel().getTable().setValueAt(lastModified, row, getAllTablePanel().getTable().getIndexOf("Last Modified"));
+							if (ChangeMonitor.changedProject.get(projectId)) {
+								int option = JOptionPane.showConfirmDialog(null, "Changes to this project have been detected. Click Yes to save them or No to discard them", "", JOptionPane.OK_OPTION);	
+								if(option ==JOptionPane.OK_OPTION )
+								{
+									ProjectManager.saveOrDeleteProject(projectId, "save");	
+									Date lastModified = PMProjectDAO.getInstance().updateLastModifiedDate(projectId);
+									getAllTablePanel().getTable().setValueAt(lastModified, row, getAllTablePanel().getTable().getIndexOf("Last Modified"));
+								}
+								if(option != JOptionPane.CLOSED_OPTION) {
+									TokenRelationDAO.getInstance().delete(projectId, userId);
+									getAllTablePanel().getTable().setValueAt(null, row, getAllTablePanel().getTable().getIndexOf("Token Holder"));
+									getAllTablePanel().getTable().setValueAt(null, row, getAllTablePanel().getTable().getIndexOf("Expiration Date"));						
+									ProjectManager.removeProjectFromExploer(projectName);
+									ChangeMonitor.changedProject.remove(projectId);
+								}
+							}else {
+								TokenRelationDAO.getInstance().delete(projectId, userId);
+								getAllTablePanel().getTable().setValueAt(null, row, getAllTablePanel().getTable().getIndexOf("Token Holder"));
+								getAllTablePanel().getTable().setValueAt(null, row, getAllTablePanel().getTable().getIndexOf("Expiration Date"));						
+								ProjectManager.removeProjectFromExploer(projectName);
+								ChangeMonitor.changedProject.remove(projectId);
 							}
 						}else{
 							ProjectManagerErrorConstants.promptCollaboratorRemovedError(projectName);
 							DefaultTableModel model =(DefaultTableModel)getAllTablePanel().getTable().getModel();
 						    model.removeRow(getAllTablePanel().getTable().convertRowIndexToModel(row));
 						}
-						TokenRelationDAO.getInstance().delete(projectId, userId);
-						getAllTablePanel().getTable().setValueAt(null, row, getAllTablePanel().getTable().getIndexOf("Token Holder"));
-						getAllTablePanel().getTable().setValueAt(null, row, getAllTablePanel().getTable().getIndexOf("Expiration Date"));						
-						ProjectManager.removeProjectFromExploer(projectName);
-						
-																				
 					} else {
 						if (token == null) {
 							ProjectManagerErrorConstants.promptNoTokenToReturnError(projectName);
@@ -398,7 +408,9 @@ public class ProjectManagerAllPanel extends JPanel {
 									new CreatePhenotypeGroup(projectTree,projectId);
 									new CreateSamplingGroup(projectTree,projectId);
 									new CreateExperimentGroup(projectTree,projectId);
-									new CreateHarvestGroup(projectTree,projectId);						
+									new CreateHarvestGroup(projectTree,projectId);
+									ChangeMonitor.changedProject.put(projectId,false);
+									ChangeMonitor.projectIdName.put(projectId, projectName);
 								} else {
 									ProjectManagerErrorConstants.promptProjectAlreadyCheckedOutError(projectName);
 									getAllTablePanel().getTable().setValueAt(UserDAO.getInstance().findUserName(token.getUserId()), row, getAllTablePanel().getTable().getIndexOf("Token Holder"));
@@ -487,7 +499,7 @@ public class ProjectManagerAllPanel extends JPanel {
 		List<Integer> projectIds = CollaborateRelationDAO.getInstance().findByUserId(userId);
 		if(projectIds.size()>0){
 			for (Integer projectId : projectIds) {
-				PMProject project = PMProjectDAO.getInstance().findProjectName(projectId);
+				PMProject project = PMProjectDAO.getInstance().findProjectObj(projectId);
 				TokenRelation tokenRelation = TokenRelationDAO.getInstance().findTokenHolder(projectId);
 				ProjectRow newRow = new ProjectRow(project.getProjectName(), UserDAO.getInstance().findUserName(project.getUserId()), 
 						tokenRelation == null? null : UserDAO.getInstance().findUserName(tokenRelation.getUserId()), 

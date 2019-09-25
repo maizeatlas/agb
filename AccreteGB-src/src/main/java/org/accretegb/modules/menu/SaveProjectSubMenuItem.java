@@ -37,7 +37,6 @@ public class SaveProjectSubMenuItem extends MenuItem {
 					String projectName = projectNode.getNodeName();
 					int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
 					ProjectManager.saveProject(projectId);
-					projectNode.setModified(false);			
 				}				
 			}
 	    }

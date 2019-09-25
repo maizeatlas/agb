@@ -130,6 +130,7 @@ public class CreateHarvestGroup {
 
         //field generated group
         BeanDefinitionBuilder fieldGeneratedHarvestingDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(FieldGenerated.class)
+        		.addPropertyValue("projectID", projectId)
                 .addPropertyValue("crossingTablePanel",getContext().getBean("crossingTablePanel"+groupPath))
                 .setInitMethodName("initialize");
         ((GenericXmlApplicationContext) getContext()).registerBeanDefinition("fieldGenerated"
@@ -185,6 +186,7 @@ public class CreateHarvestGroup {
 
         // bulk bean definition
         BeanDefinitionBuilder bulkHarvestingDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Bulk.class)
+        		.addPropertyValue("projectID", projectId)
                 .addPropertyValue("bulkTablePanel",getContext().getBean("bulkTablePanel"+groupPath))
                 .addPropertyValue("fieldGenerated", getContext().getBean("fieldGenerated"+groupPath))
                 .setInitMethodName("initialize");
@@ -247,6 +249,7 @@ public class CreateHarvestGroup {
 
         //stickerGenerator beans
         BeanDefinitionBuilder stickerGeneratorHarvestingDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(StickerGenerator.class)
+        		.addPropertyValue("projectID", projectId)
                 .addPropertyValue("stickerTablePanel", getContext().getBean("stickerTablePanel" + groupPath))
                 .addPropertyValue("fieldGenerated",getContext().getBean("fieldGenerated" + groupPath))
                 .addPropertyValue("bulk", getContext().getBean("bulk" + groupPath))

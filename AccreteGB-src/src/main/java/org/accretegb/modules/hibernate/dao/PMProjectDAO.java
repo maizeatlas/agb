@@ -52,7 +52,7 @@ public class PMProjectDAO{
 	}
 	
 	@SuppressWarnings({ "-access", "unchecked" })
-	public  PMProject findProjectName(Integer projectId) {
+	public  PMProject findProjectObj(Integer projectId) {
 		Session session = hibernateSessionFactory.getPmSessionFactory().openSession();	
         Query query = session.createSQLQuery("Select * from project where project_id = '"+projectId+"'")
         		.addEntity(PMProject.class);

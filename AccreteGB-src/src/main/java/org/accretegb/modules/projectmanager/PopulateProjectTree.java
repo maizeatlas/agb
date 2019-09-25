@@ -25,6 +25,7 @@ import org.accretegb.modules.hibernate.dao.TokenRelationDAO;
 import org.accretegb.modules.main.LoginScreen;
 import org.accretegb.modules.projectexplorer.ProjectExplorerTabbedPane;
 import org.accretegb.modules.projectexplorer.ProjectTree;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.util.ThreadPool;
 
 /**
@@ -86,7 +87,7 @@ public class PopulateProjectTree {
 		    	ArrayList<Integer> projectIds = TokenRelationDAO.getInstance().findProjects(userId);
 		  		if(projectIds.size() > 0){
 		  			for(Integer projectId :projectIds ){				
-		  				PMProject project = PMProjectDAO.getInstance().findProjectName(projectId);
+		  				PMProject project = PMProjectDAO.getInstance().findProjectObj(projectId);
 		  				ProjectTree projectTree = new ProjectTree(project.getProjectName());
 		  				getProjectExplorerTabbedPane().getExplorerPanel().addProject(projectTree);	
 		  				new CreateStockSelectionGroup(projectTree,projectId);
@@ -95,7 +96,8 @@ public class PopulateProjectTree {
 		  				new CreateSamplingGroup(projectTree,projectId);
 		  				new CreateExperimentGroup(projectTree,projectId);
 		  				new CreateHarvestGroup(projectTree,projectId);
-
+		  				ChangeMonitor.changedProject.put(projectId, false);
+		  				ChangeMonitor.projectIdName.put(projectId, project.getProjectName());
 		  			}
 		  		}
 	            return null;

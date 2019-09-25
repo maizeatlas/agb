@@ -50,6 +50,7 @@ import org.accretegb.modules.hibernate.dao.MateMethodDAO;
 import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.tab.TabComponentPanel;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.constants.ColumnConstants;
 
 public class FieldGenerated extends TabComponentPanel {
@@ -64,15 +65,17 @@ public class FieldGenerated extends TabComponentPanel {
 	private JButton multiFemaleButton;
 	private JButton clearMatingtypeButton;
 	private JButton setUnsetSelectionButton;
-	int rowNum;
-	public int nextLink;
 	private JProgressBar progressBar;
 	private JComboBox matingMethod;
 	private JButton setMatingMethod;
 	private JButton unsetMatingMethod;
 	private List<PlantingRow> stockList;
-	public HashMap<String, Integer> mateMethodtoID = new HashMap<String, Integer>();
 	private HashSet<Integer> tagsCreatedinHarvest = new HashSet<Integer>();
+	private int projectID = -1;
+	public HashMap<String, Integer> mateMethodtoID = new HashMap<String, Integer>();
+	public int rowNum;
+	public int nextLink;
+	
 	public boolean modified = false;
 	
 	public TableToolBoxPanel getCrossingTablePanel() {
@@ -81,6 +84,14 @@ public class FieldGenerated extends TabComponentPanel {
 
 	public void setCrossingTablePanel(TableToolBoxPanel crossingTablePanel) {
 		this.crossingTablePanel = crossingTablePanel;
+	}
+	
+	public int getProjectID() {
+		return projectID;
+	}
+
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
 	}
 
 	public void initialize() {
@@ -132,6 +143,7 @@ public class FieldGenerated extends TabComponentPanel {
 				if(matingMethod.getSelectedIndex() == matingMethod.getItemCount()-1) {
 					matingMethod.setSelectedIndex(0);
 					new MateMethodPanel(FieldGenerated.this);
+					ChangeMonitor.markAsChanged(projectID);
 				}
 			}
 		});
@@ -160,6 +172,7 @@ public class FieldGenerated extends TabComponentPanel {
 						table.setValueAt(selectedMethod, i, table.getIndexOf(ColumnConstants.MATE_METHOD));
 					}
 				}
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 		unsetMatingMethod.addActionListener(new ActionListener() {
@@ -178,6 +191,7 @@ public class FieldGenerated extends TabComponentPanel {
 						table.setValueAt(null, i, table.getIndexOf(ColumnConstants.MATE_METHOD));
 					}
 				}
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 	}
@@ -363,6 +377,7 @@ public class FieldGenerated extends TabComponentPanel {
 				setButtonsUsability();
 				table.getRowSorter().toggleSortOrder(table.getIndexOf(ColumnConstants.MATE_LINK));
 				table.getRowSorter().toggleSortOrder(table.getIndexOf(ColumnConstants.MATE_LINK));
+				ChangeMonitor.markAsChanged(projectID);
 			}			
 		});
 	}
@@ -380,11 +395,13 @@ public class FieldGenerated extends TabComponentPanel {
 		selfButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SFOrSB("SF");
+				ChangeMonitor.markAsChanged(projectID);
 			}			
 		});
 		sbButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SFOrSB("SB");
+				ChangeMonitor.markAsChanged(projectID);
 			}			
 		});
 		addMatingButtonListener(crButton, "CR");
@@ -502,6 +519,7 @@ public class FieldGenerated extends TabComponentPanel {
 					table.getRowSorter().toggleSortOrder(table.getIndexOf(ColumnConstants.MATE_LINK));
 			
 				}	  
+				ChangeMonitor.markAsChanged(projectID);
 			}
 			
 		});
@@ -528,6 +546,7 @@ public class FieldGenerated extends TabComponentPanel {
 				
 				table.clearSelection();
 				setButtonsUsability();
+				ChangeMonitor.markAsChanged(projectID);
 			}	
 		});
 		
@@ -552,6 +571,7 @@ public class FieldGenerated extends TabComponentPanel {
 				
 				table.clearSelection();
 				setButtonsUsability();
+				ChangeMonitor.markAsChanged(projectID);
 			}	
 		});
 		
@@ -703,7 +723,11 @@ public class FieldGenerated extends TabComponentPanel {
 		Utils.removeAllRowsFromTable((DefaultTableModel)table.getModel());
 		table.getModel().addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
-				getCrossingTablePanel().getNumberOfRows().setText(String.valueOf(getCrossingTablePanel().getTable().getRowCount()));			
+				if (e.getType() == TableModelEvent.DELETE || e.getType() == TableModelEvent.INSERT) {
+					getCrossingTablePanel().getNumberOfRows().setText(String.valueOf(getCrossingTablePanel().getTable().getRowCount()));
+					ChangeMonitor.markAsChanged(projectID);
+				}
+				
 			}});
 		getCrossingTablePanel().getDeleteButton().addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent e) {
@@ -842,6 +866,7 @@ public class FieldGenerated extends TabComponentPanel {
 				progressBar.setVisible(true);
 				new HarvestingImportWorker(FieldGenerated.this, fc).execute();	
                 updateTableStatus();
+                ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 

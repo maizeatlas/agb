@@ -110,7 +110,6 @@ public class ProjectTreeActionListener extends MouseAdapter {
                          } else if (level == 3) {
                              ProjectTreeNode parentNode = ((ProjectTreeNode) selectedNode.getParent());
                              String parentNodeName = parentNode.getUserObject().toString();
-                             System.out.print("Parent Node Name "+parentNodeName);
                              if (parentNodeName.equals(ProjectConstants.STOCK_SELECTION)) {
                                  getStockSelectionChildListener().setTreeNode(selectedNode);
                                  //project name is root node. 
@@ -156,20 +155,17 @@ public class ProjectTreeActionListener extends MouseAdapter {
                 	
                 	 ProjectTreeNode selectedNode = ((ProjectTreeNode) path.getLastPathComponent());
                 	 int level = selectedNode.getLevel();
-                	 selectedNode.setModified(true);
                 	 if(level != 1){
                 		 int levelFlag = level;
                 		 while(levelFlag >=1)
                 		 {	
                 			 ProjectTreeNode modifiedNode = selectedNode.getParentNodes().get(0);
-                			 modifiedNode.setModified(true);
                 			 levelFlag --;
                 		 }
                 	 }
                     
                      if(level == 1){
                     	 getSaveProjectItem().setEnabled(true); 
-                    	 selectedNode.setModified(true);
                     	 
                      }else{
                     	 getSaveProjectItem().setEnabled(false);

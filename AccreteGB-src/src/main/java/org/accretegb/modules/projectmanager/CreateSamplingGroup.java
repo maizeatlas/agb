@@ -173,6 +173,7 @@ public class CreateSamplingGroup {
 		
 		BeanDefinitionBuilder sampleSelectionPanelDefinitionBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(SampleSelectionPanel.class)
+				.addPropertyValue("projectID", projectId)
 				.addPropertyValue("sampleSelectionTablePanel", getContext().getBean("sampleSelectionTablePanel" + groupPath))
 				.setInitMethodName("initialize");
 		((GenericXmlApplicationContext) getContext()).registerBeanDefinition("sampleSelectionPanel" + groupPath,
@@ -255,6 +256,7 @@ public class CreateSamplingGroup {
 		
 		BeanDefinitionBuilder samplingSettingPanelDefinitionBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(SampleSettingPanel.class)
+				.addPropertyValue("projectID", projectId)
 				.addPropertyValue("sampleSettingTablePanel", getContext().getBean("sampleSettingTablePanel" + groupPath))
 				.setInitMethodName("initialize");
 		((GenericXmlApplicationContext) getContext()).registerBeanDefinition("sampleSettingPanel" + groupPath,

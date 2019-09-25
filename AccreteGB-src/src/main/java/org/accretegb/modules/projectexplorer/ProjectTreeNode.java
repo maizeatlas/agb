@@ -36,7 +36,6 @@ public class ProjectTreeNode extends DefaultMutableTreeNode {
     private NodeType type;
     private String nodeName;
     private TabComponent tabComponent;
-    private boolean modified = false;
 
     public ProjectTreeNode(String nodeName) {
         super(nodeName);
@@ -101,16 +100,7 @@ public class ProjectTreeNode extends DefaultMutableTreeNode {
     public void setType(NodeType type) {
         this.type = type;
     }
-    
-
-    public boolean isModified() {
-		return modified;
-	}
-
-	public void setModified(boolean modified) {
-		this.modified = modified;
-	}
-
+   
 
 
 }

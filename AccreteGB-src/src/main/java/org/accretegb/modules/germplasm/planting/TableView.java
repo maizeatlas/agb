@@ -11,6 +11,7 @@ import org.accretegb.modules.germplasm.stocksinfo.StocksInfoPanel;
 import org.accretegb.modules.hibernate.MateMethodConnect;
 import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.apache.commons.lang.StringUtils;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -48,12 +49,13 @@ public class TableView extends JPanel {
 	private boolean tableChanged = false;
 	private Map<String, List<PlantingRow>> tag_plants = new HashMap<String, List<PlantingRow>>();  
 	private Map<String, Color> tag_Color = new HashMap<String, Color>();  
-	public boolean synced = false;
 	private Date plantingDate = null;   
 	private int currentStartRow = 0;
+	private int projectID = -1;
 	public String prefix = null;
 	public boolean prefixIsFixed = false;
 	public String plantingIndex = null;
+	public boolean synced = false;
 	final CustomCalendar costomizedCalendar = new CustomCalendar();
 	public void initialize() {
 		setLayout(new MigLayout("insets 10, gap 10"));
@@ -119,7 +121,7 @@ public class TableView extends JPanel {
 					changeTagsByStartRow(Integer.parseInt(startRow.getText()));					
 					updateWhenRowDataChanged();
 					// System.out.println(stockList.get(0).getTag());
-					synced = false;
+					setSyncedFalse();
 				}
 			}				
 		});
@@ -127,7 +129,7 @@ public class TableView extends JPanel {
 		reset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				populateTableBasedonDatabase(stockList);	
-				synced = false;
+				setSyncedFalse();
 			}
 
 		});
@@ -158,7 +160,7 @@ public class TableView extends JPanel {
 					{
 						plantingIndex = index.getText();			
 						updateWhenRowCountChanged();
-						synced = false;
+						setSyncedFalse();
 					}
 				}
 			}				
@@ -328,7 +330,7 @@ public class TableView extends JPanel {
 
 				}	
 				updateWhenRowDataChanged();
-				synced = false;
+				setSyncedFalse();
 			}
 
 
@@ -384,7 +386,7 @@ public class TableView extends JPanel {
 				}
 			}					
 		}
-		tableChanged = true;
+		setTableChanged(true);
 		table.setValueAt(true,row, table.getIndexOf(ColumnConstants.MODIFIED));
 	}
 	private void updatePlantTagsWhenRowCountChange(int row) {
@@ -477,7 +479,7 @@ public class TableView extends JPanel {
 						updatePlantTagsWhenRowDataChange(row,table.getIndexOf(ColumnConstants.MATING_PLAN));
 					}
 					updateWhenRowDataChanged();
-					synced = false;
+					setSyncedFalse();
 				}	
 			}			
 		});
@@ -505,7 +507,7 @@ public class TableView extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				importButtonActionPerformed();
-				synced = false;		
+				setSyncedFalse();		
 
 			}
 
@@ -620,7 +622,7 @@ public class TableView extends JPanel {
 							JOptionPane.showMessageDialog(null, "<HTML>Only one year is allowed in one planting group.<br>You have synced the planting group.<br>"
 									+ "Changing planting date is not going to change the prefix of the tag names</HTML>");
 						}
-						synced = false;
+						setSyncedFalse();
 					}
 				}else{
 					JOptionPane.showMessageDialog(null, "Only one year allowed in one planting group", "Invalid Date", JOptionPane.ERROR_MESSAGE);
@@ -654,7 +656,7 @@ public class TableView extends JPanel {
 				}else{
 					JOptionPane.showMessageDialog(null, "Invalid Integer", "", JOptionPane.ERROR_MESSAGE);
 				}
-				synced = false;					
+				setSyncedFalse();					
 			}			
 		});
 		subpanel.add(kernels, "h 24:24:24, w MIN(100%, 150)");
@@ -679,7 +681,7 @@ public class TableView extends JPanel {
 					updatePlantTagsWhenRowDataChange(row,column);
 				}	
 				updateWhenRowDataChanged();
-				synced = false;
+				setSyncedFalse();
 			}
 		});
 		subpanel.add(delay, "h 24:24:24, w MIN(100%, 150)");
@@ -703,7 +705,7 @@ public class TableView extends JPanel {
 					updatePlantTagsWhenRowDataChange(row,column);
 				}	
 				updateWhenRowDataChanged();
-				synced = false;
+				setSyncedFalse();
 			}
 		});
 		subpanel.add(purpose, "h 24:24:24, w MIN(100%, 150)");
@@ -727,7 +729,7 @@ public class TableView extends JPanel {
 					updatePlantTagsWhenRowDataChange(row,column);
 				}
 				updateWhenRowDataChanged();
-				synced = false;
+				setSyncedFalse();
 			}
 		});
 		subpanel.add(comment, "h 24:24:24, w MIN(100%, 150)");
@@ -809,8 +811,8 @@ public class TableView extends JPanel {
 				((DefaultTableModel)table.getModel()).addRow(rowData);
 				stockList.add(new PlantingRow(rowData, table));
 				updateWhenRowCountChanged();
-				tableChanged = true;
-				synced = false;
+				setTableChanged(true);
+				setSyncedFalse();
 				autoDelete = false;
 			}			
 		});
@@ -843,7 +845,7 @@ public class TableView extends JPanel {
 					updateEndFromStart(row);
 					updatePlantTagsWhenRowCountChange(row);		
 					table.setValueAt(true, e.getFirstRow(), table.getIndexOf(ColumnConstants.MODIFIED));
-					tableChanged = true;
+					setTableChanged(true);
 				}
 				// not need to update for every single value change in table - very slow for large amount of rows. 		
 				autoDelete = false;	
@@ -865,7 +867,7 @@ public class TableView extends JPanel {
 						public void actionPerformed(ActionEvent e) {
 							showPopup();
 							updateWhenRowDataChanged();
-							synced = false;
+							setSyncedFalse();
 						}						
 					});
 					popup.add(change);
@@ -964,7 +966,7 @@ public class TableView extends JPanel {
 			((DefaultTableModel) getStocksOrderPanel().getTable().getModel()).addRow(rowData);
 		}
 		updateWhenRowCountChanged();
-		tableChanged = true;
+		setTableChanged(true);
 		autoDelete = false;
 	}
 
@@ -1171,7 +1173,7 @@ public class TableView extends JPanel {
 					getStocksOrderPanel().getMoveDownButton().setEnabled(true);
 				}
 				updateWhenRowCountChanged();
-				synced = false;
+				setSyncedFalse();
 			}
 
 		});
@@ -1246,7 +1248,7 @@ public class TableView extends JPanel {
 					getStocksOrderPanel().getMoveDownButton().setEnabled(true);
 				}
 				updateWhenRowCountChanged();
-				synced = false;
+				setSyncedFalse();
 			}
 
 		});
@@ -1401,8 +1403,8 @@ public class TableView extends JPanel {
 							}
 						}
 						updateWhenRowCountChanged();
-						tableChanged = true;
-						synced = false;
+						setTableChanged(true);
+						setSyncedFalse();
 						getStocksOrderPanel().getDeleteButton().setEnabled(
 								false);
 						if (getStocksOrderPanel().getMoveDownButton() != null)
@@ -1610,6 +1612,10 @@ public class TableView extends JPanel {
 	public void setTableChanged(boolean tableChanged) {
 		this.tableChanged = tableChanged;
 	}
+	public void setSyncedFalse() {
+		ChangeMonitor.markAsChanged(projectID);
+		this.synced = false;
+	}
 	public Map<String, List<PlantingRow>> getPlantTags() {
 		return tag_plants;
 	}
@@ -1620,5 +1626,10 @@ public class TableView extends JPanel {
 	public Map<String, Color> getTag_Color() {
 		return tag_Color;
 	}
-
+	public int getProjectID() {
+		return projectID;
+	}
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
+	}
 }

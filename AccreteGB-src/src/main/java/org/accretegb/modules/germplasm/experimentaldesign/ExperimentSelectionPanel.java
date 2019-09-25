@@ -23,6 +23,7 @@ import org.accretegb.modules.hibernate.dao.ExperimentFactorValueDAO;
 import org.accretegb.modules.hibernate.dao.MeasurementUnitDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.tab.TabComponentPanel;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegbR.experimental.AlphaDesign;
 import org.accretegbR.experimental.CompleteRandomizedDesign;
 import org.accretegbR.experimental.ExperimentDesign;
@@ -105,6 +106,8 @@ public class ExperimentSelectionPanel extends TabComponentPanel {
     public JProgressBar progress = new JProgressBar();
     private JLabel reminderMsg;
     private String currentComm = "";
+    private int projectID = -1;
+
 	public void initialize() {
 		setDesignSelectionComboBoxActionListener();
         setSyncButtonListener();
@@ -467,7 +470,8 @@ public class ExperimentSelectionPanel extends TabComponentPanel {
         JButton randomizeButton = new JButton("Randomize");
         randomizeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {                 
-                  submitDesignSelectionButton();                  		       
+                  submitDesignSelectionButton();  
+                  ChangeMonitor.markAsChanged(projectID);
             }
         });
         randomizeButton.setName("Button");
@@ -1591,5 +1595,11 @@ public class ExperimentSelectionPanel extends TabComponentPanel {
 	}
 	public void setCurrentComm(String currentComm) {
 		this.currentComm = currentComm;
+	}
+	public int getProjectID() {
+		return projectID;
+	}
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
 	}
 }

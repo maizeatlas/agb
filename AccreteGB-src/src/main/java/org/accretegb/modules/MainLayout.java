@@ -25,6 +25,7 @@ import org.accretegb.modules.menu.MenuManager;
 import org.accretegb.modules.projectexplorer.ProjectExplorerTabbedPane;
 import org.accretegb.modules.projectexplorer.ProjectTreeNode;
 import org.accretegb.modules.tab.TabManager;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.projectexplorer.ProjectExplorerPanel;
 import org.accretegb.modules.projectmanager.ProjectManager;
 
@@ -37,6 +38,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 /**
  * @author nkumar
@@ -49,7 +51,7 @@ public class MainLayout {
     private static String TITLE = "AccreteGB - The Breeder's ToolBox";
     private static String EXIT_MESSAGE = "Exit MaizeAtlas Application";
     private static String CONFIRM_MESSAGE = "Are you sure you want to exit ?";
-    private static String SAVE_PROJECTS_MESSAGE = "You may have modified the following projects :\n";
+    private static String SAVE_PROJECTS_MESSAGE = "Changes to the following projects have been detected:\n";
     private static String SAVE_BEFORE_EXIT = "Save all before exit, click yes\nExit without saving, click no";
     
     
@@ -95,28 +97,20 @@ public class MainLayout {
         getFrame().addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                JFrame frame = (JFrame) e.getSource();
                 ArrayList<String> modifiedProjects = new ArrayList();
-                JTree projectTrees = AccreteGBBeanFactory.getContext().getBean("projectExplorerTabbedPane", ProjectExplorerTabbedPane.class)
-        				.getExplorerPanel().getProjectsTree();
-        		DefaultMutableTreeNode projectsRoot = (DefaultMutableTreeNode) projectTrees.getModel().getRoot();
-        		for(int index = 0;index < projectsRoot.getChildCount(); ++index){
-        			ProjectTreeNode projectNode = (ProjectTreeNode) projectsRoot.getChildAt(index);
-        				if(projectNode.isModified()){
-        					modifiedProjects.add(projectNode.getNodeName());
-        				}
-        		}
+            	for (Entry<Integer, Boolean> entry : ChangeMonitor.changedProject.entrySet()) {
+            	   if(entry.getValue()) {
+            		   modifiedProjects.add(ChangeMonitor.projectIdName.get(entry.getKey()));
+            	   }
+            	} 
         		
         		if(modifiedProjects.size() > 0){
-        			int result = JOptionPane.showConfirmDialog(frame, SAVE_PROJECTS_MESSAGE + modifiedProjects + "\n" +  SAVE_BEFORE_EXIT, EXIT_MESSAGE,
+        			int result = JOptionPane.showConfirmDialog(null, SAVE_PROJECTS_MESSAGE + modifiedProjects + "\n" +  SAVE_BEFORE_EXIT, EXIT_MESSAGE,
                             JOptionPane.YES_NO_CANCEL_OPTION);
         			if (result == JOptionPane.YES_OPTION) {
-        				for(int index = 0;index < projectsRoot.getChildCount(); ++index){
-                			ProjectTreeNode projectNode = (ProjectTreeNode) projectsRoot.getChildAt(index);
-                			if(projectNode.isModified()){
-                				projectNode.setModified(false);
-                				String projectName = projectNode.getNodeName();
-            					int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
+        				for(Entry<Integer, Boolean> entry : ChangeMonitor.changedProject.entrySet()){
+        					if(entry.getValue()) {
+            					int projectId = entry.getKey();
             					ProjectManager.saveOrDeleteProject(projectId,"save");
             					System.exit(0);
             				}	
@@ -126,14 +120,12 @@ public class MainLayout {
                     }
         			
         		}else{
-        			int result = JOptionPane.showConfirmDialog(frame, CONFIRM_MESSAGE, EXIT_MESSAGE,
+        			int result = JOptionPane.showConfirmDialog(null, CONFIRM_MESSAGE, EXIT_MESSAGE,
                             JOptionPane.YES_NO_OPTION);
                     if (result == JOptionPane.YES_OPTION) {
                         System.exit(0);
                     }	
         		}
-        		
-                
             }
 
 			private JTabbedPane getProjectsTree() {

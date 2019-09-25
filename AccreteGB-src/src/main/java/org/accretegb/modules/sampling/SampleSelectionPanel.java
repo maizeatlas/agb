@@ -71,6 +71,7 @@ import org.accretegb.modules.hibernate.dao.MeasurementValueDAO;
 import org.accretegb.modules.hibernate.dao.MeasurementParameterDAO;
 import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.phenotype.PhenotypeExportPanel;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.hibernate.dao.MeasurementUnitDAO;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
@@ -93,6 +94,7 @@ public class SampleSelectionPanel extends JPanel {
 	private LinkedHashMap<String, Object[][]> subsetTableMap = new LinkedHashMap<String, Object[][]>();
 	private LinkedHashMap<String, String> subsetCommentMap = new LinkedHashMap<String, String>();
 	private LinkedHashMap<String, List<String>> parameterInfoMap;
+	private int projectID = -1;
 	public ArrayList<String> options = new ArrayList<String>();
 	
 
@@ -230,6 +232,7 @@ public class SampleSelectionPanel extends JPanel {
 						options.add(str);
 					}
 					subset.setSelectedItem(str);
+					ChangeMonitor.markAsChanged(projectID);
 				}else{
 					JOptionPane.showConfirmDialog(null,
 							"Please select subset from the table", "",
@@ -425,4 +428,12 @@ public class SampleSelectionPanel extends JPanel {
 	public void setPhenotypeExportPanel(PhenotypeExportPanel phenotypeExportPanel) {
 		this.phenotypeExportPanel = phenotypeExportPanel;
 	}
+	public int getProjectID() {
+		return projectID;
+	}
+
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
+	}
+
 }

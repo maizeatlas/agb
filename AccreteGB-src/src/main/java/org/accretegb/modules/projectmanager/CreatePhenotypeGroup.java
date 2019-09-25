@@ -174,6 +174,7 @@ public class CreatePhenotypeGroup {
 		
 		BeanDefinitionBuilder exportPanelDefinitionBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(PhenotypeExportPanel.class)
+				.addPropertyValue("projectID", projectId)
 				.addPropertyValue("phenotypeTagsTablePanel", getContext().getBean("phenotypeTagsPanel" + groupPath))
 				.addPropertyValue("exportButton", new JButton("Export"))
 				.addPropertyValue("descriptorsOptions", new JList())

@@ -195,6 +195,7 @@ public class CreatePlantingGroup {
 
 		BeanDefinitionBuilder tableViewPlantingDefinitionBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(TableView.class)
+				.addPropertyValue("projectID", projectId)
 				.addPropertyValue("stocksOrderPanel",getContext().getBean("plantingStocksOrderPanel" + groupPath))
 				.setInitMethodName("initialize");
 		

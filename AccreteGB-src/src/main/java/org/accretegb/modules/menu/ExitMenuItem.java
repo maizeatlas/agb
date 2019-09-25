@@ -22,6 +22,7 @@ package org.accretegb.modules.menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
@@ -32,6 +33,7 @@ import org.accretegb.modules.hibernate.dao.PMProjectDAO;
 import org.accretegb.modules.projectexplorer.ProjectExplorerTabbedPane;
 import org.accretegb.modules.projectexplorer.ProjectTreeNode;
 import org.accretegb.modules.projectmanager.ProjectManager;
+import org.accretegb.modules.util.ChangeMonitor;
 
 /**
  * @author nkumar
@@ -42,7 +44,7 @@ public class ExitMenuItem extends MenuItem {
     private static final long serialVersionUID = 1L;
     private static String EXIT_MESSAGE = "Exit MaizeAtlas Application";
     private static String CONFIRM_MESSAGE = "Are you sure you want to exit ?";
-    private static String SAVE_PROJECTS_MESSAGE = "You may have modified the following projects :\n";
+    private static String SAVE_PROJECTS_MESSAGE = "Changes to the following projects have been detected:\n";
     private static String SAVE_BEFORE_EXIT = "Save all before exit, click yes\nExit without saving, click no";
     
 
@@ -62,24 +64,19 @@ public class ExitMenuItem extends MenuItem {
          */
         public void actionPerformed(ActionEvent e) {
         	ArrayList<String> modifiedProjects = new ArrayList();
-            JTree projectTrees = AccreteGBBeanFactory.getContext().getBean("projectExplorerTabbedPane", ProjectExplorerTabbedPane.class)
-    				.getExplorerPanel().getProjectsTree();
-    		DefaultMutableTreeNode projectsRoot = (DefaultMutableTreeNode) projectTrees.getModel().getRoot();
-    		for(int index = 0;index < projectsRoot.getChildCount(); ++index){
-    			ProjectTreeNode projectNode = (ProjectTreeNode) projectsRoot.getChildAt(index);
-    				modifiedProjects.add(projectNode.getNodeName());
-    		}
+        	for (Entry<Integer, Boolean> entry : ChangeMonitor.changedProject.entrySet()) {
+        	   if(entry.getValue()) {
+        		   modifiedProjects.add(ChangeMonitor.projectIdName.get(entry.getKey()));
+        	   }
+        	} 
     		
     		if(modifiedProjects.size() > 0){
     			int result = JOptionPane.showConfirmDialog(null, SAVE_PROJECTS_MESSAGE + modifiedProjects + "\n" +  SAVE_BEFORE_EXIT, EXIT_MESSAGE,
                         JOptionPane.YES_NO_CANCEL_OPTION);
     			if (result == JOptionPane.YES_OPTION) {
-    				for(int index = 0;index < projectsRoot.getChildCount(); ++index){
-            			ProjectTreeNode projectNode = (ProjectTreeNode) projectsRoot.getChildAt(index);
-            			if(projectNode.isModified()){
-            				projectNode.setModified(false);
-            				String projectName = projectNode.getNodeName();
-        					int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
+    				for(Entry<Integer, Boolean> entry : ChangeMonitor.changedProject.entrySet()){
+    					if(entry.getValue()) {
+        					int projectId = entry.getKey();
         					ProjectManager.saveOrDeleteProject(projectId,"save");
         					System.exit(0);
         				}	

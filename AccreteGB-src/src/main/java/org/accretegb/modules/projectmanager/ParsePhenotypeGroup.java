@@ -91,7 +91,7 @@ public class ParsePhenotypeGroup {
 				tagnames.add(String.valueOf(oneRow[8]));
 					
 			}
-			String boxItem = PMProjectDAO.getInstance().findProjectName(projectId).getProjectName()+"-"+groupName+"-"+"all";
+			String boxItem = PMProjectDAO.getInstance().findProjectObj(projectId).getProjectName()+"-"+groupName+"-"+"all";
 			phenotyInfoPanel.subsets.put(boxItem, tagnames);	
 			phenotyInfoPanel.subsetListComboBox.addItem(boxItem);
 			
@@ -143,7 +143,7 @@ public class ParsePhenotypeGroup {
 					}
 			    	phenotypePanel.getPhenotypeExportPanel().getPhenotypeTagsTablePanel().getTableSubset().addItem(subsetName);
 			    	phenotypePanel.getPhenotypeExportPanel().getSubsetTableMap().put(subsetName, subsetTable);
-			    	boxItem = PMProjectDAO.getInstance().findProjectName(projectId).getProjectName()+"-"+groupName+"-"+subsetName;
+			    	boxItem = PMProjectDAO.getInstance().findProjectObj(projectId).getProjectName()+"-"+groupName+"-"+subsetName;
 			    	phenotyInfoPanel.subsets.put(boxItem, subsetTagnames);
 			    	phenotyInfoPanel.subsetListComboBox.addItem(boxItem);
 			    	phenotypePanel.getPhenotypeExportPanel().setSubsetCommentMap(subsetCommentMap);

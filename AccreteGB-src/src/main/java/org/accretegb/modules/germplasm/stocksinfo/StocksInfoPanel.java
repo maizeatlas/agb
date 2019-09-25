@@ -32,6 +32,7 @@ import org.accretegb.modules.projectexplorer.ProjectExplorerPanel;
 import org.accretegb.modules.projectexplorer.ProjectTree;
 import org.accretegb.modules.projectexplorer.ProjectTreeNode;
 import org.accretegb.modules.tab.TabComponentPanel;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.customswingcomponent.TextField;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -93,7 +94,7 @@ public class StocksInfoPanel extends TabComponentPanel {
 	private JLabel matchNotFound;
     private JPanel exportPanel;
     private JCheckBox showAllPackets;
-
+    private int projectID = -1;
 
 	/**
      * does layout of inputs from user
@@ -237,7 +238,8 @@ public class StocksInfoPanel extends TabComponentPanel {
                         index++;
                     }
                     				
-					br.close();					
+					br.close();	
+					ChangeMonitor.markAsChanged(projectID);
 				}
 			}
 		
@@ -597,7 +599,8 @@ public class StocksInfoPanel extends TabComponentPanel {
     }
         
     private void updateNumberofItemsCart(){
-		 getSaveTablePanel().getNumberOfRows().setText(String.valueOf(getSaveTablePanel().getTable().getRowCount()));
+    	ChangeMonitor.markAsChanged(projectID);
+		getSaveTablePanel().getNumberOfRows().setText(String.valueOf(getSaveTablePanel().getTable().getRowCount()));
 	 }
     
     private void addSaveTablePanelListeners(final CheckBoxIndexColumnTable table,final TableToolBoxPanel tableToolBoxPanel) {
@@ -973,5 +976,12 @@ public class StocksInfoPanel extends TabComponentPanel {
 
 	public void setShowAllPackets(JCheckBox showAllPackets) {
 		this.showAllPackets = showAllPackets;
+	}
+
+	public int getProjectID() {
+		return projectID;
+	}
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
 	}
 }

@@ -62,6 +62,7 @@ import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.PassportDAO;
 import org.accretegb.modules.main.StringEncrypter;
 import org.accretegb.modules.util.AdjustTableColumnSize;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.util.LoggerUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -95,7 +96,14 @@ public class StickerGenerator extends JPanel {
 	private List<Integer> deletedPakcets;
 	private TreeMap<String, List<ArrayList<String>>> stockCompositionByMate = new TreeMap<String, List<ArrayList<String>>>();
 	private TreeMap<String, List<ArrayList<String>>> stockCompositionByBulk = new TreeMap<String, List<ArrayList<String>>>();
+	private int projectID = -1;
+	public int getProjectID() {
+		return projectID;
+	}
 
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
+	}
 
 	public TableToolBoxPanel getStickerTablePanel() {
 		return stickerTablePanel;
@@ -271,7 +279,8 @@ public class StickerGenerator extends JPanel {
 				for(int row: table.getSelectedRows()) {
 					table.setValueAt(date, row, column);
 					table.setValueAt(true, row, table.getIndexOf(ColumnConstants.MODIFIED));
-				}					
+				}	
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 		setQuantity.addActionListener(new ActionListener() {
@@ -281,7 +290,8 @@ public class StickerGenerator extends JPanel {
 				for(int row: table.getSelectedRows()) {
 					table.setValueAt(count, row, column);
 					table.setValueAt(true, row, table.getIndexOf(ColumnConstants.MODIFIED));
-				}					
+				}	
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 		setUnit.addActionListener(new ActionListener() {
@@ -301,6 +311,7 @@ public class StickerGenerator extends JPanel {
 					table.setValueAt(unitId, row, table.getIndexOf(ColumnConstants.UNIT_ID));
 					table.setValueAt(true, row, table.getIndexOf(ColumnConstants.MODIFIED));
 				}
+				ChangeMonitor.markAsChanged(projectID);
 
 			}			
 		});
@@ -359,11 +370,13 @@ public class StickerGenerator extends JPanel {
 					autoUpdate = false;
 				}
 				table.clearSelection();
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 		importButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				showPopup();
+				ChangeMonitor.markAsChanged(projectID);
 			}
 		});
 		table.getModel().addTableModelListener(new TableModelListener() {
@@ -376,7 +389,11 @@ public class StickerGenerator extends JPanel {
 					table.setValueAt(true, row, table.getIndexOf(ColumnConstants.MODIFIED));
 				}
 				autoUpdate = false;
-				stickerTablePanel.getNumberOfRows().setText(String.valueOf(stickerTablePanel.getTable().getRowCount()));
+				if (event.getType() == TableModelEvent.DELETE || event.getType() == TableModelEvent.INSERT) {
+					stickerTablePanel.getNumberOfRows().setText(String.valueOf(stickerTablePanel.getTable().getRowCount()));
+					ChangeMonitor.markAsChanged(projectID);
+				}
+				
 			}			
 		});
 		getStickerTablePanel().getRefreshButton().setToolTipText("sync with database");
@@ -864,7 +881,7 @@ public class StickerGenerator extends JPanel {
 						}
 						else break;
 					}//while
-
+					ChangeMonitor.markAsChanged(projectID);
 				}//if last element
 
 			}
