@@ -861,7 +861,7 @@ public class PhenotypeExportPanel extends JPanel {
 		}
 
 		for(String selected : selectedDescriptors){
-			if(selected.equals(PhenotypeConstants.ADD_NEW_PARAMETER)){
+			if(selected.equals(PhenotypeConstants.EXPERIMENT_INFO)){
 				columnames.add("exp_name");
 				columnames.add("exp_factor_name");
 				columnames.add("exp_factor_type");
