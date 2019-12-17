@@ -824,7 +824,7 @@ public class PhenotypeImportPanel extends JPanel {
 								 }
 							 }
 						 }
-					    new SyncExperiments(getImportTable(),  progress).execute();
+					    new SyncPhenotypeData(getImportTable(),  progress).execute();
 					
 					}
 				
@@ -837,13 +837,13 @@ public class PhenotypeImportPanel extends JPanel {
 		toolPanel.add(syncButton,"h 24:24:24, w 24:24:24, wrap");
 		
 	}
-	private class SyncExperiments extends SwingWorker<Void, Void> {
+	private class SyncPhenotypeData extends SwingWorker<Void, Void> {
 
 	    private JTable table;
 	    private JProgressBar progress;
 	    private long initialTime;
 
-	    public SyncExperiments(JTable jTable, JProgressBar progress) {
+	    public SyncPhenotypeData(JTable jTable, JProgressBar progress) {
 	        this.table = jTable;
 	        this.progress = progress;
 	    }
@@ -864,14 +864,15 @@ public class PhenotypeImportPanel extends JPanel {
 			        "default");
 	        if(option ==JOptionPane.OK_OPTION )
 	        {	
-	        	JOptionPane.showMessageDialog(null,"Rows with empty measurement value will be ignored.");
+	        	
 	        	for(int tomColumn : getTomColIndexes()){
 					for(int row = 0; row < table.getRowCount();++row){		
-						String value = String.valueOf(table.getValueAt(row, tomColumn-1));
-						if(value.equalsIgnoreCase("null")){
-							continue;
+						String value = String.valueOf(table.getValueAt(row, tomColumn-1)).trim();
+						if (value.equalsIgnoreCase("null") || value.equalsIgnoreCase("")){
+							table.setValueAt("", row, tomColumn-1);
 						}
-						Object tom = String.valueOf(table.getValueAt(row, tomColumn)).equals("") ?
+						//System.out.println(String.valueOf(table.getValueAt(row, 2)) + " - " + table.getColumnName(tomColumn) + " - " + table.getValueAt( row, tomColumn-1));
+						Object tom = String.valueOf(table.getValueAt(row, tomColumn)).trim().equals("") ?
 								null :  table.getValueAt(row, tomColumn);
 						if(tom == null){
 							 table.setValueAt(date, row, tomColumn);
@@ -937,9 +938,6 @@ public class PhenotypeImportPanel extends JPanel {
 				int parameterCol = table.getColumnModel().getColumnIndex(parameter);
 				int tomCol = parameterCol+1;
 				String value = String.valueOf(table.getValueAt(row, parameterCol));
-				if(value.equalsIgnoreCase("null")){
-					continue;
-				}
 				Object  measurementIdList = table.getValueAt(row, measurementCol);	
 				Date tom = null;
 				if (table.getValueAt(row, tomCol) != null){
