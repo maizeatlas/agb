@@ -886,7 +886,8 @@ public class PhenotypeImportPanel extends JPanel {
 									table.setValueAt(convertedDate, row, tomColumn);
 								} catch (ParseException e) {
 									// TODO Auto-generated catch block
-									JOptionPane.showMessageDialog(null, "Imported tom columns have invalid date format. Format has to be MM/dd/yy.");
+									
+									JOptionPane.showMessageDialog(null, "Please check the row with observation_unit_id "+table.getValueAt(row, 0)+". Tom value: "+String.valueOf(tom)+".\nTom columns format has to be MM/dd/yy.");
 									return null;
 								}
 							}
@@ -902,7 +903,10 @@ public class PhenotypeImportPanel extends JPanel {
 		        progress.setValue(0);
 				if(getValueChangedRows().size() == 0){
 					for(int row = 0; row < table.getRowCount();++row){
-						syncWithDatabase(row,session);
+						int result = syncWithDatabase(row,session);
+						if (result == -1) {
+							return null;
+						}
 						if ( row % 1000 == 0 ) { 
 							session.flush();
 							session.clear();
@@ -910,7 +914,10 @@ public class PhenotypeImportPanel extends JPanel {
 					}
 				}else{
 					for(int row : getValueChangedRows()){
-						syncWithDatabase(row,session);
+						int result = syncWithDatabase(row,session);
+						if (result == -1) {
+							return null;
+						}
 						if ( row % 1000 == 0 ) { 
 							session.flush();
 							session.clear();
@@ -926,7 +933,7 @@ public class PhenotypeImportPanel extends JPanel {
 	        return null;
 	    }
 	    
-	    public void syncWithDatabase(int row,Session session){
+	    public int syncWithDatabase(int row,Session session){
 	    	int measurementCol = table.getColumnModel().getColumnIndex("measurement_value_id");
 	    	int obsUnitId = Integer.parseInt((String) table.getValueAt(row, 0));	
 			List<Integer> measurementIds = new ArrayList<Integer>();
@@ -946,7 +953,17 @@ public class PhenotypeImportPanel extends JPanel {
 
 				if(measurementIdList == null){			
 					int measurementId = MeasurementValueDAO.getInstance().insert(obsUnitId, parameterId, value, tom, session);
-					measurementIds.add( measurementId);
+					if (measurementId == 0) {
+						JOptionPane.showConfirmDialog(
+								 null,
+	                            "<HTML><FONT COLOR = Red>*</FONT> Can not sync duplicate records.</HTML>",
+	                            "Error!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+						return -1;
+						
+					}else {
+						measurementIds.add( measurementId);
+					}
+					
 					
 				}else{
 					measurementIds = (List<Integer>) measurementIdList;
@@ -956,6 +973,7 @@ public class PhenotypeImportPanel extends JPanel {
 			}
 		
 			table.setValueAt(measurementIds, row, measurementCol);
+			return 0;
 			
 	    }
 	    @Override
