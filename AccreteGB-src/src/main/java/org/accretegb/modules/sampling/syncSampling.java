@@ -4,7 +4,9 @@ package org.accretegb.modules.sampling;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
@@ -25,6 +27,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
+import antlr.collections.List;
 
 public class syncSampling extends SwingWorker<Void, Void> {
 	
@@ -65,7 +69,36 @@ public class syncSampling extends SwingWorker<Void, Void> {
 					SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
 					Session session = sessionFactory.openSession();
 					Transaction transaction = session.beginTransaction();
+					ArrayList<String> sampleNames = new ArrayList<String>();
 					for(int row = 0; row < rows; row ++){
+						String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
+						sampleNames.add(sampleName);
+					}
+					HashMap<String, Integer> sampleNameIdMap = ObservationUnitSampleDAO.getInstance().getSampleNameIdMap(sampleNames);
+					if (sampleNameIdMap.size() > 0) {	
+						int option = JOptionPane.showOptionDialog(null, 
+						        "Some sample names were found in the database.\n"
+						        + "Choose 'Reset' to stop the sync and generate a new set of sample names by changing the prefix\n"
+						        + "Choose 'Continue' to update exisitng sample data  ",
+						        "", 
+						        JOptionPane.YES_NO_CANCEL_OPTION, 
+						        JOptionPane.INFORMATION_MESSAGE, 
+						        null, 
+						        new String[]{"Reset","Continue","Cancel"},
+						        "default");
+				        if(option ==JOptionPane.OK_OPTION )
+				        {	
+				        	// reset
+				        	return;
+				        }else if(option == JOptionPane.NO_OPTION){
+				        	// override, continue	 
+				        }else{
+				        	progress.setVisible(false);
+				        	return;
+				        }
+					}
+					for(int row = 0; row < rows; row ++){
+						String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
 						int tagId = (Integer) table.getValueAt(row, table.getIndexOf(ColumnConstants.TAG_ID));
 						int sourceId = 0;
 						if(table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTOR))!=null)
@@ -82,14 +115,13 @@ public class syncSampling extends SwingWorker<Void, Void> {
 								sampleDate = (Date)formatter.parse(String.valueOf(d));
 							} catch (ParseException e) {
 								// TODO Auto-generated catch block
-								JOptionPane.showMessageDialog(null, "Imported tom columns have invalid date format. Format has to be MM/dd/yy.");
+								JOptionPane.showMessageDialog(null, "Imported tom columns have invalid date format. Format has to be mm/dd/yy.");
 								break;
 							}
 						}
 						
-						String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
 						String comment = sampleSettingPanel.getSubsetCommentMap().get(subsetName);
-						ObservationUnitSampleDAO.getInstance().insert(tagId, sourceId, sampleDate, sampleName, comment,session);
+						ObservationUnitSampleDAO.getInstance().insert(sampleNameIdMap.get(sampleName) == null ? 0 : sampleNameIdMap.get(sampleName), tagId, sourceId, sampleDate, sampleName, comment,session);
 						if ( row % 1000 == 0 ) { 
 							session.flush();
 							session.clear();

@@ -719,6 +719,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
                 ProjectTreeNode node = (ProjectTreeNode) getProjectsTree().getSelectionPaths()[counter]
                         .getLastPathComponent();
                 parentNodes.add(node);
+                System.out.println("adding  " + node.getType().name());
             }
             boolean hasduplicate = actionsToDuplicate(parentNodes);
             if(hasduplicate){
@@ -1037,6 +1038,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
 					.genericBeanDefinition(TableView.class)
 					.addPropertyValue("stocksOrderPanel", getContext().getBean("plantingStocksOrderPanel" + groupPath))
 					.addPropertyValue("expid_expPanel", expid_expPanel)
+					.addPropertyValue("projectID", projectId)
 					.setInitMethodName("initialize");
 			
 			
@@ -1052,6 +1054,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
 					.addPropertyValue("listOfStocks", stocksList)
 					.setInitMethodName("initialize");
 			
+			System.out.println("Sending number of stocks " + stocksList.size());
 			((GenericXmlApplicationContext) getContext()).registerBeanDefinition("Planting - " + projectId + nodeName,
 					plantingChildPanel0DefinitionBuilder.getBeanDefinition());
 
@@ -1374,6 +1377,7 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
 			BeanDefinitionBuilder samplingSettingPanelDefinitionBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition(SampleSettingPanel.class)
 					.addPropertyValue("sampleSettingTablePanel", getContext().getBean("sampleSettingTablePanel" + groupPath))
+					.addPropertyValue("projectID", projectId)
 					.setInitMethodName("initialize");
 			((GenericXmlApplicationContext) getContext()).registerBeanDefinition("sampleSettingPanel" + groupPath,
 					samplingSettingPanelDefinitionBuilder.getBeanDefinition());
@@ -1423,10 +1427,12 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
     
     public void createStockList(List<PlantingRow> stocksList, HashMap<Integer,ExperimentSelectionPanel> expid_expPanel, List<ProjectTreeNode> parentNodes){
         for(ProjectTreeNode node : parentNodes){  
-        	
+        	System.out.println("node " + node.getType());
      	   if (node.getType().equals(ProjectTreeNode.NodeType.STOCK_SELECTION_NODE)) {
+     		   		System.out.println("From stock selection node");
 					StocksInfoPanel stockInfoPanel = (StocksInfoPanel) node.getTabComponent().getComponentPanels().get(0);
 					CheckBoxIndexColumnTable stocksOutputTable = stockInfoPanel.getSaveTablePanel().getTable();
+					System.out.println("Size " + stocksOutputTable.getRowCount());
 					for (int counter = 0; counter < stocksOutputTable.getRowCount(); counter++) {
 						PlantingRow stock = new PlantingRow(
 								Integer.parseInt(String.valueOf(stocksOutputTable.getValueAt(counter, stocksOutputTable.getColumnModel().getColumnIndex(ColumnConstants.STOCK_ID)))),

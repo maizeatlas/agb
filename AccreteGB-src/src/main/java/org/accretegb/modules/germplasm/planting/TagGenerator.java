@@ -60,6 +60,7 @@ import org.accretegb.modules.phenotype.PhenotypeExportPanel;
 import org.accretegb.modules.projectexplorer.ProjectTreeNode;
 import org.accretegb.modules.sampling.SampleSelectionPanel;
 import org.accretegb.modules.tab.TabComponentPanel;
+import org.accretegb.modules.util.ChangeMonitor;
 import org.accretegb.modules.util.LoggerUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -109,10 +110,8 @@ public class TagGenerator extends TabComponentPanel {
 		getTagsTablePanel().getRefreshButton().setToolTipText("Sync with database");
 		getTagsTablePanel().getRefreshButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
-				String message = "<HTML>Only one year and one field is allowed in one planting group."
-						+ "<br>The current prefix of the tagnames is " + tableView.prefix
-						+ "<br>Prefix of the tagnames can not be changed after syncing</HTML>";
-				int option = JOptionPane.showConfirmDialog(null, message, "Are you sure to sync the data?",
+				String message = "Are you sure you want to save the data to database?";
+				int option = JOptionPane.showConfirmDialog(null, message, "",
 						JOptionPane.OK_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE);
 				if (option == JOptionPane.OK_OPTION){
 					SwingWorker<Boolean, Integer> worker = new SwingWorker<Boolean, Integer>() {
@@ -137,6 +136,7 @@ public class TagGenerator extends TabComponentPanel {
 					worker.execute();
 						
 				}	
+				ChangeMonitor.markAsChanged(tableView.getProjectID());
 			}
 		});
 	}
@@ -476,22 +476,37 @@ public class TagGenerator extends TabComponentPanel {
 			{
 				if(getPhenotypeExportPanel().getIsFirstSync() == null || getPhenotypeExportPanel().getIsFirstSync()){
 					Vector data = ((DefaultTableModel) getTagsTablePanel().getTable().getModel()).getDataVector();
+					getPhenotypeExportPanel().getSubsetJlistMap().clear();
+					getPhenotypeExportPanel().getSubsetTableMap().clear();
+					getPhenotypeExportPanel().getSubsetCommentMap().clear();
 					getPhenotypeExportPanel().setTableData(data);
 					getPhenotypeExportPanel().populateTable();
 					getPhenotypeExportPanel().setIsFirstSync(false);
+
 				}else{
 					Vector data = ((DefaultTableModel) getTagsTablePanel().getTable().getModel()).getDataVector();
+					getPhenotypeExportPanel().getSubsetJlistMap().clear();
+					getPhenotypeExportPanel().getSubsetTableMap().clear();
+					getPhenotypeExportPanel().getSubsetCommentMap().clear();
 					getPhenotypeExportPanel().setTableData(data);
 					getPhenotypeExportPanel().plantingResync();
 					getPhenotypeExportPanel().populateTable();
+
 				}
 				if(getSampleSelectionPanel().getIsFirstSync() == null || getSampleSelectionPanel().getIsFirstSync()){
 					Vector data = ((DefaultTableModel) getTagsTablePanel().getTable().getModel()).getDataVector();
+					getSampleSelectionPanel().getSubsetCommentMap().clear();
+					getSampleSelectionPanel().getSubsetTableMap().clear();
+					getSampleSelectionPanel().setShouldResetMaps(true);
 					getSampleSelectionPanel().setTableData(data);
 					getSampleSelectionPanel().populateTable();
 					getSampleSelectionPanel().setIsFirstSync(false);
+
 				}else{
 					Vector data = ((DefaultTableModel) getTagsTablePanel().getTable().getModel()).getDataVector();
+					getSampleSelectionPanel().getSubsetCommentMap().clear();
+					getSampleSelectionPanel().getSubsetTableMap().clear();
+					getSampleSelectionPanel().setShouldResetMaps(true);
 					getSampleSelectionPanel().setTableData(data);
 					getSampleSelectionPanel().plantingResync();
 					getSampleSelectionPanel().populateTable();

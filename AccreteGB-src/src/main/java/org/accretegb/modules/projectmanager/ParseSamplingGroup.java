@@ -29,6 +29,7 @@ import org.accretegb.modules.constants.JsonConstants;
 import org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable;
 import org.accretegb.modules.hibernate.dao.SamplingGroupDAO;
 import org.accretegb.modules.sampling.Sampling;
+import org.accretegb.modules.util.GlobalProjectInfo;
 import org.accretegb.modules.util.LoggerUtils;
 import org.apache.avro.data.Json;
 import org.json.JSONArray;
@@ -105,6 +106,13 @@ public class ParseSamplingGroup {
 		    	}		    	
 		    }
 		    SamplingPanel.getSampleSelectionPanel().populateSubset("All");
+		    
+		    JSONObject globalSampingObject = json.getJSONObject("globalSamping");
+		    Iterator it = selectionTableSubsetObject.keys(); 
+		    while(it.hasNext()){
+		    	GlobalProjectInfo.insertNewSamplingInfo(projectId, it.next().toString(), globalSampingObject.getJSONArray(it.next().toString()));
+		    }
+		    
 		  } catch (Exception e) {
 			  e.printStackTrace();
 		}
@@ -146,16 +154,6 @@ public class ParseSamplingGroup {
 		    }
 		    SamplingPanel.getSampleSettingPanel().setSubsetInfo(subsetInfoMap);
 			
-		    //get prefix info 
-		    JSONObject prefixIndexObject = json.getJSONObject("prefixIndex");
-		    LinkedHashMap<String, Integer> prefixIndex = new LinkedHashMap<String, Integer>();
-		    Iterator prefixIndexIter = prefixIndexObject.keys(); 
-		    while(prefixIndexIter.hasNext()){
-		    	String prefix = prefixIndexIter.next().toString();
-		    	prefixIndex.put(prefix, (Integer) prefixIndexObject.get(prefix));
-		    }
-		    SamplingPanel.getSampleSettingPanel().setPrefixIndex(prefixIndex);
-		    
 		    
 		    //get subset data for subset tables
 			JSONObject SettingTableSubsetObject = json.getJSONObject("subset");
@@ -201,7 +199,7 @@ public class ParseSamplingGroup {
 						}
 			    	}		    	
 			    	subset.addItem(subsetName);			    	
-			    	subsetTableMap.put(subsetName, subsetTable);			    	
+			    	subsetTableMap.put(subsetName, subsetTable);	
 		    	}
 		    }
 		    Boolean synced = false;
@@ -283,15 +281,6 @@ public class ParseSamplingGroup {
 			settingTableSubsetInfoObject.put(subsetName,info);			
 		}
 		
-		//prefixIndex
-		JSONObject prefixIndexObject = new JSONObject();	
-		LinkedHashMap<String, Integer> prefixIndex = SamplingPanel.getSampleSettingPanel().getPrefixIndex();
-		Iterator iter3 = prefixIndex.entrySet().iterator();    
-		while (iter3.hasNext()) {
-			Map.Entry entry = (Entry) iter3.next();
-			prefixIndexObject.put((String) entry.getKey(),entry.getValue());	
-		}
-		
 		JSONObject selectionTableMainObject = null;		 
 		JSONObject settingTableMainObject = null;
 		if(selectionTableSubsetObject != null && selectionTableSubsetObject.length() > 0){
@@ -311,11 +300,15 @@ public class ParseSamplingGroup {
 				 settingTableMainObject = new JSONObject();
 				 settingTableMainObject.put("subset", settingTableSubsetObject);
 				 settingTableMainObject.put("subsetInfo", settingTableSubsetInfoObject);
-				 settingTableMainObject.put("prefixIndex", prefixIndexObject);
+				 JSONObject globalSampingInfoObject = new JSONObject();
+				 globalSampingInfoObject.put("sampling", GlobalProjectInfo.getProjectInfo().get(projectId).get("sampling"));
+				 settingTableMainObject.put("globalSampling", globalSampingInfoObject);
 				 } catch (JSONException e) {
 					e.printStackTrace();
 			}		
 		}
+		
+		
 		SamplingGroupDAO.getInstance().save(projectId, groupName, 
 				selectionTableMainObject == null ? null : selectionTableMainObject.toString(), 
 				settingTableMainObject == null ? null : settingTableMainObject.toString());

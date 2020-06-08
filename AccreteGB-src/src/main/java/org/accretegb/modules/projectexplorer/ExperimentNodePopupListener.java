@@ -646,6 +646,7 @@ public class ExperimentNodePopupListener extends MouseAdapter {
 					.genericBeanDefinition(TableView.class)
 					.addPropertyValue("stocksOrderPanel", getContext().getBean("plantingStocksOrderPanel" + groupPath))
 					.addPropertyValue("expid_expPanel", expid_expPanel)
+					.addPropertyValue("projectID", projectId)
 					.setInitMethodName("initialize");
 			((GenericXmlApplicationContext) getContext()).registerBeanDefinition("plantingTableView" + groupPath,
 					tableViewPlantingDefinitionBuilder.getBeanDefinition());
@@ -973,6 +974,7 @@ public class ExperimentNodePopupListener extends MouseAdapter {
 			BeanDefinitionBuilder samplingSettingPanelDefinitionBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition(SampleSettingPanel.class)
 					.addPropertyValue("sampleSettingTablePanel", getContext().getBean("sampleSettingTablePanel" + groupPath))
+					.addPropertyValue("projectID", projectId)
 					.setInitMethodName("initialize");
 			((GenericXmlApplicationContext) getContext()).registerBeanDefinition("sampleSettingPanel" + groupPath,
 					samplingSettingPanelDefinitionBuilder.getBeanDefinition());

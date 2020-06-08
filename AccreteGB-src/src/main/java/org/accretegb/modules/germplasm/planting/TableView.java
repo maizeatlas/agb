@@ -12,7 +12,10 @@ import org.accretegb.modules.hibernate.MateMethodConnect;
 import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.util.ChangeMonitor;
+import org.accretegb.modules.util.GlobalProjectInfo;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
+
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -150,20 +153,14 @@ public class TableView extends JPanel {
 		setRow.setToolTipText("Set the planting group index.");
 		setRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (prefixIsFixed) {
-					JOptionPane.showMessageDialog(null, "<HTML>Only one index is allowed in one planting group.<br>"
-							+ "You have synced the planting group.<br>"
-							+ "Changing the group index is not going to change prefix of the tag names</HTML>");
-
-				}else{
-					if(Utils.isInteger(index.getText()))
-					{
-						plantingIndex = index.getText();			
-						updateWhenRowCountChanged();
-						setSyncedFalse();
+				if(Utils.isInteger(index.getText()))
+				{
+					plantingIndex = index.getText();			
+					updateWhenRowCountChanged();
+					setSyncedFalse();
 					}
 				}
-			}				
+						
 		});
 
 		subpanel.add(plantingIndexLabel,"gapleft 10");
@@ -199,8 +196,7 @@ public class TableView extends JPanel {
 		}	
 
 		// IN ORDER TO SPEED UP, ASSUME A USER ONLY WORK ON THE PLANTINGS ON ONE YEAR.
-		// ORTHERWISE, EVERY ROW NEEDS TO QURY DATABASE TO SET THE TAGf
-		// System.out.println(" >> 1");
+		// ORTHERWISE, EVERY ROW NEEDS TO QURY DATABASE TO SET THE TAG
 		prefix = getTagPrefix(date);
 		StringBuffer tag = new StringBuffer();
 		DecimalFormat plotFormat = new DecimalFormat("00000");
@@ -615,13 +611,7 @@ public class TableView extends JPanel {
 					{
 						updateWhenRowDataChanged();
 						updateWhenRowCountChanged();
-						if(!prefixIsFixed)
-						{
-							prefix = null;
-						}else{
-							JOptionPane.showMessageDialog(null, "<HTML>Only one year is allowed in one planting group.<br>You have synced the planting group.<br>"
-									+ "Changing planting date is not going to change the prefix of the tag names</HTML>");
-						}
+						prefix = null;
 						setSyncedFalse();
 					}
 				}else{
@@ -1536,28 +1526,30 @@ public class TableView extends JPanel {
 
 
 	private String getTagPrefix(Date date){
-		if(prefixIsFixed){
-			return prefix;	
-		}
-		else{
-			String year = String.valueOf(date.getYear()+1900).substring(2);
-			int season = 0;
-			if (plantingIndex != null)
-			{
-				season = Integer.parseInt(plantingIndex);
-			}else{
-				season = ObservationUnitDAO.getInstance().getSeasonIndex(year, String.valueOf(zipcode));
-				plantingIndex = String.valueOf(season);
+		String year = String.valueOf(date.getYear()+1900).substring(2);
+		int season = 0;
+		if (plantingIndex != null)
+		{
+			season = Integer.parseInt(plantingIndex);
+		}else{
+			season = ObservationUnitDAO.getInstance().getSeasonIndex(year, String.valueOf(zipcode));
+			plantingIndex = String.valueOf(season);
+			// check with other planting groups
+			Object maxIndex = GlobalProjectInfo.getPlantingInfo(projectID, "maxPlantingIndex");
+			if (maxIndex != null && Integer.valueOf(plantingIndex) <= (Integer)maxIndex ) {
+				plantingIndex = String.valueOf((Integer)maxIndex + 1); 
+				GlobalProjectInfo.insertNewPlantingInfo(projectID, "maxPlantingIndex", Integer.valueOf(plantingIndex));
+			} else {
+				GlobalProjectInfo.insertNewPlantingInfo(projectID, "maxPlantingIndex", Integer.valueOf(plantingIndex));
 			}
-			//System.out.println("season " + season);
-			StringBuffer prefixbuffer = new StringBuffer();
-			prefixbuffer.append(year).append('.').append(season).append('.').append(String.valueOf(zipcode)).append('.').toString();
-			if(!prefixIsFixed){
-				prefix = prefixbuffer.toString(); 
-			}
-			//System.out.println(" new prefix " + prefix);
-			return prefix;	
+			
 		}
+		//System.out.println("season " + season);
+		StringBuffer prefixbuffer = new StringBuffer();
+		prefixbuffer.append(year).append('.').append(season).append('.').append(String.valueOf(zipcode)).append('.').toString();
+		prefix = prefixbuffer.toString(); 
+		//System.out.println(" new prefix " + prefix);
+		return prefix;	
 
 	} 
 

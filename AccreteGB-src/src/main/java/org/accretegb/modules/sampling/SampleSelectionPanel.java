@@ -96,7 +96,8 @@ public class SampleSelectionPanel extends JPanel {
 	private LinkedHashMap<String, List<String>> parameterInfoMap;
 	private int projectID = -1;
 	public ArrayList<String> options = new ArrayList<String>();
-	
+	private boolean shouldResetMaps = false;
+
 
 	public void initialize() {
 		setLayout(new MigLayout("insets 10, gap 5"));
@@ -434,6 +435,14 @@ public class SampleSelectionPanel extends JPanel {
 
 	public void setProjectID(int projectID) {
 		this.projectID = projectID;
+	}
+	
+	public boolean isShouldResetMaps() {
+		return shouldResetMaps;
+	}
+
+	public void setShouldResetMaps(boolean shouldResetMaps) {
+		this.shouldResetMaps = shouldResetMaps;
 	}
 
 }

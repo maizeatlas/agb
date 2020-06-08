@@ -13,7 +13,11 @@ import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.accretegb.modules.constants.ColumnConstants;
+import org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable;
 import org.accretegb.modules.tab.TabComponentPanel;
+import org.accretegb.modules.util.GlobalProjectInfo;
+import org.json.JSONObject;
 
 public class Sampling extends TabComponentPanel {
 	private static final long serialVersionUID = 1L;
@@ -46,21 +50,33 @@ public class Sampling extends TabComponentPanel {
 	
 	
 	public void updateSubsets(){
+		// only contains All
+		if (sampleSelectionPanel.isShouldResetMaps()) {
+			sampleSettingPanel.getSubsetCommentMap().clear();
+			sampleSettingPanel.getSubsetTableMap().clear();
+			sampleSettingPanel.getSubsetInfo().clear();
+			sampleSettingPanel.getSampleSettingTablePanel().getTableSubset().removeAllItems();
+			sampleSelectionPanel.setShouldResetMaps(false);
+		}
 		JComboBox subset = sampleSettingPanel.getSampleSettingTablePanel().getTableSubset();
 		DefaultComboBoxModel subsetNamemodel = (DefaultComboBoxModel)subset.getModel();
 		for(String key :sampleSelectionPanel.getSubsetTableMap().keySet()){
 			if(!sampleSettingPanel.getSubsetTableMap().keySet().contains(key)){
 				sampleSettingPanel.getSubsetTableMap().put(key, sampleSelectionPanel.getSubsetTableMap().get(key));
+				Object[][] subsetData =	(Object[][]) sampleSettingPanel.getSubsetTableMap().get(key);
+				CheckBoxIndexColumnTable table = sampleSettingPanel.getSampleSettingTablePanel().getTable();
+				sampleSettingPanel.setInitialIndex(String.valueOf(subsetData[0][table.getIndexOf(ColumnConstants.TAG)])); 
 				HashMap<String, Object> tmp = new HashMap<String, Object>();
-				tmp.put("prefix", "sample");
+				tmp.put("prefix", sampleSettingPanel.getInitialPrefix());
 				tmp.put("date", new Date());
-				sampleSettingPanel.getSubsetInfo().put(key, tmp);				
-				sampleSettingPanel.populateSelectionSubset(key);
+				sampleSettingPanel.getSubsetInfo().put(key, tmp);	
+				
 				if(subsetNamemodel.getIndexOf(key) == -1)
 				{
 					sampleSettingPanel.getSampleSettingTablePanel().getTableSubset().addItem(key);
 				}
 				sampleSettingPanel.getSampleSettingTablePanel().getTableSubset().setSelectedItem(key);
+				sampleSettingPanel.populateSelectionSubset(key);
 				
 			}else {
 				if (sampleSettingPanel.currentSubset == null ) {

@@ -125,7 +125,7 @@ public class ObservationUnitDAO {
 	}
 	
 	public int getSeasonIndex(String year, String zipcode){
-		System.out.println("SELECT MAX(CAST(SUBSTRING(tagname, 4, length(tagname)-20) AS UNSIGNED)) FROM observation_unit WHERE (tagname REGEXP '^"+year+".[0-9]*."+zipcode+"')");
+		//System.out.println("SELECT MAX(CAST(SUBSTRING(tagname, 4, length(tagname)-20) AS UNSIGNED)) FROM observation_unit WHERE (tagname REGEXP '^"+year+".[0-9]*."+zipcode+"')");
 		SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
 		Session session = sessionFactory.openSession();
 		Query query = session.createSQLQuery("SELECT MAX(CAST(SUBSTRING(tagname, 4, length(tagname)-20) AS UNSIGNED)) FROM observation_unit WHERE (tagname REGEXP '^"+year+".[0-9]*."+zipcode+"')");

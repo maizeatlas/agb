@@ -19,6 +19,7 @@ import org.accretegb.modules.germplasm.planting.MapView;
 import org.accretegb.modules.germplasm.planting.Planting;
 import org.accretegb.modules.germplasm.planting.PlantingRow;
 import org.accretegb.modules.hibernate.dao.PlantingGroupDAO;
+import org.accretegb.modules.util.GlobalProjectInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +42,7 @@ public class ParsePlantingGroup implements Serializable {
 	}
 
 	public List<Object[]> getTableViewTable(String tableViewJson, String groupName) {
-		System.out.println( projectId + groupName);
+		System.out.println( projectId + " : planting group " + groupName);
 		Planting plantingPanel = (Planting) getContext().getBean("Planting - " + projectId + groupName);
 		PlotIndexColumnTable table = plantingPanel.getTableView().getStocksOrderPanel().getTable();	
 		List<Object[]> tableView  = new ArrayList<Object[]>();
@@ -79,6 +80,17 @@ public class ParsePlantingGroup implements Serializable {
 				tableView.add(oneRow);
 				
 			}
+			
+			// set up max planting index 
+			String firstTag = (String) tableView.get(0)[7];
+			String currentIndex = firstTag.split("\\.")[1];
+			Object maxIndex = GlobalProjectInfo.getPlantingInfo(projectId, "maxPlantingIndex");
+			if (maxIndex != null && Integer.valueOf(currentIndex) > (Integer)maxIndex ) {
+				GlobalProjectInfo.insertNewPlantingInfo(projectId, "maxPlantingIndex", Integer.valueOf(currentIndex));
+			}else {
+				GlobalProjectInfo.insertNewPlantingInfo(projectId, "maxPlantingIndex", Integer.valueOf(currentIndex));
+			}
+			
 		  } catch (Exception e) {
 			  System.out.println(e.getMessage());
 		}

@@ -62,8 +62,10 @@ import org.accretegb.modules.hibernate.dao.ObservationUnitSampleDAO;
 import org.accretegb.modules.hibernate.dao.SourceDAO;
 import org.accretegb.modules.hibernate.dao.StockDAO;
 import org.accretegb.modules.util.ChangeMonitor;
+import org.accretegb.modules.util.GlobalProjectInfo;
 import org.accretegb.modules.util.LoggerUtils;
 import org.hibernate.HibernateException;
+import org.json.JSONObject;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -75,7 +77,6 @@ public class SampleSettingPanel extends JPanel {
 	private LinkedHashMap<String, Object[][]> subsetTableMap = new LinkedHashMap<String, Object[][]>();
 	//private Date collectionDate = null;
 	private LinkedHashMap<String, HashMap<String, Object>> subsetInfo = new LinkedHashMap<String,HashMap<String, Object>>();
-	private LinkedHashMap<String, Integer> prefixIndex = new LinkedHashMap<String, Integer>();
 	public final JTextField setSampleNames = new JTextField(30);;
 	public final JCheckBox ignoreRows = new JCheckBox("Ignore Rows");;
 	private HashMap<String, Integer> nameSourceid= new HashMap<String, Integer>();
@@ -84,6 +85,7 @@ public class SampleSettingPanel extends JPanel {
 	public String currentSubset = null;
 	private JProgressBar progress ;
 	private int projectID = -1;
+	private String initialPrefix = ""; //plantingPrefx.s.No
 
 	
 	public void initialize() {
@@ -99,7 +101,11 @@ public class SampleSettingPanel extends JPanel {
 		initializeSubsetComboBox();
 		setExportButtonsPanel();
 		setSyncButton();
-		
+	}
+	
+	public void setInitialIndex(String tagName) {
+		String[] parts = tagName.split("\\.");
+		initialPrefix = parts[0] + "." + parts[1] + "." + parts[2] + "." + "s";
 	}
 	
 	public void setZipcode(){
@@ -124,12 +130,12 @@ public class SampleSettingPanel extends JPanel {
 				}
 				model.addRow(newRow);
 			}
-			table.setModel(model);	
+			table.setModel(model);
+
 		}
 		setZipcode();
 		updateNumofItems();
-		updateSettingTableSubset(subsetName);
-		populateSettingSubset(subsetName);
+		updateSampleNames((String) subsetInfo.get(subsetName).get("prefix"), false);
 		
 	}
 	
@@ -153,8 +159,15 @@ public class SampleSettingPanel extends JPanel {
 			table.setModel(model);	
 		}
 		updateNumofItems();
+		
 		if (this.subsetInfo != null && this.subsetInfo.get(subsetName)!= null) {
-			table.setHasSynced((Boolean) this.subsetInfo.get(subsetName).get("syncstatus"));
+			Object syncStatus = this.subsetInfo.get(subsetName).get("syncstatus");
+			if (syncStatus != null) {
+				table.setHasSynced((Boolean) syncStatus);
+			} else {
+				table.setHasSynced(false);
+			}
+			
 		}
 	}
 	
@@ -170,13 +183,9 @@ public class SampleSettingPanel extends JPanel {
 				subsetInfo.get(subsetName).put("ignorerows",false);
 			}
 			if((String) subsetInfo.get(subsetName).get("prefix") == null){
-				subsetInfo.get(subsetName).put("prefix","sample");
+				subsetInfo.get(subsetName).put("prefix",initialPrefix);
 			}
 			Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
-			SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
-			String dateString = sdf.format(collectionDate);
-			String prefix = (String) subsetInfo.get(subsetName).get("prefix");
-			int index = this.getInitialIndex(subsetName);
 			for(int row = 0; row < table.getRowCount(); row++){
 				subsetData[row][0] = new Boolean(false);
 				for(int col = 1; col < table.getColumnCount(); col++){
@@ -184,14 +193,7 @@ public class SampleSettingPanel extends JPanel {
 						subsetData[row][col] = collectionDate;
 					}
 					else if (col == table.getIndexOf(ColumnConstants.SAMPLENAME)){
-						if(table.getValueAt(row, table.getIndexOf(ColumnConstants.TYPES)).equals("Row")
-								&& (Boolean)subsetInfo.get(subsetName).get("ignorerows")) {
-							subsetData[row][col] = "";
-						}else {
-							subsetData[row][col] = prefix+"."+dateString+"."+String.valueOf(index);
-							index++;
-						}
-						
+						subsetData[row][col] = table.getValueAt(row, col);
 					}
 					else if(col == table.getIndexOf(ColumnConstants.LOCATION)){
 						subsetData[row][col] = location;
@@ -202,15 +204,14 @@ public class SampleSettingPanel extends JPanel {
 					}
 				}						
 			}
-			System.out.println("updated SubsetTableMap " + subsetName);
+			
+			//System.out.println("updated SubsetTableMap " + subsetName);
 			getSubsetTableMap().put(subsetName, subsetData);
-			prefixIndex.put(prefix+"-"+dateString, index);
 		}
 		
 		this.subsetInfo.get(subsetName).put("syncstatus",false);
 		table.setHasSynced(false);
 		table.repaint();
-		
 	}
 	
 	
@@ -228,10 +229,13 @@ public class SampleSettingPanel extends JPanel {
 					{
 						setSampleNames.setText((String) subsetInfo.get(selected).get("prefix"));
 					}else{
-						setSampleNames.setText("sample");
+						setSampleNames.setText(initialPrefix);
 					}
-					ignoreRows.setSelected((Boolean)subsetInfo.get(currentSubset).get("ignorerows"));
-					if(!(Boolean) subsetInfo.get(currentSubset).get("syncstatus"))
+					if (subsetInfo.get(currentSubset).get("ignorerows") != null) {
+						ignoreRows.setSelected((Boolean)subsetInfo.get(currentSubset).get("ignorerows"));
+					}
+					
+					if(subsetInfo.get(currentSubset).get("syncstatus") != null && !(Boolean) subsetInfo.get(currentSubset).get("syncstatus"))
 					{
 						updateSettingTableSubset(currentSubset);
 					}
@@ -261,25 +265,30 @@ public class SampleSettingPanel extends JPanel {
 			setSampleNamesButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String value = setSampleNames.getText();
-					subsetInfo.get(currentSubset).put("prefix", value);
-					updateSampleNames(value);
-					updateSettingTableSubset(currentSubset);
-					ChangeMonitor.markAsChanged(projectID);
+					if (!((String)subsetInfo.get(currentSubset).get("prefix")).equals(value)) {
+						subsetInfo.get(currentSubset).put("prefix", value);
+						updateSampleNames(value, false);
+						updateSettingTableSubset(currentSubset);
+						ChangeMonitor.markAsChanged(projectID);
+					}
+					
 				}
 			});
 			
 			if(currentSubset != null)
 			{     if(!subsetInfo.get(currentSubset).containsKey("prefix")){
-	            	subsetInfo.get(currentSubset).put("prefix", "sample");
+	            	subsetInfo.get(currentSubset).put("prefix", initialPrefix);
 	            }
 				setSampleNames.setText((String) subsetInfo.get(currentSubset).get("prefix"));
 			}else{
-				setSampleNames.setText("sample");
+				setSampleNames.setText(initialPrefix);
 			}
 			ignoreRows.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					subsetInfo.get(currentSubset).put("ignorerows",ignoreRows.isSelected() );
-					ChangeMonitor.markAsChanged(projectID);
+					updateSampleNames((String) subsetInfo.get(currentSubset).get("prefix"), true);
+					updateSettingTableSubset(currentSubset);
+					ChangeMonitor.markAsChanged(projectID);	
 				}
 			});
 			
@@ -292,48 +301,52 @@ public class SampleSettingPanel extends JPanel {
 		}
 	 
 	 private int getInitialIndex(String subsetName) {
-		 Date collectionDate = (Date) subsetInfo.get(subsetName).get("date");
-		 SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
-		 String dateString = sdf.format(collectionDate);
-		 String prefix = (String) subsetInfo.get(subsetName).get("prefix");
-		 int indexDB = ObservationUnitSampleDAO.getInstance().getSeasonIndex(dateString, prefix);
-		 int indexLocal = 1;
-		 for(String sn : subsetTableMap.keySet()){
-			 if(!sn.equals(subsetName)) {
-				 if (!((String)subsetInfo.get(sn).get("prefix")).equals(prefix)) {
-					 continue;
-				 }else if (!(sdf.format(subsetInfo.get(sn).get("date"))).equals(dateString)) {
-					 continue;
-				 }else {
-					 //prefix and date are same
-					 if(subsetInfo.get(sn).get("syncstatus") != null && (Boolean) subsetInfo.get(sn).get("syncstatus")) {
-						 Object[][] subsetData =(Object[][]) getSubsetTableMap().get(sn);
-						 indexLocal += subsetData.length;
-					 }
-				 }
-			 }
+		 if (subsetInfo.get(subsetName) == null || subsetInfo.get(subsetName).get("prefix") == null) {
+			 return 1;
 		 }
+		 String prefix = (String) subsetInfo.get(subsetName).get("prefix");
+		 int indexDB = ObservationUnitSampleDAO.getInstance().getSeasonIndex(prefix);
+		 int indexLocal = 1;
+		 //Check with existing sample groups
+		 Object maxIndex = GlobalProjectInfo.getSamplingInfo(projectID, prefix);
+		 if (maxIndex != null && indexLocal <= (Integer)maxIndex ) {
+			 indexLocal = (Integer)maxIndex; 
+			 GlobalProjectInfo.insertNewSamplingInfo(projectID, prefix, indexLocal);
+		 }
+		 
 		 return indexLocal < indexDB ? indexDB :indexLocal;
 	 }
 
-	 private void updateSampleNames(String prefix){
-		 //System.out.println("SET BY updateSampleNames" + prefix);
-		 SimpleDateFormat sdf = new SimpleDateFormat("MMddYY");
+	 private void updateSampleNames(String prefix, boolean ignoreRowsOnly){
+		 //System.out.println("SET BY updateSampleNames" + prefix);		
 		 String currentSubset = (String)getSampleSettingTablePanel().getTableSubset().getSelectedItem();
-		 Date collectionDate = (Date) subsetInfo.get(currentSubset).get("date");
-		 String dateString = sdf.format(collectionDate);
-		 int index = this.getInitialIndex(currentSubset);
 		 CheckBoxIndexColumnTable table = getSampleSettingTablePanel().getTable();	
+		 int index = this.getInitialIndex(currentSubset);
+		 if(ignoreRowsOnly) {
+			 for (int row = 0; row < table.getRowCount(); row++){
+				 if(table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME))!=null){
+					 String sampleName = (String) table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
+					 if(sampleName.equals("")) {
+						 continue;
+					 }
+					 String[] bits = sampleName.split("\\.");
+					 index = Integer.valueOf(bits[bits.length-1]);
+					 break;
+				 }
+			 }
+		 }
+		
 		 for (int row = 0; row < table.getRowCount(); row++){
 			 if(table.getValueAt(row, table.getIndexOf(ColumnConstants.TYPES)).equals("Row") 
-					 && (Boolean)subsetInfo.get(currentSubset).get("ignorerows")) {
+					 && subsetInfo.get(currentSubset).get("ignorerows") != null 
+					 &&(Boolean)subsetInfo.get(currentSubset).get("ignorerows")) {
 				 table.setValueAt("", row, table.getIndexOf(ColumnConstants.SAMPLENAME));
 			 }else{
-				 table.setValueAt(prefix+"."+dateString+"."+String.valueOf(index), row, table.getIndexOf(ColumnConstants.SAMPLENAME));	
+				 table.setValueAt(prefix+"."+String.valueOf(index), row, table.getIndexOf(ColumnConstants.SAMPLENAME));	
 				 index++;
 			 }
 		 }
-		 
+		 GlobalProjectInfo.insertNewSamplingInfo(projectID, prefix, index);
 		 updateSettingTableSubset(currentSubset);
 	 }
 	
@@ -353,9 +366,7 @@ public class SampleSettingPanel extends JPanel {
 						table.setValueAt(date, row, column);
 					}
 					String currentSubset = (String)getSampleSettingTablePanel().getTableSubset().getSelectedItem();
-					String prefix = (String) subsetInfo.get(currentSubset).get("prefix");
 					subsetInfo.get(currentSubset).put("date", date);
-					updateSampleNames(prefix);
 					//updateAllSamplaNamesSubsets();
 					updateSettingTableSubset(currentSubset);
 					ChangeMonitor.markAsChanged(projectID);
@@ -732,10 +743,9 @@ public class SampleSettingPanel extends JPanel {
 		getSubsetTableMap().clear();
 		subsetInfo.clear();
 		getSubsetCommentMap().clear();
-		prefixIndex.clear();
 		
 		HashMap<String, Object> tmp = new HashMap<String, Object>();
-		tmp.put("prefix", "sample");
+		tmp.put("prefix", initialPrefix);
 		tmp.put("date", new Date());
 		subsetInfo.put("import", tmp);
 		
@@ -801,13 +811,6 @@ public class SampleSettingPanel extends JPanel {
 		this.subsetCommentMap = subsetCommentMap;
 	}
 	
-	public LinkedHashMap<String, Integer> getPrefixIndex() {
-		return prefixIndex;
-	}
-
-	public void setPrefixIndex(LinkedHashMap<String, Integer> prefixIndex) {
-		this.prefixIndex = prefixIndex;
-	}
 
 	public HashMap<String, Integer> getNameSourceid() {
 		return nameSourceid;
@@ -825,4 +828,7 @@ public class SampleSettingPanel extends JPanel {
 		this.projectID = projectID;
 	}
 
+	public String getInitialPrefix() {
+		return initialPrefix;
+	}
 }
