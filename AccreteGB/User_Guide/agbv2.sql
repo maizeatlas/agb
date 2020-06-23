@@ -1,42 +1,44 @@
--- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
---
--- Host: 127.0.0.1    Database: agbv2
--- ------------------------------------------------------
--- Server version	5.6.24
+# ************************************************************
+# Sequel Pro SQL dump
+# Version 4541
+#
+# http://www.sequelpro.com/
+# https://github.com/sequelpro/sequelpro
+#
+# Host: 10.0.0.06 (MySQL 5.6.44)
+# Database: agbv2
+# Generation Time: 2020-06-23 03:22:33 +0000
+# ************************************************************
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `classification`
---
+
+# Dump of table classification
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `classification`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `classification` (
   `classification_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `classification_code` varchar(255) NOT NULL,
   `classIfication_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`classification_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `collection_info`
---
+
+
+# Dump of table collection_info
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `collection_info`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `collection_info` (
   `collection_info_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `field_id` int(10) unsigned DEFAULT NULL,
@@ -49,15 +51,14 @@ CREATE TABLE `collection_info` (
   CONSTRAINT `FK_collection_field_id` FOREIGN KEY (`field_id`) REFERENCES `field` (`field_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_collection_source_id` FOREIGN KEY (`source_id`) REFERENCES `source` (`source_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `container_location`
---
+
+
+# Dump of table container_location
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `container_location`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `container_location` (
   `container_location_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `location_id` int(10) unsigned NOT NULL,
@@ -71,16 +72,15 @@ CREATE TABLE `container_location` (
   PRIMARY KEY (`container_location_id`),
   KEY `FK_div_storage_unit_div_locality` (`location_id`),
   CONSTRAINT `FK_div_storage_unit_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=298 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `experiment`
---
+
+
+# Dump of table experiment
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `experiment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `experiment` (
   `experiment_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `exp_name` varchar(255) NOT NULL,
@@ -88,16 +88,15 @@ CREATE TABLE `experiment` (
   `exp_originator` varchar(255) DEFAULT NULL,
   `exp_comments` text,
   PRIMARY KEY (`experiment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `experiment_factor`
---
+
+
+# Dump of table experiment_factor
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `experiment_factor`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `experiment_factor` (
   `experiment_factor_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `exp_factor_name` varchar(255) DEFAULT NULL,
@@ -105,16 +104,15 @@ CREATE TABLE `experiment_factor` (
   `exp_factor_desc` varchar(255) DEFAULT NULL,
   `exp_factor_comments` text,
   PRIMARY KEY (`experiment_factor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `experiment_factor_value`
---
+
+
+# Dump of table experiment_factor_value
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `experiment_factor_value`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `experiment_factor_value` (
   `experiment_factor_value_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `experiment_factor_id` int(10) unsigned NOT NULL,
@@ -135,16 +133,15 @@ CREATE TABLE `experiment_factor_value` (
   CONSTRAINT `FK_experiment_factor_value_measurement_unit_id` FOREIGN KEY (`measurement_unit_id`) REFERENCES `measurement_unit` (`measurement_unit_id`),
   CONSTRAINT `FK_experiment_factor_value_observation_uni_id` FOREIGN KEY (`observation_unit_id`) REFERENCES `observation_unit` (`observation_unit_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_experiment_factor_value_stock_id` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`stock_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6503 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `field`
---
+
+
+# Dump of table field
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `field`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `field` (
   `field_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `location_id` int(10) unsigned NOT NULL,
@@ -157,16 +154,15 @@ CREATE TABLE `field` (
   PRIMARY KEY (`field_id`),
   KEY `FK_div_field_div_locality` (`location_id`),
   CONSTRAINT `FK_div_field_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `field_owner`
---
+
+
+# Dump of table field_owner
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `field_owner`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `field_owner` (
   `field_owner_id` int(11) NOT NULL,
   `field_id` int(10) unsigned NOT NULL,
@@ -177,15 +173,14 @@ CREATE TABLE `field_owner` (
   CONSTRAINT `field_owner_field_id` FOREIGN KEY (`field_id`) REFERENCES `field` (`field_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `field_owner_users_id` FOREIGN KEY (`users_id`) REFERENCES `users` (`users_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `location`
---
+
+
+# Dump of table location
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `location`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `location` (
   `location_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `location_name` varchar(255) DEFAULT NULL,
@@ -195,31 +190,29 @@ CREATE TABLE `location` (
   `zipcode` varchar(255) NOT NULL,
   `location_comments` text,
   PRIMARY KEY (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `mate`
---
+
+
+# Dump of table mate
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `mate`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `mate` (
   `mate_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mating_type` varchar(255) DEFAULT NULL,
   `mate_role` varchar(255) NOT NULL,
   PRIMARY KEY (`mate_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `mate_method`
---
+
+
+# Dump of table mate_method
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `mate_method`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `mate_method` (
   `mate_method_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mate_method_name` varchar(255) NOT NULL,
@@ -229,15 +222,14 @@ CREATE TABLE `mate_method` (
   `mate_method_comments` text,
   PRIMARY KEY (`mate_method_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `mate_method_connect`
---
+
+
+# Dump of table mate_method_connect
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `mate_method_connect`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `mate_method_connect` (
   `mate_method_connect_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mate_id` int(10) unsigned NOT NULL,
@@ -247,16 +239,15 @@ CREATE TABLE `mate_method_connect` (
   KEY `FK_div_mate_connect_div_mate_method` (`mate_method_id`),
   CONSTRAINT `FK_connect_mate_id` FOREIGN KEY (`mate_id`) REFERENCES `mate` (`mate_id`),
   CONSTRAINT `FK_connect_mate_method_id` FOREIGN KEY (`mate_method_id`) REFERENCES `mate_method` (`mate_method_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `measurement_parameter`
---
+
+
+# Dump of table measurement_parameter
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `measurement_parameter`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `measurement_parameter` (
   `measurement_parameter_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `measurement_unit_id` int(10) unsigned NOT NULL,
@@ -273,44 +264,41 @@ CREATE TABLE `measurement_parameter` (
   `protocol` text,
   PRIMARY KEY (`measurement_parameter_id`),
   KEY `FK_div_measurement_parameter_div_unit_of_measure` (`measurement_unit_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `measurement_type`
---
+
+
+# Dump of table measurement_type
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `measurement_type`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `measurement_type` (
   `measurement_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `measurement_type` varchar(255) NOT NULL,
   PRIMARY KEY (`measurement_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `measurement_unit`
---
+
+
+# Dump of table measurement_unit
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `measurement_unit`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `measurement_unit` (
   `measurement_unit_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `units` varchar(255) NOT NULL,
   PRIMARY KEY (`measurement_unit_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `measurement_value`
---
+
+
+# Dump of table measurement_value
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `measurement_value`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `measurement_value` (
   `measurement_value_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `field_id` int(10) unsigned DEFAULT NULL,
@@ -322,6 +310,7 @@ CREATE TABLE `measurement_value` (
   `value` varchar(255) DEFAULT NULL,
   `measurement_value_comments` text,
   PRIMARY KEY (`measurement_value_id`),
+  UNIQUE KEY `idx_name` (`observation_unit_id`,`measurement_parameter_id`,`tom`),
   KEY `FK_div_measurement_div_field` (`field_id`),
   KEY `FK_div_measurement_div_measurement_parameter` (`measurement_parameter_id`),
   KEY `FK_div_measurement_cdv_source` (`source_id`),
@@ -332,16 +321,15 @@ CREATE TABLE `measurement_value` (
   CONSTRAINT `FK_measurement_measurement_type_id` FOREIGN KEY (`measurement_type_id`) REFERENCES `measurement_type` (`measurement_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_measurement_observation_unit_id` FOREIGN KEY (`observation_unit_id`) REFERENCES `observation_unit` (`observation_unit_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_measurement_source_id` FOREIGN KEY (`source_id`) REFERENCES `source` (`source_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50343 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `obervation_unit_sample`
---
+
+
+# Dump of table obervation_unit_sample
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `obervation_unit_sample`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `obervation_unit_sample` (
   `observation_unit_sample_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `observation_unit_id` int(10) unsigned NOT NULL,
@@ -355,15 +343,14 @@ CREATE TABLE `obervation_unit_sample` (
   CONSTRAINT `FK_sample_observation_unit_id` FOREIGN KEY (`observation_unit_id`) REFERENCES `observation_unit` (`observation_unit_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_sample_source_id` FOREIGN KEY (`source_id`) REFERENCES `source` (`source_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `observation_unit`
---
+
+
+# Dump of table observation_unit
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `observation_unit`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `observation_unit` (
   `observation_unit_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `field_id` int(10) unsigned NOT NULL,
@@ -391,16 +378,15 @@ CREATE TABLE `observation_unit` (
   CONSTRAINT `FK_observation_unit_filed_id` FOREIGN KEY (`field_id`) REFERENCES `field` (`field_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_observation_unit_mate_connect_id` FOREIGN KEY (`mate_method_connect_id`) REFERENCES `mate_method_connect` (`mate_method_connect_id`),
   CONSTRAINT `FK_observation_unit_stock_id` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`stock_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=209911 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `passport`
---
+
+
+# Dump of table passport
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `passport`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `passport` (
   `passport_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `taxonomy_id` int(10) unsigned DEFAULT NULL,
@@ -421,30 +407,28 @@ CREATE TABLE `passport` (
   CONSTRAINT `FK_passport_collection_id` FOREIGN KEY (`collection_info_id`) REFERENCES `collection_info` (`collection_info_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_passport_source_id` FOREIGN KEY (`source_id`) REFERENCES `source` (`source_id`),
   CONSTRAINT `FK_passport_taxonomy_id` FOREIGN KEY (`taxonomy_id`) REFERENCES `taxonomy` (`taxonomy_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=15293 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `passport_group`
---
+
+
+# Dump of table passport_group
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `passport_group`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `passport_group` (
   `passport_group_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `group_name` varchar(255) NOT NULL,
   PRIMARY KEY (`passport_group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `passport_set`
---
+
+
+# Dump of table passport_set
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `passport_set`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `passport_set` (
   `passport_set_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `passport_group_id` int(10) unsigned NOT NULL,
@@ -455,15 +439,14 @@ CREATE TABLE `passport_set` (
   CONSTRAINT `passport_set_passport_group_id` FOREIGN KEY (`passport_group_id`) REFERENCES `passport_group` (`passport_group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `passport_set_passport_id` FOREIGN KEY (`passport_id`) REFERENCES `passport` (`passport_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `passport_synonym`
---
+
+
+# Dump of table passport_synonym
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `passport_synonym`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `passport_synonym` (
   `passport_synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `passport_id` int(10) unsigned NOT NULL,
@@ -473,15 +456,14 @@ CREATE TABLE `passport_synonym` (
   KEY `FK_div_synonym_div_passport` (`passport_id`),
   CONSTRAINT `FK_passport_synonym_passport_id` FOREIGN KEY (`passport_id`) REFERENCES `passport` (`passport_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `project`
---
+
+
+# Dump of table project
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `project`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `project` (
   `project_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `source_id` int(10) unsigned DEFAULT NULL,
@@ -493,15 +475,14 @@ CREATE TABLE `project` (
   KEY `FK_project_source_id_idx` (`source_id`),
   CONSTRAINT `FK_project_source_id` FOREIGN KEY (`source_id`) REFERENCES `source` (`source_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `source`
---
+
+
+# Dump of table source
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `source`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `source` (
   `source_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `location_id` int(10) unsigned NOT NULL,
@@ -517,16 +498,15 @@ CREATE TABLE `source` (
   PRIMARY KEY (`source_id`),
   KEY `FK_cdv_source_div_locality` (`location_id`),
   CONSTRAINT `FK_cdv_source_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `stock`
---
+
+
+# Dump of table stock
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `stock`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `stock` (
   `stock_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `stock_generation_id` int(10) unsigned DEFAULT NULL,
@@ -543,16 +523,15 @@ CREATE TABLE `stock` (
   CONSTRAINT `FK_stock_generation_id` FOREIGN KEY (`stock_generation_id`) REFERENCES `stock_generation` (`stock_generation_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_stock_passport_id` FOREIGN KEY (`passport_id`) REFERENCES `passport` (`passport_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_stock_project_id` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=112924 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `stock_composition`
---
+
+
+# Dump of table stock_composition
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `stock_composition`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `stock_composition` (
   `stock_composition_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `stock_id` int(10) unsigned NOT NULL,
@@ -573,32 +552,30 @@ CREATE TABLE `stock_composition` (
   CONSTRAINT `FK_stock_composition_mix_from_stock_id` FOREIGN KEY (`mix_from_stock_id`) REFERENCES `stock` (`stock_id`),
   CONSTRAINT `FK_stock_composition_observation_unit_id` FOREIGN KEY (`observation_unit_id`) REFERENCES `observation_unit` (`observation_unit_id`),
   CONSTRAINT `FK_stock_composition_stock_id` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`stock_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=308689 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `stock_generation`
---
+
+
+# Dump of table stock_generation
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `stock_generation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `stock_generation` (
   `stock_generation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `generation` varchar(255) NOT NULL,
   `cycle` varchar(255) DEFAULT NULL,
   `generation_comments` text,
   PRIMARY KEY (`stock_generation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1401 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `stock_packet`
---
+
+
+# Dump of table stock_packet
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `stock_packet`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `stock_packet` (
   `stock_packet_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `stock_id` int(10) unsigned NOT NULL,
@@ -614,16 +591,15 @@ CREATE TABLE `stock_packet` (
   KEY `FK_div_stock_packet_div_packet_loc` (`stock_packet_container_id`),
   CONSTRAINT `FK_stock_packet_container_id` FOREIGN KEY (`stock_packet_container_id`) REFERENCES `stock_packet_container` (`stock_packet_container_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_stock_packet_stock_id` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`stock_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=11930 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `stock_packet_container`
---
+
+
+# Dump of table stock_packet_container
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `stock_packet_container`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `stock_packet_container` (
   `stock_packet_container_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `container_location_id` int(10) unsigned DEFAULT NULL,
@@ -631,16 +607,15 @@ CREATE TABLE `stock_packet_container` (
   `stock_packet_container_comments` text,
   PRIMARY KEY (`stock_packet_container_id`),
   KEY `FK_div_packet_loc_div_storage_unit` (`container_location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `taxonomy`
---
+
+
+# Dump of table taxonomy
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `taxonomy`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `taxonomy` (
   `taxonomy_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `genus` varchar(255) DEFAULT NULL,
@@ -652,16 +627,15 @@ CREATE TABLE `taxonomy` (
   `common_name` varchar(255) DEFAULT NULL,
   `gto` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`taxonomy_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `users`
---
+
+
+# Dump of table users
+# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `users` (
   `users_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
@@ -672,15 +646,13 @@ CREATE TABLE `users` (
   `users_comments` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+
+
+
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2018-03-20 13:27:51
