@@ -86,18 +86,8 @@ public class TableView extends JPanel {
 
 	private JPanel getPlantsSetterPanel() {
 		JPanel plantsSetterPanel = new JPanel(new MigLayout("insets 0, gapx 0"));
-		/*JButton importTags= new JButton("Import");
-		importTags.setToolTipText("Import start and end tags");
-		importTags.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent actionEvent) {
-				importTags();
-			}			
-		});
-		plantsSetterPanel.add(importTags, "pushx");*/
 		addStartRow(plantsSetterPanel);
-		addPlantingIndex(plantsSetterPanel);
 		addCountSetter(plantsSetterPanel);
-		//addResetButton(plantsSetterPanel);// need ? 	
 		addMatingSetterPanel(plantsSetterPanel);		
 		return plantsSetterPanel;
 	}	
@@ -166,7 +156,7 @@ public class TableView extends JPanel {
 		subpanel.add(plantingIndexLabel,"gapleft 10");
 		subpanel.add(index);
 		subpanel.add(setRow);
-		plantsSetterPanel.add(subpanel, "w 25%");	
+		plantsSetterPanel.add(subpanel, "gapleft 10, w 35%");	
 	}
 
 

@@ -718,8 +718,11 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
             for (int counter = 0; counter < getProjectsTree().getSelectionCount(); counter++) {
                 ProjectTreeNode node = (ProjectTreeNode) getProjectsTree().getSelectionPaths()[counter]
                         .getLastPathComponent();
-                parentNodes.add(node);
-                System.out.println("adding  " + node.getType().name());
+                if(node.getType().equals(ProjectTreeNode.NodeType.EXPERIMENTAL_DESIGN_NODE) 
+                		|| node.getType().equals(ProjectTreeNode.NodeType.STOCK_SELECTION_NODE)) {
+                	 parentNodes.add(node);                	
+                }          
+                
             }
             boolean hasduplicate = actionsToDuplicate(parentNodes);
             if(hasduplicate){
@@ -728,6 +731,10 @@ public class StockSelectionNodePopupListener extends MouseAdapter {
             		return;
             	} 
             }   
+            if(parentNodes.size() == 0) {
+            	JOptionPane.showMessageDialog(null, "No group was selected");
+            	return;
+            }
             for(ProjectTreeNode node : parentNodes){   
             	if (node.getType().equals(ProjectTreeNode.NodeType.EXPERIMENTAL_DESIGN_NODE)){
             		ExperimentSelectionPanel experimentSelectionPanel = (ExperimentSelectionPanel) node.getTabComponent().getComponentPanels().get(0); 

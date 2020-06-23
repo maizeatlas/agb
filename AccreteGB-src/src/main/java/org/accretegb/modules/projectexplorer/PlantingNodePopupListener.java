@@ -77,6 +77,11 @@ public class PlantingNodePopupListener extends MouseAdapter {
         plantingSelectionPopupMenu.add(sendToMenu);
         menuItem = new JMenuItem(ProjectConstants.EDIT_GROIP_NAME);
         plantingSelectionPopupMenu.add(menuItem);
+        
+        JMenuItem deleteGroup = new JMenuItem(ProjectConstants.DELETE_GROUP);
+        deleteGroup.addActionListener(new DeletePlantingGroupActionListener(this));
+        plantingSelectionPopupMenu.add(deleteGroup);
+        
         menuItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {				
 				String newGroupName; 
@@ -501,6 +506,86 @@ public class PlantingNodePopupListener extends MouseAdapter {
 
     }
 
+    private class DeletePlantingGroupActionListener implements ActionListener {
+
+		public DeletePlantingGroupActionListener(PlantingNodePopupListener plantingNodePopupListener) {
+			// TODO Auto-generated constructor stub
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			List<ProjectTreeNode> parentNodes = new ArrayList<ProjectTreeNode>();
+            for (int counter = 0; counter < getProjectsTree().getSelectionCount(); counter++) {
+                ProjectTreeNode node = (ProjectTreeNode) getProjectsTree().getSelectionPaths()[counter].getLastPathComponent();
+                parentNodes.add(node);
+            }
+        	Planting planting = (Planting)parentNodes.get(0).getTabComponent().getComponentPanels().get(0);
+        	CheckBoxIndexColumnTable tagTable = planting.getTagGenerator().getTagsTablePanel().getTable();
+        	int tagIdCol = tagTable.getIndexOf(ColumnConstants.TAG_ID);
+        	boolean proceed = true;
+            if(planting.getTagGenerator().getTagsTablePanel().getTable().hasSynced() == true ||
+            		(tagTable.getRowCount()>0 &&!String.valueOf(tagTable.getValueAt(0, tagIdCol)).equalsIgnoreCase("null"))){
+            	int option = JOptionPane.showConfirmDialog(null, "You are deleting a synced group. "
+            			+ "Deleting this group only removes data from ProjactManager database. "
+            			+ "Are you sure you want to delete this group?", "Warning", JOptionPane.OK_CANCEL_OPTION);
+            	if (option != JOptionPane.OK_OPTION) {
+            		proceed = false;
+            	}
+            		
+            }
+            if (proceed) {
+            	String plantingGroupName = getTreeNode().getNodeName();		
+				String projectName = getTreeNode().getParent().getParent().toString();
+				int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
+				DefaultTreeModel model = (DefaultTreeModel)getProjectsTree().getModel();
+				
+				// delete planting group from db and ui
+				PlantingGroupDAO.getInstance().delete(projectId, plantingGroupName);
+				TabComponent tabComponent = (TabComponent) getContext().getBean("plantingTab" + projectId + plantingGroupName);
+     			ProjectManager.removeTab(tabComponent);
+     			
+     			ProjectTreeNode plantingNodeToRemove = getTreeNode();
+     			
+				
+     			// delete phenotype group from db and ui
+     			PhenotypeGroupDAO.getInstance().delete(projectId, plantingGroupName);
+     			tabComponent = (TabComponent) getContext().getBean("phenotypeTab" + projectId + plantingGroupName);
+     			ProjectManager.removeTab(tabComponent);
+     			
+     			ProjectTreeNode phenotypeNodeToRemove = null;
+     			ProjectTreeNode plantingNode = (ProjectTreeNode) plantingNodeToRemove.getParent();
+				ProjectTreeNode phenotypeNode = (ProjectTreeNode) plantingNode.getNextSibling();
+				for(int index = 0; index < phenotypeNode.getChildCount(); ++index){
+					ProjectTreeNode child = (ProjectTreeNode) phenotypeNode.getChildAt(index);
+					if(child.getNodeName().equals(plantingGroupName)){
+						phenotypeNodeToRemove = child;
+					}
+				}	
+				  
+				
+     			// delete sampling group from db and ui
+     			SamplingGroupDAO.getInstance().delete(projectId, plantingGroupName);
+     			tabComponent = (TabComponent) getContext().getBean("samplingTab" + projectId + plantingGroupName);
+     			ProjectManager.removeTab(tabComponent);
+     			
+     			ProjectTreeNode samplingNodeToRemove = null;
+     			
+     			ProjectTreeNode samplingNode = (ProjectTreeNode) phenotypeNode.getNextSibling();
+     			for(int index = 0; index < samplingNode.getChildCount(); ++index){
+					ProjectTreeNode child = (ProjectTreeNode) samplingNode.getChildAt(index);
+					if(child.getNodeName().equals(plantingGroupName)){
+						samplingNodeToRemove = child;
+					}
+     			}	
+     			model.removeNodeFromParent(plantingNodeToRemove);
+     			model.removeNodeFromParent(phenotypeNodeToRemove);
+     			model.removeNodeFromParent(samplingNodeToRemove);
+     			
+        	}
+			
+		}
+    	
+    }
+    
     public JTree getProjectsTree() {
         return projectsTree;
     }

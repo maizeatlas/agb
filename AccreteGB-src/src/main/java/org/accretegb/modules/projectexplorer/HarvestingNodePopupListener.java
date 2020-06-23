@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -14,8 +16,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
+
+import org.accretegb.modules.constants.ColumnConstants;
+import org.accretegb.modules.customswingcomponent.CheckBoxIndexColumnTable;
+import org.accretegb.modules.germplasm.harvesting.Harvesting;
+import org.accretegb.modules.germplasm.planting.Planting;
 import org.accretegb.modules.hibernate.dao.HarvestingGroupDAO;
 import org.accretegb.modules.hibernate.dao.PMProjectDAO;
+import org.accretegb.modules.hibernate.dao.PlantingGroupDAO;
 import org.accretegb.modules.projectmanager.ProjectManager;
 import org.accretegb.modules.tab.TabComponent;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -98,11 +106,56 @@ public class HarvestingNodePopupListener extends MouseAdapter {
 			       	
         });
         harvestingPopupMenu.add(menuItem);
+        
+        JMenuItem deleteGroup = new JMenuItem(ProjectConstants.DELETE_GROUP);
+        deleteGroup.addActionListener(new DeleteHarvestingGroupActionListener(this));
+        harvestingPopupMenu.add(deleteGroup);
 	}
 	
-	 public void mousePressed(MouseEvent e) {
-	        maybeShowPopup(e);
-	    }
+	 private class DeleteHarvestingGroupActionListener implements ActionListener {
+
+		public DeleteHarvestingGroupActionListener(HarvestingNodePopupListener harvestingNodePopupListener) {
+			// TODO Auto-generated constructor stub
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			List<ProjectTreeNode> parentNodes = new ArrayList<ProjectTreeNode>();
+            for (int counter = 0; counter < getProjectsTree().getSelectionCount(); counter++) {
+                ProjectTreeNode node = (ProjectTreeNode) getProjectsTree().getSelectionPaths()[counter].getLastPathComponent();
+                parentNodes.add(node);
+            }
+            Harvesting harvesting = (Harvesting)parentNodes.get(0).getTabComponent().getComponentPanels().get(0);
+        	CheckBoxIndexColumnTable tagTable = harvesting.getStickerGenerator().getStickerTablePanel().getTable();
+        	int packetIdCol = tagTable.getIndexOf(ColumnConstants.PACKET_ID);
+        	boolean proceed = true;
+            if(tagTable.hasSynced() == true || (tagTable.getRowCount()>0 &&!String.valueOf(tagTable.getValueAt(0, packetIdCol)).equalsIgnoreCase("null"))){
+            	int option = JOptionPane.showConfirmDialog(null, "You are deleting a synced group. "
+            			+ "Deleting this group only removes data from ProjactManager database. "
+            			+ "Are you sure you want to delete this group?", "Warning", JOptionPane.OK_CANCEL_OPTION);
+            	if (option != JOptionPane.OK_OPTION) {
+            		proceed = false;
+            	}
+            }
+            if (proceed) {
+        		String harvestingGroupName = getTreeNode().getNodeName();		
+				String projectName = getTreeNode().getParent().getParent().toString();
+				int projectId = PMProjectDAO.getInstance().findProjectId(projectName);
+				DefaultTreeModel model = (DefaultTreeModel)getProjectsTree().getModel();
+				
+        		HarvestingGroupDAO.getInstance().delete(projectId, harvestingGroupName);
+				TabComponent tabComponent = (TabComponent) getContext().getBean("harvestingTab" + projectId + harvestingGroupName);
+     			ProjectManager.removeTab(tabComponent);
+     			
+     			model.removeNodeFromParent(getTreeNode());
+            }
+		}
+	
+		 
+	 }
+	
+	public void mousePressed(MouseEvent e) {
+	    maybeShowPopup(e);
+	}
 
     public void mouseReleased(MouseEvent e) {
         maybeShowPopup(e);
