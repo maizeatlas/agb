@@ -69,6 +69,14 @@ public class ExperimentFactorDAO {
 		return experimentFactorList;
 	}
 	
+	public  List<ExperimentFactor> findAll() {
+		Session session = hibernateSessionFactory.getSessionFactory().openSession();		
+		Query query = session.createSQLQuery("select * from experiment_factor").addEntity(ExperimentFactor.class);
+		List<ExperimentFactor> experimentFactorList = (List<ExperimentFactor>)query.list();
+		session.close();
+		return experimentFactorList;
+	}
+	
 	
 	
 	public  ExperimentFactor insert(String exp_factor_name, String exp_factor_type, String exp_factor_desc, String exp_factor_comments) {

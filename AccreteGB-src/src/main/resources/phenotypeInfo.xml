@@ -100,7 +100,7 @@
     </bean>
    
 
-    <bean id="phenotypeInfoChildPanel0" class="org.accretegb.modules.phenotype.PhenotypeInfoPanel"
+    <bean id="phenotypeInfoChildPanel0" class="org.accretegb.modules.germplasm.phenotype.PhenotypeInfoPanel"
           parent="phenotypeInfoPanel0" init-method="initialize">
         <property name="progressBar"      ref="phenotypeProgressBar" />
         <property name="tableOutput"      ref="phenotypeTableOutput" />

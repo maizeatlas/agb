@@ -21,7 +21,7 @@ package org.accretegb.modules.config;
 
 import org.accretegb.modules.MainLayout;
 import org.accretegb.modules.ToolBar;
-import org.accretegb.modules.phenotype.PhenotypeInfoPanel;
+import org.accretegb.modules.germplasm.phenotype.PhenotypeInfoPanel;
 import org.accretegb.modules.projectexplorer.NewProjectPanel;
 import org.accretegb.modules.tab.TabManager;
 import org.springframework.context.ApplicationContext;

@@ -103,7 +103,7 @@ public class StocksInfoPanel extends TabComponentPanel {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public JPanel searchInputsPanel() {
         JPanel searchPanel = new JPanel();
-        searchPanel.setToolTipText("use '*' to indicate regex");
+        searchPanel.setToolTipText("use '*' for wildcard matching");
         searchPanel.setLayout(new MigLayout("insets 5 5 5 5, gapx 0"));
         searchPanel.add(new JLabel("Search the database for stocks:"), "span, grow, wrap");
         searchPanel.add(new JLabel("Stock Name:"), "pushx");
