@@ -60,79 +60,88 @@ public class syncSampling extends SwingWorker<Void, Void> {
 
 	private void syncWithDatabase() {
 		CheckBoxIndexColumnTable table = sampleSettingPanel.getSampleSettingTablePanel().getTable();
-		int index = 0;
-		for(String subsetName : sampleSettingPanel.getSubsetTableMap().keySet()){
-			index++;
-        	Object[][] subsetData =	(Object[][]) sampleSettingPanel.getSubsetTableMap().get(subsetName);
-				if (subsetData != null){
-					int rows = subsetData.length;
-					SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
-					Session session = sessionFactory.openSession();
-					Transaction transaction = session.beginTransaction();
-					ArrayList<String> sampleNames = new ArrayList<String>();
-					for(int row = 0; row < rows; row ++){
-						String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
-						sampleNames.add(sampleName);
-					}
-					HashMap<String, Integer> sampleNameIdMap = ObservationUnitSampleDAO.getInstance().getSampleNameIdMap(sampleNames);
-					if (sampleNameIdMap.size() > 0) {	
-						int option = JOptionPane.showOptionDialog(null, 
-						        "Some sample names were found in the database.\n"
-						        + "Choose 'Reset' to stop the sync and generate a new set of sample names by changing the prefix\n"
-						        + "Choose 'Continue' to update exisitng sample data  ",
-						        "", 
-						        JOptionPane.YES_NO_CANCEL_OPTION, 
-						        JOptionPane.INFORMATION_MESSAGE, 
-						        null, 
-						        new String[]{"Reset","Continue","Cancel"},
-						        "default");
-				        if(option ==JOptionPane.OK_OPTION )
-				        {	
-				        	// reset
-				        	return;
-				        }else if(option == JOptionPane.NO_OPTION){
-				        	// override, continue	 
-				        }else{
-				        	progress.setVisible(false);
-				        	return;
-				        }
-					}
-					for(int row = 0; row < rows; row ++){
-						String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
-						int tagId = (Integer) table.getValueAt(row, table.getIndexOf(ColumnConstants.TAG_ID));
-						int sourceId = 0;
-						if(table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTOR))!=null)
-						{
-							sourceId = sampleSettingPanel.getNameSourceid().get(table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTOR)));
-						}
-						Object d = table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTION_DATE));
-						Date sampleDate =  null;
-						if ( d instanceof Date){
-							sampleDate = (Date) d;
-						}else{
-							DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
-							try {
-								sampleDate = (Date)formatter.parse(String.valueOf(d));
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								JOptionPane.showMessageDialog(null, "Imported tom columns have invalid date format. Format has to be mm/dd/yy.");
-								break;
-							}
-						}
-						
-						String comment = sampleSettingPanel.getSubsetCommentMap().get(subsetName);
-						ObservationUnitSampleDAO.getInstance().insert(sampleNameIdMap.get(sampleName) == null ? 0 : sampleNameIdMap.get(sampleName), tagId, sourceId, sampleDate, sampleName, comment,session);
-						if ( row % 1000 == 0 ) { 
-							session.flush();
-							session.clear();
-						}
-					}
-					transaction.commit();
-					session.close();
+		System.out.println("table  size: " +  table.getRowCount());
+		SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
+		Session session = sessionFactory.openSession();
+		Transaction transaction = session.beginTransaction();
+		String subsetName = this.sampleSettingPanel.currentSubset;
+    	Object[][] subsetData =	(Object[][]) sampleSettingPanel.getSubsetTableMap().get(subsetName);
+    	System.out.println("sampling subset size: " +  subsetData.length);
+    	try {
+			if (subsetData != null){
+				int rows = subsetData.length;
+				ArrayList<String> sampleNames = new ArrayList<String>();
+				for(int row = 0; row < rows; row ++){
+					String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
+					sampleNames.add(sampleName);
 				}
-			progress.setValue((int) ((index*1.0/sampleSettingPanel.getSubsetTableMap().size())*100));
-			progress.setString("Syncing..." + progress.getValue() + "%");
+				HashMap<String, Integer> sampleNameIdMap = ObservationUnitSampleDAO.getInstance().getSampleNameIdMap(sampleNames);
+				if (sampleNameIdMap.size() > 0) {	
+					int option = JOptionPane.showOptionDialog(null, 
+					        "Some sample names were found in the database.\n"
+					        + "Choose 'Reset' to stop the sync and generate a new set of sample names by changing the prefix\n"
+					        + "Choose 'Continue' to update exisitng sample data  ",
+					        "", 
+					        JOptionPane.YES_NO_CANCEL_OPTION, 
+					        JOptionPane.INFORMATION_MESSAGE, 
+					        null, 
+					        new String[]{"Reset","Continue","Cancel"},
+					        "default");
+			        if(option ==JOptionPane.OK_OPTION )
+			        {	
+			        	// reset
+			        	return;
+			        }else if(option == JOptionPane.NO_OPTION){
+			        	// override, continue	 
+			        }else{
+			        	progress.setVisible(false);
+			        	return;
+			        }
+				}
+				for(int row = 0; row < rows; row ++){
+					String sampleName = (String)table.getValueAt(row, table.getIndexOf(ColumnConstants.SAMPLENAME));
+					int tagId = (Integer) table.getValueAt(row, table.getIndexOf(ColumnConstants.TAG_ID));
+					int sourceId = 0;
+					if(table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTOR))!=null)
+					{
+						sourceId = sampleSettingPanel.getNameSourceid().get(table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTOR)));
+					}
+					Object d = table.getValueAt(row, table.getIndexOf(ColumnConstants.COLLECTION_DATE));
+					Date sampleDate =  null;
+					if ( d instanceof Date){
+						sampleDate = (Date) d;
+					}else{
+						DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+						try {
+							sampleDate = (Date)formatter.parse(String.valueOf(d));
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							JOptionPane.showMessageDialog(null, "Imported tom columns have invalid date format. Format has to be mm/dd/yy.");
+							break;
+						}
+					}
+					
+					String comment = sampleSettingPanel.getSubsetCommentMap().get(subsetName);
+					ObservationUnitSampleDAO.getInstance().insert(sampleNameIdMap.get(sampleName) == null ? 0 : sampleNameIdMap.get(sampleName), tagId, sourceId, sampleDate, sampleName, comment,session);
+					if ( row % 1000 == 0 ) { 
+						session.flush();
+						session.clear();
+					}
+				}
+				transaction.commit();
+			}
+		progress.setValue((int) ((1/subsetData.length)*100));
+		progress.setString("Syncing..." + progress.getValue() + "%");
+    	}catch(Exception e) {
+			transaction.rollback(); //table info need to rollback too.
+			System.out.println("sampling syncWithDatabase " + e.getMessage());
+			if(LoggerUtils.isLogEnabled())
+				LoggerUtils.log(Level.INFO,  e.toString());
+			rollbacked = true;
+		} finally {
+			session.close();
 		}
+		
 	}
 	
 	
