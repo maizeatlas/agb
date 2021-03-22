@@ -239,7 +239,7 @@ public class PhenotypeInfoPanel extends TabComponentPanel {
         add(getFieldTablePanel(), "growx, spanx, pushx, h 50%, wrap");
         add(new JLabel(""), "align label");
         add(submitButton, "tag submit, sizegroup bttn, alignx right,wrap");
-        submitButton.setToolTipText("Please note that only one of the filters [Tag Name/Sample Name, Phenotying Subsets or Field Selection] will be applied.");
+        submitButton.setToolTipText("Please note that only one of these three filters [Tag Name/Sample Name, Phenotying Subsets or Field Selection] will be used to select plants.");
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	if(getSelectedParameters().size() == 0){
@@ -416,18 +416,18 @@ public class PhenotypeInfoPanel extends TabComponentPanel {
         	for(int i = factors.size()-1; i >= 0; i--) {
         		this.originalColNames.add(1, factors.get(i));
         	}
-        	if (!this.originalColNames.contains("Row")) {
-            	this.originalColNames.add(factors.size()+1, "Plant");
-            	this.originalColNames.add(factors.size()+1, "Row");
-        	}
+//        	if (!this.originalColNames.contains("Row")) {
+//            	this.originalColNames.add(factors.size()+1, "Plant");
+//            	this.originalColNames.add(factors.size()+1, "Row");
+//        	}
         	this.resetTableColumns(this.originalColNames);
             searchValues.put("exp_factor_names", "'"+StringUtils.join(getSelectedFactors(), "','")+"'");
         } else {
         	for(JCheckBox b : expFactorsCheckBoxes){
         		this.originalColNames.remove(b.getText());
         	}
-        	this.originalColNames.remove("Plant");
-        	this.originalColNames.remove("Row");
+//        	this.originalColNames.remove("Plant");
+//        	this.originalColNames.remove("Row");
         	this.resetTableColumns(this.originalColNames);
         }
         return searchValues;

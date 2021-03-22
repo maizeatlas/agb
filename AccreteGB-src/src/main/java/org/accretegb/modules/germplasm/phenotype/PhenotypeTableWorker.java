@@ -56,7 +56,7 @@ public class PhenotypeTableWorker extends PopulateTableWorker {
 		.append("select distinct tagname," 
 				+ (sqlParameters.get("sampleName") != null ? "sample_name," : "") 
 				+ (sqlParameters.get("exp_factor_names") != null ? getExperimentQueryParts(sqlParameters.get("exp_factor_names")) : "")
-				+ " parameter_name, value, units, measurement_type, tom"
+				+ " plot row, plant, parameter_name, value, units, measurement_type, tom"
 				+ " from measurement_value"
 				+ " left join observation_unit on observation_unit.observation_unit_id=measurement_value.observation_unit_id"
 				+ (sqlParameters.get("sampleName") != null ? " left join obervation_unit_sample on observation_unit.observation_unit_id=obervation_unit_sample.observation_unit_id" : "")
@@ -125,7 +125,7 @@ public class PhenotypeTableWorker extends PopulateTableWorker {
 			queryBuff.append(" and sample_name like '" + parameter + "'");
 		}
 		
-		queryBuff.append(" order by tagname, parameter_name");
+		queryBuff.append(" group by tagname, parameter_name, value, units, measurement_type, tom order by tagname, parameter_name");
 		System.out.println("Query is " + queryBuff);
 		return queryBuff.toString();
 	}
@@ -172,9 +172,8 @@ public class PhenotypeTableWorker extends PopulateTableWorker {
 		StringBuffer queryBuff = new StringBuffer();
 		for (String factor: factors.split(",")) {
 			factor = factor.replace("'", "");
-			queryBuff.append("(case when exp_factor_name = '"+factor+"' then exp_factor_value_level else '' end) "+factor+",");
+			queryBuff.append("max(case when exp_factor_name = '"+factor+"' then exp_factor_value_level else '' end) as "+factor+",");
 		}
-		queryBuff.append("plot row, plant,");
 		return queryBuff.toString();
 	}
 

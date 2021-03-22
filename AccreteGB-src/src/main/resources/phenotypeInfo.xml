@@ -71,6 +71,8 @@
         <property name="columnNames">
             <list>
                 <value>Tag Name</value>
+                <value>Row</value>
+                <value>Plant</value>
                 <value>Parameter Name</value>
                 <value>Value</value>
                 <value>Unit</value>
