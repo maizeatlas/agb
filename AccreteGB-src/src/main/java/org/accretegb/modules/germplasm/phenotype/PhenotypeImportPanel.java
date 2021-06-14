@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +78,7 @@ import org.accretegb.modules.hibernate.dao.ObservationUnitDAO;
 import org.accretegb.modules.hibernate.dao.MeasurementUnitDAO;
 import org.accretegb.modules.util.LoggerUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -107,7 +109,7 @@ public class PhenotypeImportPanel extends JPanel {
 			};
 
 	private List<String> paramersImported = new ArrayList<String>();
-	private List<String> newParameters = new ArrayList<String>();;
+	private HashSet newParameters = new HashSet<String>();;
 	private List<Integer> paramersColIndexes = new ArrayList<Integer>();
 	private List<Integer> tomColIndexes = new ArrayList<Integer>();
 	private List<Integer> valueChangedRows = new ArrayList<Integer>();
@@ -568,10 +570,14 @@ public class PhenotypeImportPanel extends JPanel {
 			dbParameters.add(entry.getKey());
 	    }
 		
-		List<String> newParameters = new ArrayList<String>();
+		//System.out.println("db" + dbParameters);
+		//System.out.println("imported" + getParamersImported());
+		
+		HashSet<String> newParameters = new HashSet<String>();
 		 for(int columnCounter =0; columnCounter< getImportTable().getColumnCount();++columnCounter){
-	    	String columnName = getImportTable().getColumnName(columnCounter);	
-	    	if(!dbParameters.contains(columnName) && getParamersImported().contains(columnName)){				    		
+	    	String columnName = getImportTable().getColumnName(columnCounter).trim();
+	    	if(!dbParameters.contains(columnName) && getParamersImported().contains(columnName)){	
+	    		columnName = WordUtils.capitalizeFully(columnName);
 	    		newParameters.add(columnName);
 	    	}
 		 }
@@ -614,6 +620,7 @@ public class PhenotypeImportPanel extends JPanel {
 		setImportTable(table);
 		table.setShowGrid(true);
 		table.setRowSelectionAllowed(false);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.addMouseListener(new MouseListener() {
 
 			public void mouseClicked(MouseEvent e) {
@@ -656,7 +663,7 @@ public class PhenotypeImportPanel extends JPanel {
 		
 		final JTableHeader header = table.getTableHeader();
         header.setReorderingAllowed(false);  
-        header.addMouseListener(new MouseAdapter() {  
+        header.addMouseListener(new MouseAdapter() {  	
             public void mouseClicked(MouseEvent e) {  
                 int col = header.columnAtPoint(e.getPoint());   
                 if(header.getCursor().getType() == Cursor.E_RESIZE_CURSOR)  
@@ -670,7 +677,7 @@ public class PhenotypeImportPanel extends JPanel {
           }  
         });  
        
-		JScrollPane tableScrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane tableScrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		importTablePanel.add(tableScrollPane,"span, w 100%, h 100%, wrap");
 		setImportTablePanel(importTablePanel);
 		setCurrentTable(table);
@@ -816,6 +823,7 @@ public class PhenotypeImportPanel extends JPanel {
 								 if(option == JOptionPane.OK_OPTION)
 								 {
 									 addNewParameterPerformed(newParameter);
+									 setParametersInfo();
 								 }else{
 									 int parameterCol = getImportTable().getColumnModel().getColumnIndex(newParameter);									
 									 deleteColumn(parameterCol);
@@ -871,7 +879,6 @@ public class PhenotypeImportPanel extends JPanel {
 						if (value.equalsIgnoreCase("null") || value.equalsIgnoreCase("")){
 							table.setValueAt("", row, tomColumn-1);
 						}
-						//System.out.println(String.valueOf(table.getValueAt(row, 2)) + " - " + table.getColumnName(tomColumn) + " - " + table.getValueAt( row, tomColumn-1));
 						Object tom = String.valueOf(table.getValueAt(row, tomColumn)).trim().equals("") ?
 								null :  table.getValueAt(row, tomColumn);
 						if(tom == null){
@@ -886,7 +893,7 @@ public class PhenotypeImportPanel extends JPanel {
 									table.setValueAt(convertedDate, row, tomColumn);
 								} catch (ParseException e) {
 									// TODO Auto-generated catch block
-									
+									System.out.println(row + " - " + tom);
 									JOptionPane.showMessageDialog(null, "Please check the row with observation_unit_id "+table.getValueAt(row, 0)+". Tom value: "+String.valueOf(tom)+".\nTom columns format has to be MM/dd/yy.");
 									return null;
 								}
@@ -905,6 +912,8 @@ public class PhenotypeImportPanel extends JPanel {
 					for(int row = 0; row < table.getRowCount();++row){
 						int result = syncWithDatabase(row,session);
 						if (result == -1) {
+							table.repaint();
+							session.close();
 							return null;
 						}
 						if ( row % 1000 == 0 ) { 
@@ -916,6 +925,8 @@ public class PhenotypeImportPanel extends JPanel {
 					for(int row : getValueChangedRows()){
 						int result = syncWithDatabase(row,session);
 						if (result == -1) {
+							table.repaint();
+							session.close();
 							return null;
 						}
 						if ( row % 1000 == 0 ) { 
@@ -954,9 +965,10 @@ public class PhenotypeImportPanel extends JPanel {
 				if(measurementIdList == null){			
 					int measurementId = MeasurementValueDAO.getInstance().insert(obsUnitId, parameterId, value, tom, session);
 					if (measurementId == 0) {
+						//System.out.println("Skip " + obsUnitId + ", " + parameterId+ ", " + value+ ", " +  tom);
 						JOptionPane.showConfirmDialog(
 								 null,
-	                            "<HTML><FONT COLOR = Red>*</FONT> Can not sync duplicate records.</HTML>",
+	                            "<HTML><FONT COLOR = Red>*</FONT> Record Already Exist: " + obsUnitId + ", " + parameter + ", " + tom + " </HTML>",
 	                            "Error!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
 						return -1;
 						
@@ -989,7 +1001,8 @@ public class PhenotypeImportPanel extends JPanel {
 	    removeAllRowsFromTable(tableModel);	
 		for(Object[] row : exportTableRows){
 			tableModel.addRow(row);               
-		}		
+		}	
+		numberofRows.setText(String.valueOf(getImportTable().getRowCount()));
 	}
 	public JComboBox<String> getUniTypeInfo() {
 		return uniTypeInfo;
@@ -1057,11 +1070,11 @@ public class PhenotypeImportPanel extends JPanel {
 	public void setParamersColIndexes(List<Integer> paramersColIndexes) {
 		this.paramersColIndexes = paramersColIndexes;
 	}
-	public List<String> getNewParameters() {
+	public HashSet<String> getNewParameters() {
 		return newParameters;
 	}
 
-	public void setNewParameters(List<String> newParameters) {
+	public void setNewParameters(HashSet<String> newParameters) {
 		this.newParameters = newParameters;
 	}
 

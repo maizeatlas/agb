@@ -79,8 +79,10 @@ public class CreatePhenotypeGroup {
      				if(LoggerUtils.isLogEnabled())
      				{
      					LoggerUtils.log(Level.INFO, "error in loading Phenotype group " + groupName);
+     					System.out.println("error in loading Phenotype group " + groupName);
+     					e.printStackTrace();
      				}
-     				 TabComponent phenoTab = createphenotypePanel(projectId, groupPath,groupName, null,null);
+     				TabComponent phenoTab = createphenotypePanel(projectId, groupPath,groupName, null,null);
  			        groupNode.setTabComponent(phenoTab); 
 				}
      		}

@@ -9,6 +9,7 @@ import org.accretegb.modules.hibernate.MeasurementParameter;
 import org.accretegb.modules.hibernate.ObservationUnit;
 import org.accretegb.modules.hibernate.Stock;
 import org.accretegb.modules.util.LoggerUtils;
+import org.accretegb.modules.hibernate.Experiment;
 import org.accretegb.modules.hibernate.HibernateSessionFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -64,9 +65,11 @@ public class MeasurementValueDAO {
 	
 	public int insert(int observationUnitId, int parameterId, String value, Date time, Session session){
 		try{
+			// searching to make sure record exists would be way too slow
 			MeasurementValue measurement = new MeasurementValue();
 			MeasurementParameter measurementParameter= (MeasurementParameter) session.load(MeasurementParameter.class, parameterId);
-			ObservationUnit ObservationUnit= (ObservationUnit) session.load(ObservationUnit.class, observationUnitId);		
+			ObservationUnit ObservationUnit= (ObservationUnit) session.load(ObservationUnit.class, observationUnitId);	
+			
 			
 			measurement.setMeasurementParameter(measurementParameter);
 			measurement.setObservationUnit(ObservationUnit);
@@ -74,6 +77,7 @@ public class MeasurementValueDAO {
 			measurement.setTom(time);				
 			session.save(measurement);
 			return measurement.getMeasurementValueId();
+			
 		}catch (HibernateException ex) {
 			if(LoggerUtils.isLogEnabled())
 			{
