@@ -117,6 +117,7 @@ public class PhenotypeImportPanel extends JPanel {
 	boolean hasSynced = false;
 	private JProgressBar progress = new JProgressBar(0, 100);
 	private JLabel numberofRows;
+	DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
 
 	public void initialize() {
 		
@@ -307,7 +308,7 @@ public class PhenotypeImportPanel extends JPanel {
 					int newid = MeasurementParameterDAO.getInstance().insert(newParaInfo);
 					newParaInfo.set(12, String.valueOf(newid));
 					invalid = false;
-					getParameterNameIDMap().put(values[0].trim(), newid);
+					getParameterNameIDMap().put(capitalizeFirstLetter(values[0]), newid);
 				}else{
 					JOptionPane.showConfirmDialog(
 							 addNewParemeterPanel,
@@ -375,51 +376,53 @@ public class PhenotypeImportPanel extends JPanel {
 					List<String> parametersAndTom =  new ArrayList<String>();
 					for(String header : headers)
 					{
-						if(!Arrays.asList(descriptors).contains(header)){
+						if(!Arrays.asList(descriptors).contains(header.toLowerCase())){
 					
 							parametersAndTom.add(header);
 						}
 			    	}
 					
-					for(int index = 0; index < parametersAndTom.size();++index){
+					for(int index = 0; index < parametersAndTom.size(); index = index + 2){
+						String paramCol = parametersAndTom.get(index);
+						String tomCol = parametersAndTom.get(index + 1);
+						String expectedTomCol = "tom_" + paramCol;
 
-						if(index + 1 == parametersAndTom.size()){
-							int insert = headers.indexOf(parametersAndTom.get(index));
-							headers.add(insert+1,"tom_"+parametersAndTom.get(index));
-						}
-						else if(!parametersAndTom.get(index+1).equals("tom_"+parametersAndTom.get(index))){
-							int insert = headers.indexOf(parametersAndTom.get(index));
-							headers.add(insert+1,"tom_"+parametersAndTom.get(index));
-						}
-						else{
-							index = index + 1;
-						}
-					}
-					if(!headers.contains("measurement_value_id")){
-						headers.add("measurement_value_id");
-					}
-					String[] colIndentifiers = new String[headers.size()];
-					colIndentifiers = headers.toArray(colIndentifiers);
-					((DefaultTableModel) getImportTable().getModel()).setColumnIdentifiers(colIndentifiers);
-					getImportTable().setGridColor(Color.LIGHT_GRAY);
-					String dataLine = br.readLine();
-					
-					while (dataLine != null) {
-						dataLine = dataLine.trim();
-						List<String> rowdata = Arrays.asList(dataLine.split(","));
-						Object[] row = new Object[rowdata.size()];
-						row = rowdata.toArray(row);
-						try{
-							Integer.parseInt(String.valueOf(row[0]));
-						}
-						catch(Exception e){
-							getImportTable().setModel(new DefaultTableModel());
-							JOptionPane.showMessageDialog(null, "Invalid input File", "Error", JOptionPane.ERROR_MESSAGE);
+						if (!expectedTomCol.toLowerCase().trim().equals(tomCol.toLowerCase().trim())) {
+							JOptionPane.showMessageDialog(null, "Mising "+expectedTomCol+" column", "Error", JOptionPane.ERROR_MESSAGE);
 							validInput = false;
 							break;
 						}
-						((DefaultTableModel) getImportTable().getModel()).addRow(row);
-						dataLine = br.readLine();
+					}
+					if (validInput) {
+						if(!headers.contains("measurement_value_id")){
+							headers.add("measurement_value_id");
+						}
+						String[] colIndentifiers = new String[headers.size()];
+						colIndentifiers = headers.toArray(colIndentifiers);
+						for (int i = 0; i < colIndentifiers.length; i++) {
+							colIndentifiers[i] = capitalizeFirstLetter(colIndentifiers[i]);
+						}
+						((DefaultTableModel) getImportTable().getModel()).setColumnIdentifiers(colIndentifiers);
+						getImportTable().setGridColor(Color.LIGHT_GRAY);
+						String dataLine = br.readLine();
+						
+						while (dataLine != null) {
+							dataLine = dataLine.trim();
+							List<String> rowdata = Arrays.asList(dataLine.split(","));
+							Object[] row = new Object[rowdata.size()];
+							row = rowdata.toArray(row);
+							try{
+								Integer.parseInt(String.valueOf(row[0]));
+							}
+							catch(Exception e){
+								getImportTable().setModel(new DefaultTableModel());
+								JOptionPane.showMessageDialog(null, "Invalid input File", "Error", JOptionPane.ERROR_MESSAGE);
+								validInput = false;
+								break;
+							}
+							((DefaultTableModel) getImportTable().getModel()).addRow(row);
+							dataLine = br.readLine();
+						}
 					}
 									
 					br.close();
@@ -530,8 +533,9 @@ public class PhenotypeImportPanel extends JPanel {
 			List<String> values = new ArrayList<String>();
 			values.add(dmp.getMinValue());
 			values.add(dmp.getMaxValue());
-			parameterNameValuesMap.put(dmp.getParameterName(), values);
-			parameterInfomap.put(dmp.getParameterName(), dmp.getMeasurementParameterId());
+			String paraName = capitalizeFirstLetter(dmp.getParameterName());
+			parameterNameValuesMap.put(paraName, values);
+			parameterInfomap.put(paraName, dmp.getMeasurementParameterId());
 			if(dmp.getParameterCode()!=null)
 			{
 				parameterInfomap.put(dmp.getParameterCode(), dmp.getMeasurementParameterId());
@@ -546,7 +550,7 @@ public class PhenotypeImportPanel extends JPanel {
 		if(!getImportTable().getColumnName(0).equals("")){
 			for(int columnCounter =0; columnCounter< getImportTable().getColumnCount();++columnCounter){
 		    	String columnName = getImportTable().getColumnName(columnCounter);	
-		    	if(!Arrays.asList(descriptors).contains(columnName))
+		    	if(!Arrays.asList(descriptors).contains(columnName.toLowerCase()))
 		    	{	if(!StringUtils.substring(columnName,0,3).equals("tom")){
 			    		 getParamersImported().add(columnName);
 			    	}else{
@@ -709,7 +713,7 @@ public class PhenotypeImportPanel extends JPanel {
 	    	
 			String parameter = (String) getImportTable().getColumnModel().getColumn(column).getHeaderValue();
 		
-			if(!getNewParameters().contains(parameter))
+			if(!getNewParameters().contains(parameter) && getParameterNameValuesMap().containsKey(parameter))
 			{
 				
 				Object min = getParameterNameValuesMap().get(parameter).get(0);
@@ -813,7 +817,7 @@ public class PhenotypeImportPanel extends JPanel {
 							 {
 								
 								 int option= JOptionPane.showOptionDialog(null, 
-									        "Compelete information for "+newParameter+" ?", 
+									        "Complete information for "+newParameter+" ?", 
 									        "", 
 									        JOptionPane.OK_CANCEL_OPTION, 
 									        JOptionPane.INFORMATION_MESSAGE, 
@@ -876,27 +880,22 @@ public class PhenotypeImportPanel extends JPanel {
 	        	for(int tomColumn : getTomColIndexes()){
 					for(int row = 0; row < table.getRowCount();++row){		
 						String value = String.valueOf(table.getValueAt(row, tomColumn-1)).trim();
-						if (value.equalsIgnoreCase("null") || value.equalsIgnoreCase("")){
-							table.setValueAt("", row, tomColumn-1);
+						if (String.valueOf(value).equals("null")){
+							continue;
 						}
 						Object tom = String.valueOf(table.getValueAt(row, tomColumn)).trim().equals("") ?
 								null :  table.getValueAt(row, tomColumn);
 						if(tom == null){
 							 table.setValueAt(date, row, tomColumn);
 						}else{
-							if(tom instanceof Date){
-								break;
-							}else{
-								DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
-								try {
-									Date convertedDate = (Date)formatter.parse(String.valueOf(tom));
-									table.setValueAt(convertedDate, row, tomColumn);
-								} catch (ParseException e) {
-									// TODO Auto-generated catch block
-									System.out.println(row + " - " + tom);
-									JOptionPane.showMessageDialog(null, "Please check the row with observation_unit_id "+table.getValueAt(row, 0)+". Tom value: "+String.valueOf(tom)+".\nTom columns format has to be MM/dd/yy.");
-									return null;
-								}
+							try {
+								Date convertedDate = (Date)formatter.parse(String.valueOf(tom));
+								table.setValueAt(formatter.format(convertedDate), row, tomColumn);
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								System.out.println(row + " - " + tom);
+								JOptionPane.showMessageDialog(null, "Please check the row with observation_unit_id "+table.getValueAt(row, 0)+". Tom value: "+String.valueOf(tom)+".\nTom columns format has to be MM/dd/yy.");
+								return null;
 							}
 							
 						}
@@ -944,44 +943,58 @@ public class PhenotypeImportPanel extends JPanel {
 	        return null;
 	    }
 	    
-	    public int syncWithDatabase(int row,Session session){
+	    public int syncWithDatabase(int row, Session session){
 	    	int measurementCol = table.getColumnModel().getColumnIndex("measurement_value_id");
-	    	int obsUnitId = Integer.parseInt((String) table.getValueAt(row, 0));	
-			List<Integer> measurementIds = new ArrayList<Integer>();
-			int index = -1;
-			for(String parameter : getParamersImported())
-			{
-				index++;
-				int parameterId = getParameterNameIDMap().get(parameter);
-				int parameterCol = table.getColumnModel().getColumnIndex(parameter);
-				int tomCol = parameterCol+1;
-				String value = String.valueOf(table.getValueAt(row, parameterCol));
-				Object  measurementIdList = table.getValueAt(row, measurementCol);	
-				Date tom = null;
-				if (table.getValueAt(row, tomCol) != null){
-					tom = (Date)table.getValueAt(row, tomCol);
-				}
+	    	int obsUnitId = Integer.parseInt((String) table.getValueAt(row, 0));
 
-				if(measurementIdList == null){			
-					int measurementId = MeasurementValueDAO.getInstance().insert(obsUnitId, parameterId, value, tom, session);
-					if (measurementId == 0) {
-						//System.out.println("Skip " + obsUnitId + ", " + parameterId+ ", " + value+ ", " +  tom);
-						JOptionPane.showConfirmDialog(
-								 null,
-	                            "<HTML><FONT COLOR = Red>*</FONT> Record Already Exist: " + obsUnitId + ", " + parameter + ", " + tom + " </HTML>",
-	                            "Error!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-						return -1;
-						
-					}else {
-						measurementIds.add( measurementId);
+			List<Integer> measurementIds = new ArrayList<Integer>();
+			System.out.println("row" + row);
+			for (int colIndex = 0; colIndex < table.getColumnCount(); colIndex++) {
+				String colName = table.getColumnName(colIndex);
+				System.out.println(colName + ", " + getParamersImported().contains(colName));
+				if (getParamersImported().contains(colName)) {
+					int parameterCol = colIndex;
+					int tomCol = parameterCol+1;
+					int parameterId = getParameterNameIDMap().get(colName);
+					String value = String.valueOf(table.getValueAt(row, parameterCol));
+					Object  measurementIdList = table.getValueAt(row, measurementCol);	
+					Date tom = null;
+
+					if (!String.valueOf(table.getValueAt(row, tomCol)).trim().equals("null")){
+						System.out.println("1 - " + table.getValueAt(row, tomCol));
+						try {
+							tom = formatter.parse(String.valueOf(table.getValueAt(row, tomCol)));
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println("2 - " + tom);
+
+						if(measurementIdList == null){			
+							int measurementId = MeasurementValueDAO.getInstance().insert(obsUnitId, parameterId, value, tom, session);
+							if (measurementId == 0) {
+								System.out.println("Skip " + obsUnitId + ", " + parameterId+ ", " + value+ ", " +  tom);
+								JOptionPane.showConfirmDialog(
+										 null,
+			                            "<HTML><FONT COLOR = Red>*</FONT> Record Already Exist: " + obsUnitId + ", " + colName + ", " + tom + " </HTML>",
+			                            "Error!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+								return -1;
+								
+							}else {
+								measurementIds.add(measurementId);
+							}
+							
+							
+						}else{
+							measurementIds = (List<Integer>) measurementIdList;
+							MeasurementValueDAO.getInstance().update(obsUnitId, parameterId, value, tom, measurementIds.get(colIndex),session);
+						}
 					}
+
 					
-					
-				}else{
-					measurementIds = (List<Integer>) measurementIdList;
-					MeasurementValueDAO.getInstance().update(obsUnitId, parameterId, value, tom, measurementIds.get(index),session);
+					progress.setValue((int) ((row * 1.0 / table.getRowCount()) * 100));	
+					colIndex = colIndex + 1;
 				}
-				progress.setValue((int) ((row * 1.0 / table.getRowCount()) * 100));	
 			}
 		
 			table.setValueAt(measurementIds, row, measurementCol);
@@ -993,6 +1006,20 @@ public class PhenotypeImportPanel extends JPanel {
 	        long duration = System.currentTimeMillis() - initialTime;        
   	        System.out.println("Time: " + duration / 1000);						
 	        progress.setVisible(false);
+	    }
+	}
+	
+	public String capitalizeFirstLetter(String original) {
+	    if (original == null || original.length() == 0 || Arrays.asList(descriptors).contains(original)) {
+	        return original.trim();
+	    }
+	    original = original.trim().toLowerCase();
+	    if (original.contains("tom")) {
+	    	String param = original.split("tom_")[1];
+	    	return "tom_"+ param.substring(0, 1).toUpperCase() + param.substring(1);
+	    }else {
+		    return original.substring(0, 1).toUpperCase() + original.substring(1);
+
 	    }
 	}
 	
@@ -1099,6 +1126,8 @@ public class PhenotypeImportPanel extends JPanel {
 	public void setCurrentTable(JTable currentTable) {
 		this.currentTable = currentTable;
 	}
+	
+	
 	
 
 }
