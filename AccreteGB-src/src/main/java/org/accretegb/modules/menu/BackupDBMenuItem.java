@@ -82,7 +82,7 @@ public class BackupDBMenuItem extends MenuItem{
             
             String PMcmd = " --host=" + server + " --port=" + port 
             		+" --user=\"" + username + "\" --password='" + password 
-            		+"'  " + LoginScreen.PROJECT_MANAGER_DB_NAME + " --ignore-table=" + LoginScreen.PROJECT_MANAGER_DB_NAME + ".user  > " + AGBpmPath;
+            		+"'  " + LoginScreen.PROJECT_MANAGER_DB_NAME + " > " + AGBpmPath;
             
             
             //String mysqldump = this.getClass().getClassLoader().getResource("mysqlcmds/mysqldump").getPath();
