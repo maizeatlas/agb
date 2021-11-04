@@ -591,6 +591,18 @@ public class TableView extends JPanel {
 				}				
 
 				if(validDate){
+					int oldYear = ((Date)table.getValueAt(0, table.getIndexOf(ColumnConstants.PLANTING_DATE))).getYear();
+
+					if(date.getYear() != oldYear){
+						//Year is reset. Reset the index
+						plantingIndex = null;
+						int oldYearKey = Integer.valueOf(String.valueOf(oldYear+1900).substring(2));
+
+						int newMaxIndex = GlobalProjectInfo.getPlantingMaxIndex(oldYearKey) - 1;
+						System.out.println(oldYearKey + " new max index" + newMaxIndex);
+						GlobalProjectInfo.insertPlantingMaxIndex(oldYearKey, newMaxIndex);
+
+					}
 					for(int row: table.getSelectedRows()) {
 						if(((String)table.getValueAt(row, ColumnConstants.TYPES)).equals(ColumnConstants.ROW)) {
 							table.setValueAt(date, row, column);
@@ -1518,27 +1530,25 @@ public class TableView extends JPanel {
 	private String getTagPrefix(Date date){
 		String year = String.valueOf(date.getYear()+1900).substring(2);
 		int season = 0;
-		if (plantingIndex != null)
+		if (plantingIndex == null)
 		{
-			season = Integer.parseInt(plantingIndex);
-		}else{
 			season = ObservationUnitDAO.getInstance().getSeasonIndex(year, String.valueOf(zipcode));
 			plantingIndex = String.valueOf(season);
+			int maxIndex = GlobalProjectInfo.getPlantingMaxIndex(Integer.valueOf(year));
 			// check with other planting groups
-			Object maxIndex = GlobalProjectInfo.getPlantingInfo(projectID, "maxPlantingIndex");
-			if (maxIndex != null && Integer.valueOf(plantingIndex) <= (Integer)maxIndex ) {
+			if (Integer.valueOf(plantingIndex) <= (Integer)maxIndex ) {
 				plantingIndex = String.valueOf((Integer)maxIndex + 1); 
-				GlobalProjectInfo.insertNewPlantingInfo(projectID, "maxPlantingIndex", Integer.valueOf(plantingIndex));
+				GlobalProjectInfo.insertPlantingMaxIndex(Integer.valueOf(year), Integer.valueOf(plantingIndex));
 			} else {
-				GlobalProjectInfo.insertNewPlantingInfo(projectID, "maxPlantingIndex", Integer.valueOf(plantingIndex));
+				GlobalProjectInfo.insertPlantingMaxIndex(Integer.valueOf(year), Integer.valueOf(plantingIndex));
 			}
 			
 		}
 		//System.out.println("season " + season);
 		StringBuffer prefixbuffer = new StringBuffer();
-		prefixbuffer.append(year).append('.').append(season).append('.').append(String.valueOf(zipcode)).append('.').toString();
+		prefixbuffer.append(year).append('.').append(plantingIndex).append('.').append(String.valueOf(zipcode)).append('.').toString();
 		prefix = prefixbuffer.toString(); 
-		//System.out.println(" new prefix " + prefix);
+		System.out.println(" new prefix " + prefix);
 		return prefix;	
 
 	} 

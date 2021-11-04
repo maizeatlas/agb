@@ -10,6 +10,8 @@ public class GlobalProjectInfo {
 	
 	private static HashMap<Integer, HashMap<String, HashMap<String, Object>>> projectInfo = new HashMap<Integer, HashMap<String, HashMap<String, Object>>>();
 	
+	private static HashMap<String, Integer> plantingIndexInfo = new HashMap<String, Integer>();
+	
 	public static HashMap<Integer, HashMap<String, HashMap<String, Object>>> getProjectInfo () {
 		return projectInfo;
 	}
@@ -29,6 +31,17 @@ public class GlobalProjectInfo {
 		projectInfo.get(projectId).get(plantingKey).put(key, value);
 		JSONObject toPrint = new JSONObject( GlobalProjectInfo.getProjectInfo());
 		System.out.println("Current Project Info - " + toPrint);
+	}
+	
+	public static void insertPlantingMaxIndex(int year, int index) {
+		plantingIndexInfo.put(String.valueOf(year)+"MaxIndex", index);
+	}
+	
+	public static int getPlantingMaxIndex(int year) {
+		if (plantingIndexInfo.containsKey(String.valueOf(year)+"MaxIndex")){
+			return plantingIndexInfo.get(String.valueOf(year)+"MaxIndex");
+		}
+		return 0;
 	}
 	
 	public static void insertNewSamplingInfo(int projectId, String key, Object value) {

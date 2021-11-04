@@ -83,12 +83,11 @@ public class ParsePlantingGroup implements Serializable {
 			
 			// set up max planting index 
 			String firstTag = (String) tableView.get(0)[7];
-			String currentIndex = firstTag.split("\\.")[1];
-			Object maxIndex = GlobalProjectInfo.getPlantingInfo(projectId, "maxPlantingIndex");
-			if (maxIndex != null && Integer.valueOf(currentIndex) > (Integer)maxIndex ) {
-				GlobalProjectInfo.insertNewPlantingInfo(projectId, "maxPlantingIndex", Integer.valueOf(currentIndex));
-			}else {
-				GlobalProjectInfo.insertNewPlantingInfo(projectId, "maxPlantingIndex", Integer.valueOf(currentIndex));
+			int year = Integer.valueOf(firstTag.split("\\.")[0]);
+			int currentIndex = Integer.valueOf(firstTag.split("\\.")[1]);
+			int maxIndex = GlobalProjectInfo.getPlantingMaxIndex(year);
+			if (Integer.valueOf(currentIndex) > maxIndex ) {
+				GlobalProjectInfo.insertPlantingMaxIndex(Integer.valueOf(year), Integer.valueOf(currentIndex));
 			}
 			
 		  } catch (Exception e) {
